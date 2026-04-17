@@ -1,0 +1,78 @@
+{
+  "landing": {
+    "hero": {
+      "title": "Твой сервис для творчества",
+      "cta": "Начать"
+    },
+    "steps": {
+      "heading1": "Всего 3 шага",
+      "heading2": "и начинай творить!",
+      "step1": {
+        "number": "1",
+        "text": "Создай коллектив или прими приглашение"
+      },
+      "step2": {
+        "number": "2",
+        "text": "Создай профиль и укажи свой инструмент"
+      },
+      "step3": {
+        "number": "3",
+        "text": "Начинай получать удовольствие от музыки!"
+      }
+    }
+  },
+  "auth": {
+    "select": {
+      "register": "Зарегистрироваться",
+      "login": "Войти"
+    },
+    "login": {
+      "title": "Вход",
+      "username": "Имя пользователя",
+      "password": "Пароль",
+      "submit": "Войти",
+      "back": "Назад"
+    },
+    "errors": {
+      "usernameRequired": "Введите имя пользователя",
+      "usernameMinLength": "Минимум 3 символа",
+      "usernameNoSpaces": "Не должно содержать пробелов",
+      "usernameLatinOnly": "Только латинские буквы, цифры и _",
+      "nameRequired": "Введите имя",
+      "emailRequired": "Введите email",
+      "emailInvalid": "Некорректный email",
+      "passwordRequired": "Введите пароль",
+      "passwordMinLength": "Минимум 8 символов",
+      "birthDateRequired": "Укажите дату рождения",
+      "birthDateFuture": "Дата не может быть в будущем",
+      "loginFailed": "Неверное имя пользователя или пароль",
+      "loginError": "Ошибка входа. Попробуйте позже",
+      "registerFailed": "Ошибка регистрации",
+      "registerError": "Ошибка регистрации. Попробуйте позже"
+    },
+    "register": {
+      "title": "Регистрация",
+      "step1": "Основные данные",
+      "step2": "Дополнительная информация",
+      "username": "Имя пользователя",
+      "name": "Имя",
+      "email": "Email",
+      "password": "Пароль",
+      "birthDate": "Дата рождения",
+      "preferredLanguage": "Предпочитаемый язык",
+      "location": "Местоположение (необязательно)",
+      "avatar": "Аватар",
+      "next": "Далее",
+      "back": "Назад",
+      "submit": "Зарегистрироваться"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard (coming soon)",
+    "welcome": "Добро пожаловать, {{username}}!",
+    "logout": "Выйти"
+  },
+  "language": {
+    "current": "РУС"
+  }
+}

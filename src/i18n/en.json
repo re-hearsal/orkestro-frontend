@@ -1,0 +1,78 @@
+{
+  "landing": {
+    "hero": {
+      "title": "Your creative service",
+      "cta": "Get started"
+    },
+    "steps": {
+      "heading1": "Just 3 steps",
+      "heading2": "and start creating!",
+      "step1": {
+        "number": "1",
+        "text": "Create a collective or accept an invitation"
+      },
+      "step2": {
+        "number": "2",
+        "text": "Create a profile and specify your instrument"
+      },
+      "step3": {
+        "number": "3",
+        "text": "Start enjoying music!"
+      }
+    }
+  },
+  "auth": {
+    "select": {
+      "register": "Sign up",
+      "login": "Log in"
+    },
+    "login": {
+      "title": "Log in",
+      "username": "Username",
+      "password": "Password",
+      "submit": "Log in",
+      "back": "Back"
+    },
+    "errors": {
+      "usernameRequired": "Enter a username",
+      "usernameMinLength": "At least 3 characters",
+      "usernameNoSpaces": "Must not contain spaces",
+      "usernameLatinOnly": "Only Latin letters, digits and _",
+      "nameRequired": "Enter your name",
+      "emailRequired": "Enter your email",
+      "emailInvalid": "Invalid email address",
+      "passwordRequired": "Enter a password",
+      "passwordMinLength": "At least 8 characters",
+      "birthDateRequired": "Enter your date of birth",
+      "birthDateFuture": "Date cannot be in the future",
+      "loginFailed": "Invalid username or password",
+      "loginError": "Login error. Please try again later",
+      "registerFailed": "Registration error",
+      "registerError": "Registration error. Please try again later"
+    },
+    "register": {
+      "title": "Sign up",
+      "step1": "Basic info",
+      "step2": "Additional info",
+      "username": "Username",
+      "name": "Name",
+      "email": "Email",
+      "password": "Password",
+      "birthDate": "Date of birth",
+      "preferredLanguage": "Preferred language",
+      "location": "Location (optional)",
+      "avatar": "Avatar",
+      "next": "Next",
+      "back": "Back",
+      "submit": "Sign up"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard (coming soon)",
+    "welcome": "Welcome, {{username}}!",
+    "logout": "Log out"
+  },
+  "language": {
+    "current": "ENG"
+  }
+}
