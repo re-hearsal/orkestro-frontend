@@ -1,12 +1,11 @@
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 
 export default function DashboardPage() {
-  const { user, profile, logout } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
 

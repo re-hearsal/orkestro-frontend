@@ -48,7 +48,8 @@
       "loginFailed": "Invalid username or password",
       "loginError": "Login error. Please try again later",
       "registerFailed": "Registration error",
-      "registerError": "Registration error. Please try again later"
+      "registerError": "Registration error. Please try again later",
+      "sessionExpired": "Session expired. Please log in again"
     },
     "register": {
       "title": "Sign up",
@@ -72,7 +73,253 @@
     "welcome": "Welcome, {{username}}!",
     "logout": "Log out"
   },
+  "user": {
+    "profile": "My profile",
+    "logout": "Log out"
+  },
+  "nav": {
+    "organizations": "My organizations",
+    "calendar": "My calendar",
+    "settings": "Settings"
+  },
+  "sidebar": {
+    "joinRequests": "Requests"
+  },
   "language": {
     "current": "ENG"
+  },
+  "organizations": {
+    "emptyState": {
+      "text": "Create your organization or join an existing one via an invite link!",
+      "createButton": "Create organization"
+    },
+    "page": {
+      "currentSection": "Current organization",
+      "othersSection": "Other organizations",
+      "createButton": "Create organization"
+    },
+    "card": {
+      "organizers": "Organizers"
+    },
+    "createForm": {
+      "title": "Create organization",
+      "name": "Name",
+      "namePlaceholder": "Enter organization name",
+      "location": "Location",
+      "locationPlaceholder": "Enter location",
+      "description": "Description (optional)",
+      "descriptionPlaceholder": "Tell people about your organization",
+      "profileImage": "Profile image",
+      "socialLinks": "Social links",
+      "addLink": "Add link",
+      "removeLink": "Remove",
+      "linkType": "Type",
+      "linkUrl": "URL",
+      "linkUrlPlaceholder": "https://example.com",
+      "linkTypes": {
+        "WEBSITE": "Website",
+        "VK": "VK",
+        "YOUTUBE": "YouTube",
+        "INSTAGRAM": "Instagram",
+        "FACEBOOK": "Facebook",
+        "TELEGRAM": "Telegram",
+        "OTHER": "Other"
+      },
+      "submit": "Create",
+      "errors": {
+        "nameRequired": "Enter a name",
+        "nameMinLength": "At least 3 characters",
+        "nameMaxLength": "Maximum 255 characters",
+        "locationRequired": "Enter a location",
+        "locationMaxLength": "Maximum 255 characters",
+        "descriptionMaxLength": "Maximum 1000 characters",
+        "linkTypeDuplicate": "This link type is already added",
+        "linkUrlRequired": "Enter a URL",
+        "linkUrlInvalid": "Invalid URL",
+        "createFailed": "Could not create organization. Please try again"
+      },
+      "success": "Organization created successfully"
+    },
+    "editForm": {
+      "title": "Edit organization",
+      "submit": "Save",
+      "success": "Organization updated successfully",
+      "errors": {
+        "nameMinLength": "At least 3 characters",
+        "nameMaxLength": "Maximum 255 characters",
+        "locationMaxLength": "Maximum 255 characters",
+        "descriptionMaxLength": "Maximum 1000 characters",
+        "linkTypeDuplicate": "This link type is already added",
+        "linkUrlRequired": "Enter a URL",
+        "linkUrlInvalid": "Invalid URL",
+        "saveFailed": "Could not save organization. Please try again"
+      }
+    },
+    "profile": {
+      "editButton": "Edit organization",
+      "yourRole": "Your role",
+      "changeAvatar": "Change organization image",
+      "removeAvatar": "Remove organization image",
+      "avatarUploadError": "Could not upload image",
+      "avatarUpdateError": "Could not update organization image",
+      "avatarDeleteError": "Could not remove organization image",
+      "avatarUnknownError": "Could not update image. Please try again",
+      "loadError": "Could not load organization profile",
+      "memberContextError": "Could not load your role in this organization",
+      "membersSection": "Members",
+      "eventsSection": "Upcoming events",
+      "leaveButton": "Leave organization"
+    },
+    "members": {
+      "searchPlaceholder": "Search by name",
+      "filterByRole": "Role",
+      "filterByInstrument": "Instrument",
+      "loadMore": "Load more",
+      "empty": "No members found",
+      "loadError": "Could not load members",
+      "assignRole": "Assign role",
+      "removeRole": "Delete",
+      "changeRole": "Change role",
+      "roleAssigned": "Role assigned",
+      "roleRemoved": "Role removed"
+    },
+    "instrumentNames": {
+      "conductor": "Conductor",
+      "violin": "Violin",
+      "viola": "Viola",
+      "cello": "Cello",
+      "doubleBass": "Double bass",
+      "flute": "Flute",
+      "altoFlute": "Alto flute",
+      "piccolo": "Piccolo",
+      "oboe": "Oboe",
+      "englishHorn": "English horn",
+      "clarinet": "Clarinet",
+      "bassClarinet": "Bass clarinet",
+      "bassoon": "Bassoon",
+      "contrabassoon": "Contrabassoon",
+      "saxophone": "Saxophone",
+      "sopranoSaxophone": "Soprano saxophone",
+      "altoSaxophone": "Alto saxophone",
+      "tenorSaxophone": "Tenor saxophone",
+      "baritoneSaxophone": "Baritone saxophone",
+      "trumpet": "Trumpet",
+      "cornet": "Cornet",
+      "flugelhorn": "Flugelhorn",
+      "trombone": "Trombone",
+      "bassTrombone": "Bass trombone",
+      "tuba": "Tuba",
+      "euphonium": "Euphonium",
+      "frenchHorn": "French horn",
+      "triangle": "Triangle",
+      "tamTam": "Tam-tam",
+      "timpani": "Timpani",
+      "xylophone": "Xylophone",
+      "marimba": "Marimba",
+      "vibraphone": "Vibraphone",
+      "glockenspiel": "Glockenspiel",
+      "tubularBells": "Tubular bells",
+      "piano": "Piano",
+      "harpsichord": "Harpsichord",
+      "organ": "Organ",
+      "keyboard": "Keyboard",
+      "synthesizer": "Synthesizer",
+      "guitar": "Guitar",
+      "electricGuitar": "Electric guitar",
+      "bassGuitar": "Bass guitar",
+      "drums": "Drums",
+      "percussion": "Percussion",
+      "vocal": "Vocal",
+      "choir": "Choir",
+      "choirSoprano": "Choir soprano",
+      "choirAlto": "Choir alto",
+      "choirTenor": "Choir tenor",
+      "choirBass": "Choir bass",
+      "accordion": "Accordion",
+      "harp": "Harp",
+      "ukulele": "Ukulele"
+    },
+    "roleNames": {
+      "leader": "Leader",
+      "coLeader": "Co-leader"
+    },
+    "leaveDialog": {
+      "title": "Leave organization",
+      "confirmText": "Are you sure you want to leave this organization?",
+      "leaderWarning": "Warning! You are the leader of this organization. If you leave and are the last remaining member, all organization data will be permanently deleted.",
+      "leaveFailed": "Could not leave organization",
+      "leaveSuccess": "You left the organization",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    },
+    "events": {
+      "rehearsal": "Rehearsal",
+      "concert": "Concert",
+      "other": "Other",
+      "empty": "No events in this period",
+      "loadError": "Could not load events"
+    },
+    "invite": {
+      "label": "Invite link",
+      "inviteFriends": "Invite friends!",
+      "copyButton": "Copy",
+      "copied": "Copied!",
+      "regenerateButton": "Regenerate",
+      "regenerateConfirm": "Are you sure? The old link will stop working."
+    }
+  },
+  "join": {
+    "title": "Join organization",
+    "descriptionLabel": "Tell us about yourself (optional)",
+    "submitButton": "Submit request",
+    "successMessage": "Request sent! Please wait for a decision.",
+    "invalidCode": "The invite link is invalid or expired.",
+    "alreadyPending": "You have already submitted a request to this organization.",
+    "homeButton": "Go to home"
+  },
+  "joinRequests": {
+    "title": "Join requests",
+    "submittedAt": "Submitted: {{date}}",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approved": "Request approved",
+    "rejected": "Request rejected",
+    "empty": "No pending requests"
+  },
+  "roles": {
+    "form": {
+      "name": "Role name",
+      "permissions": "Permissions",
+      "nameRequired": "Enter a role name",
+      "nameTooShort": "At least 2 characters",
+      "nameTooLong": "Maximum 64 characters"
+    },
+    "createTitle": "Create role",
+    "editTitle": "Edit role",
+    "deleteConfirm": "Delete this role? This action cannot be undone.",
+    "deleteButton": "Delete",
+    "rolesSection": "Technical roles"
+  },
+  "permissions": {
+    "ORG_EDIT": "Edit organization",
+    "ORG_DELETE": "Delete organization",
+    "ORG_WRITE_INFO": "Write info messages",
+    "ORG_FUND_MANIPULATION": "Manage funds",
+    "ORG_MEMBER_REMOVE": "Remove members",
+    "ORG_JOIN_REQUEST_VIEW": "View join requests",
+    "ORG_JOIN_REQUEST_MANAGE": "Manage join requests",
+    "ORG_ASSIGN_TECH_ROLE": "Assign technical roles",
+    "ORG_TECH_ROLE_MANAGE": "Manage technical roles",
+    "REPERTOIRE_CREATE_SONG": "Add repertoire items",
+    "REPERTOIRE_EDIT_SONG": "Edit repertoire items",
+    "REPERTOIRE_DELETE_SONG": "Delete repertoire items",
+    "REPERTOIRE_MANAGE_FILES": "Manage repertoire files",
+    "REPERTOIRE_MANAGE_TAGS": "Manage repertoire tags",
+    "REPERTOIRE_MANAGE_INSTRUMENTATION": "Manage instrumentation",
+    "EVENT_MARK_ATTENDANCE": "Mark attendance",
+    "EVENT_DELETION": "Delete events",
+    "EVENT_MANAGE_DESCRIPTIONS": "Manage event description templates",
+    "EVENT_WRITE_COMMENT": "Write event comments",
+    "TASK_MANAGE": "Manage tasks"
   }
 }

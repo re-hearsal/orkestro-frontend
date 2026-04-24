@@ -2,7 +2,6 @@ import { useState } from 'react';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import Alert from '@mui/material/Alert';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
@@ -13,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import client from '../../api/client';
 import { useAuth } from '../../hooks/useAuth';
+import { useAppAlert } from '../../hooks/useAppAlert';
 
 interface Props {
   onBack: () => void;
@@ -31,8 +31,8 @@ export default function LoginForm({ onBack }: Props) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const { showAlert } = useAppAlert();
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const validate = (): boolean => {
@@ -47,38 +47,36 @@ export default function LoginForm({ onBack }: Props) {
 
   const handleSubmit = async () => {
     if (!validate()) return;
-    setError(null);
     setLoading(true);
     try {
       const { data, error: apiError } = await client.POST('/api/v1/auth/login', {
         body: { username, password },
       });
       if (apiError || !data?.token || !data?.username) {
-        setError((apiError as { message?: string })?.message ?? t('auth.errors.loginFailed'));
+        showAlert((apiError as { message?: string })?.message ?? t('auth.errors.loginFailed'), 'error');
         return;
       }
       login(data.token, data.username);
-      navigate('/dashboard');
+      navigate('/organizations');
     } catch {
-      setError(t('auth.errors.loginError'));
+      showAlert(t('auth.errors.loginError'), 'error');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} component="form" noValidate onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
       <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f3eb5', textAlign: 'center' }}>
         {t('auth.login.title')}
       </Typography>
-
-      {error && <Alert severity="error">{error}</Alert>}
 
       <TextField
         label={t('auth.login.username')}
         value={username}
         onChange={(e) => { setUsername(e.target.value); setFieldErrors((p) => ({ ...p, username: undefined })); }}
         fullWidth
+        required
         error={!!fieldErrors.username}
         helperText={fieldErrors.username}
       />
@@ -88,6 +86,7 @@ export default function LoginForm({ onBack }: Props) {
         value={password}
         onChange={(e) => { setPassword(e.target.value); setFieldErrors((p) => ({ ...p, password: undefined })); }}
         fullWidth
+        required
         error={!!fieldErrors.password}
         helperText={fieldErrors.password}
         slotProps={{
@@ -104,10 +103,10 @@ export default function LoginForm({ onBack }: Props) {
       />
 
       <Button
+        type="submit"
         variant="contained"
         fullWidth
         size="large"
-        onClick={handleSubmit}
         disabled={loading}
         sx={{ bgcolor: '#0f3eb5', '&:hover': { bgcolor: '#0c32a0' }, fontWeight: 'bold' }}
       >

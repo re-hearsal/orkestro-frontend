@@ -48,7 +48,8 @@
       "loginFailed": "Неверное имя пользователя или пароль",
       "loginError": "Ошибка входа. Попробуйте позже",
       "registerFailed": "Ошибка регистрации",
-      "registerError": "Ошибка регистрации. Попробуйте позже"
+      "registerError": "Ошибка регистрации. Попробуйте позже",
+      "sessionExpired": "Сессия истекла. Войдите снова"
     },
     "register": {
       "title": "Регистрация",
@@ -72,7 +73,253 @@
     "welcome": "Добро пожаловать, {{username}}!",
     "logout": "Выйти"
   },
+  "user": {
+    "profile": "Мой профиль",
+    "logout": "Выйти"
+  },
+  "nav": {
+    "organizations": "Мои организации",
+    "calendar": "Мой календарь",
+    "settings": "Настройки"
+  },
+  "sidebar": {
+    "joinRequests": "Заявки"
+  },
   "language": {
     "current": "РУС"
+  },
+  "organizations": {
+    "emptyState": {
+      "text": "Создай свою организацию или присоединись к уже существующей по пригласительной ссылке!",
+      "createButton": "Создать организацию"
+    },
+    "page": {
+      "currentSection": "Текущая организация",
+      "othersSection": "Остальные организации",
+      "createButton": "Создать организацию"
+    },
+    "card": {
+      "organizers": "Организаторы"
+    },
+    "createForm": {
+      "title": "Создать организацию",
+      "name": "Название",
+      "namePlaceholder": "Введите название организации",
+      "location": "Местоположение",
+      "locationPlaceholder": "Введите местоположение",
+      "description": "Описание (необязательно)",
+      "descriptionPlaceholder": "Расскажите об организации",
+      "profileImage": "Изображение профиля",
+      "socialLinks": "Социальные ссылки",
+      "addLink": "Добавить ссылку",
+      "removeLink": "Удалить",
+      "linkType": "Тип",
+      "linkUrl": "URL",
+      "linkUrlPlaceholder": "https://example.com",
+      "linkTypes": {
+        "WEBSITE": "Сайт",
+        "VK": "VK",
+        "YOUTUBE": "YouTube",
+        "INSTAGRAM": "Instagram",
+        "FACEBOOK": "Facebook",
+        "TELEGRAM": "Telegram",
+        "OTHER": "Другое"
+      },
+      "submit": "Создать",
+      "errors": {
+        "nameRequired": "Введите название",
+        "nameMinLength": "Минимум 3 символа",
+        "nameMaxLength": "Максимум 255 символов",
+        "locationRequired": "Введите местоположение",
+        "locationMaxLength": "Максимум 255 символов",
+        "descriptionMaxLength": "Максимум 1000 символов",
+        "linkTypeDuplicate": "Ссылка такого типа уже добавлена",
+        "linkUrlRequired": "Введите URL",
+        "linkUrlInvalid": "Некорректный URL",
+        "createFailed": "Не удалось создать организацию. Попробуйте снова"
+      },
+      "success": "Организация успешно создана"
+    },
+    "editForm": {
+      "title": "Редактировать организацию",
+      "submit": "Сохранить",
+      "success": "Организация обновлена",
+      "errors": {
+        "nameMinLength": "Минимум 3 символа",
+        "nameMaxLength": "Максимум 255 символов",
+        "locationMaxLength": "Максимум 255 символов",
+        "descriptionMaxLength": "Максимум 1000 символов",
+        "linkTypeDuplicate": "Ссылка такого типа уже добавлена",
+        "linkUrlRequired": "Введите URL",
+        "linkUrlInvalid": "Некорректный URL",
+        "saveFailed": "Не удалось сохранить. Попробуйте снова"
+      }
+    },
+    "profile": {
+      "editButton": "Редактировать организацию",
+      "yourRole": "Ваша роль",
+      "changeAvatar": "Изменить изображение организации",
+      "removeAvatar": "Удалить изображение организации",
+      "avatarUploadError": "Не удалось загрузить изображение",
+      "avatarUpdateError": "Не удалось обновить изображение организации",
+      "avatarDeleteError": "Не удалось удалить изображение организации",
+      "avatarUnknownError": "Не удалось обновить изображение. Попробуйте снова",
+      "loadError": "Не удалось загрузить профиль организации",
+      "memberContextError": "Не удалось загрузить вашу роль в организации",
+      "membersSection": "Участники",
+      "eventsSection": "Ближайшие мероприятия",
+      "leaveButton": "Выйти из организации"
+    },
+    "members": {
+      "searchPlaceholder": "Поиск по имени",
+      "filterByRole": "Роль",
+      "filterByInstrument": "Инструмент",
+      "loadMore": "Загрузить ещё",
+      "empty": "Участники не найдены",
+      "loadError": "Не удалось загрузить участников",
+      "assignRole": "Назначить роль",
+      "removeRole": "Удалить",
+      "changeRole": "Сменить роль",
+      "roleAssigned": "Роль назначена",
+      "roleRemoved": "Роль убрана"
+    },
+    "instrumentNames": {
+      "conductor": "Дирижёр",
+      "violin": "Скрипка",
+      "viola": "Альт",
+      "cello": "Виолончель",
+      "doubleBass": "Контрабас",
+      "flute": "Флейта",
+      "altoFlute": "Альтовая флейта",
+      "piccolo": "Пикколо",
+      "oboe": "Гобой",
+      "englishHorn": "Английский рожок",
+      "clarinet": "Кларнет",
+      "bassClarinet": "Бас-кларнет",
+      "bassoon": "Фагот",
+      "contrabassoon": "Контрафагот",
+      "saxophone": "Саксофон",
+      "sopranoSaxophone": "Сопрано-саксофон",
+      "altoSaxophone": "Альт-саксофон",
+      "tenorSaxophone": "Тенор-саксофон",
+      "baritoneSaxophone": "Баритон-саксофон",
+      "trumpet": "Труба",
+      "cornet": "Корнет",
+      "flugelhorn": "Флюгельгорн",
+      "trombone": "Тромбон",
+      "bassTrombone": "Бас-тромбон",
+      "tuba": "Туба",
+      "euphonium": "Эуфониум",
+      "frenchHorn": "Валторна",
+      "triangle": "Треугольник",
+      "tamTam": "Там-там",
+      "timpani": "Литавры",
+      "xylophone": "Ксилофон",
+      "marimba": "Маримба",
+      "vibraphone": "Вибрафон",
+      "glockenspiel": "Глокеншпиль",
+      "tubularBells": "Трубчатые колокола",
+      "piano": "Фортепиано",
+      "harpsichord": "Клавесин",
+      "organ": "Орган",
+      "keyboard": "Клавиши",
+      "synthesizer": "Синтезатор",
+      "guitar": "Гитара",
+      "electricGuitar": "Электрогитара",
+      "bassGuitar": "Бас-гитара",
+      "drums": "Барабаны",
+      "percussion": "Перкуссия",
+      "vocal": "Вокал",
+      "choir": "Хор",
+      "choirSoprano": "Хор сопрано",
+      "choirAlto": "Хор альт",
+      "choirTenor": "Хор тенор",
+      "choirBass": "Хор бас",
+      "accordion": "Аккордеон",
+      "harp": "Арфа",
+      "ukulele": "Укулеле"
+    },
+    "roleNames": {
+      "leader": "Руководитель",
+      "coLeader": "Со-руководитель"
+    },
+    "leaveDialog": {
+      "title": "Выйти из организации",
+      "confirmText": "Вы уверены, что хотите покинуть организацию?",
+      "leaderWarning": "Внимание! Вы являетесь руководителем организации. Если вы покинете организацию и являетесь её последним участником, все данные организации будут безвозвратно удалены.",
+      "leaveFailed": "Не удалось выйти из организации",
+      "leaveSuccess": "Вы вышли из организации",
+      "cancel": "Отмена",
+      "confirm": "Подтвердить"
+    },
+    "events": {
+      "rehearsal": "Репетиция",
+      "concert": "Концерт",
+      "other": "Другое",
+      "empty": "На выбранный период событий нет",
+      "loadError": "Не удалось загрузить мероприятия"
+    },
+    "invite": {
+      "label": "Пригласительная ссылка",
+      "inviteFriends": "Пригласи друзей!",
+      "copyButton": "Копировать",
+      "copied": "Скопировано!",
+      "regenerateButton": "Обновить",
+      "regenerateConfirm": "Вы уверены? Старая ссылка перестанет работать."
+    }
+  },
+  "join": {
+    "title": "Вступить в организацию",
+    "descriptionLabel": "Расскажите о себе (необязательно)",
+    "submitButton": "Подать заявку",
+    "successMessage": "Заявка отправлена! Ожидайте решения.",
+    "invalidCode": "Ссылка недействительна или устарела.",
+    "alreadyPending": "Вы уже подали заявку в эту организацию.",
+    "homeButton": "На главную"
+  },
+  "joinRequests": {
+    "title": "Заявки на вступление",
+    "submittedAt": "Подано: {{date}}",
+    "approve": "Принять",
+    "reject": "Отклонить",
+    "approved": "Заявка принята",
+    "rejected": "Заявка отклонена",
+    "empty": "Нет ожидающих заявок"
+  },
+  "roles": {
+    "form": {
+      "name": "Название роли",
+      "permissions": "Права",
+      "nameRequired": "Введите название роли",
+      "nameTooShort": "Минимум 2 символа",
+      "nameTooLong": "Максимум 64 символа"
+    },
+    "createTitle": "Создать роль",
+    "editTitle": "Редактировать роль",
+    "deleteConfirm": "Удалить эту роль? Действие необратимо.",
+    "deleteButton": "Удалить",
+    "rolesSection": "Технические роли"
+  },
+  "permissions": {
+    "ORG_EDIT": "Редактировать организацию",
+    "ORG_DELETE": "Удалить организацию",
+    "ORG_WRITE_INFO": "Писать информационные сообщения",
+    "ORG_FUND_MANIPULATION": "Управление финансами",
+    "ORG_MEMBER_REMOVE": "Удалять участников",
+    "ORG_JOIN_REQUEST_VIEW": "Просматривать заявки",
+    "ORG_JOIN_REQUEST_MANAGE": "Управлять заявками",
+    "ORG_ASSIGN_TECH_ROLE": "Назначать технические роли",
+    "ORG_TECH_ROLE_MANAGE": "Управлять техническими ролями",
+    "REPERTOIRE_CREATE_SONG": "Добавлять произведения",
+    "REPERTOIRE_EDIT_SONG": "Редактировать произведения",
+    "REPERTOIRE_DELETE_SONG": "Удалять произведения",
+    "REPERTOIRE_MANAGE_FILES": "Управлять файлами репертуара",
+    "REPERTOIRE_MANAGE_TAGS": "Управлять тегами репертуара",
+    "REPERTOIRE_MANAGE_INSTRUMENTATION": "Управлять инструментовкой",
+    "EVENT_MARK_ATTENDANCE": "Отмечать посещаемость",
+    "EVENT_DELETION": "Удалять мероприятия",
+    "EVENT_MANAGE_DESCRIPTIONS": "Управлять шаблонами описаний событий",
+    "EVENT_WRITE_COMMENT": "Писать комментарии к мероприятиям",
+    "TASK_MANAGE": "Управлять задачами"
   }
 }

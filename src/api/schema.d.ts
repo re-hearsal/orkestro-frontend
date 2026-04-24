@@ -212,6 +212,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/me/organizations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Получить организации текущего пользователя
+         * @description Возвращает список организаций, в которых состоит текущий пользователь.
+         */
+        get: operations["getMyOrganizations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/me/musical-roles": {
         parameters: {
             query?: never;
@@ -1365,6 +1385,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/organizations/{organizationId}/invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Получить пригласительный код
+         * @description Возвращает текущий пригласительный код организации. Требует права ORG_EDIT.
+         */
+        get: operations["getInviteCode"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{organizationId}/invite/regenerate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Обновить пригласительный код
+         * @description Генерирует новый пригласительный код для организации. Требует права ORG_EDIT.
+         */
+        post: operations["regenerateInviteCode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/invite-info": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Получить информацию об организации по коду приглашения
+         * @description Публичный эндпоинт. Возвращает OrganizationDTO по коду приглашения.
+         */
+        get: operations["getOrganizationByInviteCode"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/join/invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Вступить в организацию по коду приглашения
+         * @description Подаёт заявку на вступление в организацию по коду приглашения. Требует авторизации.
+         */
+        post: operations["joinByInviteCode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/notifications": {
         parameters: {
             query?: never;
@@ -1652,7 +1752,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Получить контекст участника
+         * @description Возвращает техническую роль и список прав текущего пользователя в организации.
+         */
+        get: operations["getMyMemberContext"];
         put?: never;
         post?: never;
         /**
@@ -1712,7 +1816,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Скачать файл
+         * @description Возвращает содержимое файла из хранилища по его ID.
+         */
+        get: operations["downloadFile"];
         put?: never;
         post?: never;
         /**
@@ -2054,6 +2162,15 @@ export interface components {
             linkType: "WEBSITE" | "VK" | "YOUTUBE" | "INSTAGRAM" | "FACEBOOK" | "TELEGRAM" | "OTHER";
             url: string;
         };
+        OrgMemberContextDTO: {
+            role?: components["schemas"]["OrgMemberRoleInfo"];
+            permissions?: string[];
+        };
+        OrgMemberRoleInfo: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+        };
         OrganizationDTO: {
             /** Format: int64 */
             id?: number;
@@ -2127,6 +2244,19 @@ export interface components {
              * @description Описание заявки на вступление
              * @example Хочу присоединиться как саксофонист, есть концертный опыт 5 лет.
              */
+            description?: string;
+        };
+        OrganizationJoinRequestDTO: {
+            /** Format: int64 */
+            userId?: number;
+            username?: string;
+            name?: string;
+            /** Format: int64 */
+            profileImageFileId?: number;
+            /** @enum {string} */
+            status?: "PENDING" | "ACCEPTED" | "REJECTED";
+            /** Format: date-time */
+            joinedAt?: string;
             description?: string;
         };
         OrgFundTransactionCreateRequestDTO: {
@@ -2348,6 +2478,21 @@ export interface components {
             totalElements?: number;
             /** Format: int64 */
             totalPages?: number;
+        };
+        OrganizationMemberDTO: {
+            /** Format: int64 */
+            id?: number;
+            username?: string;
+            name?: string;
+            /** Format: int64 */
+            profileImageFileId?: number;
+            /** Format: date-time */
+            joinedAt?: string;
+            role?: components["schemas"]["OrgMemberRoleInfo"];
+        };
+        PagedModelOrganizationMemberDTO: {
+            content?: components["schemas"]["OrganizationMemberDTO"][];
+            page?: components["schemas"]["PageMetadata"];
         };
         PagedModel: {
             content?: Record<string, never>[];
@@ -3500,6 +3645,35 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    getMyOrganizations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Список организаций получен */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizationDTO"][];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
                 };
             };
         };
@@ -6948,7 +7122,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["PagedModel"];
+                    "*/*": components["schemas"]["PagedModelOrganizationMemberDTO"];
                 };
             };
             /** @description Не аутентифицирован */
@@ -7007,7 +7181,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": string;
+                    "*/*": components["schemas"]["OrganizationJoinRequestDTO"][];
                 };
             };
             /** @description Не аутентифицирован */
@@ -7596,6 +7770,159 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["ApiErrorResponse"];
                 };
+            };
+        };
+    };
+    getInviteCode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Код получен */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": string;
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Доступ запрещен */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Организация не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    regenerateInviteCode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Новый код сгенерирован */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": string;
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Доступ запрещен */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Организация не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getOrganizationByInviteCode: {
+        parameters: {
+            query: {
+                code: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Организация найдена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizationDTO"];
+                };
+            };
+            /** @description Некорректный код приглашения */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    joinByInviteCode: {
+        parameters: {
+            query: {
+                code: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrganizationJoinCreateRequestDTO"];
+            };
+        };
+        responses: {
+            /** @description Заявка подана */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Некорректный код приглашения */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -8307,6 +8634,56 @@ export interface operations {
             };
         };
     };
+    getMyMemberContext: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID организации */
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Контекст участника получен */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrgMemberContextDTO"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Не является участником организации */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Организация не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
     leaveOrganization: {
         parameters: {
             query?: never;
@@ -8493,6 +8870,50 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    downloadFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description ID файла
+                 * @example 1
+                 */
+                fileId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Файл успешно получен */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/octet-stream": string;
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Файл не найден */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
                 };
             };
         };

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import Alert from '@mui/material/Alert';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import MenuItem from '@mui/material/MenuItem';
@@ -15,6 +14,7 @@ import Box from '@mui/material/Box';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import CloseIcon from '@mui/icons-material/Close';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import client from '../../api/client';
 import { useAuth } from '../../hooks/useAuth';
+import { useAppAlert } from '../../hooks/useAppAlert';
 
 interface Props {
   onBack: () => void;
@@ -45,10 +46,10 @@ export default function RegisterForm({ onBack }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { showAlert } = useAppAlert();
 
   const [step, setStep] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
-  const [apiError, setApiError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Step 1
@@ -95,7 +96,6 @@ export default function RegisterForm({ onBack }: Props) {
 
   const handleNext = () => {
     if (!validateStep1()) return;
-    setApiError(null);
     setStep(1);
   };
 
@@ -105,9 +105,17 @@ export default function RegisterForm({ onBack }: Props) {
     setAvatarPreview(file ? URL.createObjectURL(file) : null);
   };
 
+  const handleAvatarRemove = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setAvatar(null);
+    setAvatarPreview(null);
+    const input = document.getElementById('avatar-upload') as HTMLInputElement;
+    if (input) input.value = '';
+  };
+
   const handleSubmit = async () => {
     if (!validateStep2()) return;
-    setApiError(null);
     setLoading(true);
 
     try {
@@ -121,9 +129,7 @@ export default function RegisterForm({ onBack }: Props) {
       if (location.trim()) formData.append('location', location.trim());
       if (avatar) formData.append('avatar', avatar);
 
-      // Schema incorrectly marks requestBody as never for @ModelAttribute endpoints,
-      // so we cast to any to send multipart/form-data via the shared client.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       const { data, error: apiErr } = await (client.POST as any)('/api/v1/auth/register', {
         body: formData,
         bodySerializer: (body: FormData) => body,
@@ -131,14 +137,14 @@ export default function RegisterForm({ onBack }: Props) {
 
       if (apiErr || !data?.token || !data?.username) {
         const details: string[] = apiErr?.details ?? [];
-        setApiError(details.length > 0 ? details.join('\n') : (apiErr?.message ?? t('auth.errors.registerFailed')));
+        showAlert(details.length > 0 ? details.join('\n') : (apiErr?.message ?? t('auth.errors.registerFailed')), 'error');
         return;
       }
 
       login(data.token, data.username);
-      navigate('/dashboard');
+      navigate('/organizations');
     } catch {
-      setApiError(t('auth.errors.registerError'));
+      showAlert(t('auth.errors.registerError'), 'error');
     } finally {
       setLoading(false);
     }
@@ -159,15 +165,14 @@ export default function RegisterForm({ onBack }: Props) {
           <Step><StepLabel>{t('auth.register.step2')}</StepLabel></Step>
         </Stepper>
 
-        {apiError && <Alert severity="error" sx={{ whiteSpace: 'pre-line' }}>{apiError}</Alert>}
-
         {step === 0 ? (
-          <>
+          <Stack spacing={2} component="form" noValidate onSubmit={(e) => { e.preventDefault(); handleNext(); }}>
             <TextField
               label={t('auth.register.username')}
               value={username}
               onChange={(e) => { setUsername(e.target.value); clearStep1Error('username'); }}
               fullWidth
+              required
               error={!!step1Errors.username}
               helperText={step1Errors.username}
             />
@@ -176,6 +181,7 @@ export default function RegisterForm({ onBack }: Props) {
               value={name}
               onChange={(e) => { setName(e.target.value); clearStep1Error('name'); }}
               fullWidth
+              required
               error={!!step1Errors.name}
               helperText={step1Errors.name}
             />
@@ -185,6 +191,7 @@ export default function RegisterForm({ onBack }: Props) {
               value={email}
               onChange={(e) => { setEmail(e.target.value); clearStep1Error('email'); }}
               fullWidth
+              required
               error={!!step1Errors.email}
               helperText={step1Errors.email}
             />
@@ -194,6 +201,7 @@ export default function RegisterForm({ onBack }: Props) {
               value={password}
               onChange={(e) => { setPassword(e.target.value); clearStep1Error('password'); }}
               fullWidth
+              required
               error={!!step1Errors.password}
               helperText={step1Errors.password}
               slotProps={{
@@ -208,15 +216,15 @@ export default function RegisterForm({ onBack }: Props) {
                 },
               }}
             />
-            <Button variant="contained" fullWidth size="large" onClick={handleNext} sx={{ bgcolor: '#0f3eb5', '&:hover': { bgcolor: '#0c32a0' }, fontWeight: 'bold' }}>
+            <Button type="submit" variant="contained" fullWidth size="large" sx={{ bgcolor: '#0f3eb5', '&:hover': { bgcolor: '#0c32a0' }, fontWeight: 'bold' }}>
               {t('auth.register.next')}
             </Button>
             <Link component="button" onClick={onBack} sx={{ textAlign: 'center', color: '#0f3eb5' }}>
               {t('auth.login.back')}
             </Link>
-          </>
+          </Stack>
         ) : (
-          <>
+          <Stack spacing={2} component="form" noValidate onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
             <DatePicker
               label={t('auth.register.birthDate')}
               value={birthDate}
@@ -225,6 +233,7 @@ export default function RegisterForm({ onBack }: Props) {
               slotProps={{
                 textField: {
                   fullWidth: true,
+                  required: true,
                   error: !!step2Errors.birthDate,
                   helperText: step2Errors.birthDate,
                 },
@@ -281,7 +290,7 @@ export default function RegisterForm({ onBack }: Props) {
                   ) : (
                     <CloudUploadIcon sx={{ color: 'grey.500', fontSize: 32, flexShrink: 0 }} />
                   )}
-                  <Box>
+                  <Box sx={{ flex: 1 }}>
                     <Typography variant="body2" sx={{ fontWeight: 'bold', color: avatar ? '#0f3eb5' : 'text.secondary' }}>
                       {avatar ? avatar.name : t('auth.register.avatar')}
                     </Typography>
@@ -291,16 +300,25 @@ export default function RegisterForm({ onBack }: Props) {
                       </Typography>
                     )}
                   </Box>
+                  {avatar && (
+                    <IconButton
+                      size="small"
+                      onClick={handleAvatarRemove}
+                      sx={{ color: 'grey.500', '&:hover': { color: 'error.main' } }}
+                    >
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  )}
                 </Box>
               </label>
             </Box>
-            <Button variant="contained" fullWidth size="large" onClick={handleSubmit} disabled={loading} sx={{ bgcolor: '#0f3eb5', '&:hover': { bgcolor: '#0c32a0' }, fontWeight: 'bold' }}>
+            <Button type="submit" variant="contained" fullWidth size="large" disabled={loading} sx={{ bgcolor: '#0f3eb5', '&:hover': { bgcolor: '#0c32a0' }, fontWeight: 'bold' }}>
               {t('auth.register.submit')}
             </Button>
-            <Link component="button" onClick={() => { setApiError(null); setStep(0); }} sx={{ textAlign: 'center', color: '#0f3eb5' }}>
+            <Link component="button" onClick={() => setStep(0)} sx={{ textAlign: 'center', color: '#0f3eb5' }}>
               {t('auth.register.back')}
             </Link>
-          </>
+          </Stack>
         )}
       </Stack>
     </LocalizationProvider>
