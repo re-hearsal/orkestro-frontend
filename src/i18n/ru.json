@@ -77,6 +77,46 @@
     "profile": "Мой профиль",
     "logout": "Выйти"
   },
+  "profile": {
+    "title": "Мой профиль",
+    "editButton": "Редактировать профиль",
+    "generalInfo": "Общая информация",
+    "username": "Имя пользователя",
+    "name": "Имя",
+    "email": "Email",
+    "location": "Город",
+    "birthDate": "Дата рождения",
+    "empty": "—",
+    "instruments": "Ваши инструменты",
+    "addInstrument": "Добавить инструмент",
+    "removeInstrument": "Удалить",
+    "searchInstrument": "Поиск инструмента",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "saveSuccess": "Профиль обновлён",
+    "channel": {
+      "title": "Предпочитаемый канал связи",
+      "EMAIL": "Email",
+      "TELEGRAM": "Telegram",
+      "VK": "ВКонтакте"
+    },
+    "telegram": {
+      "link": "Привязать Telegram",
+      "unlink": "Отвязать Telegram",
+      "linked": "Telegram привязан",
+      "copyLink": "Скопировать ссылку",
+      "copied": "Ссылка скопирована",
+      "success": "Telegram успешно привязан",
+      "unlinked": "Telegram отвязан",
+      "waitingHint": "Перейдите по ссылке в Telegram и нажмите Start"
+    },
+    "avatar": {
+      "upload": "Загрузить фото",
+      "remove": "Удалить фото",
+      "uploadError": "Ошибка загрузки фото",
+      "removeError": "Ошибка удаления фото"
+    }
+  },
   "nav": {
     "organizations": "Мои организации",
     "calendar": "Мой календарь",
@@ -299,6 +339,11 @@
     "deleteConfirm": "Удалить эту роль? Действие необратимо.",
     "deleteButton": "Удалить",
     "rolesSection": "Технические роли"
+  },
+  "notifications": {
+    "title": "Уведомления",
+    "empty": "Уведомлений нет",
+    "loadMore": "Загрузить ещё"
   },
   "permissions": {
     "ORG_EDIT": "Редактировать организацию",

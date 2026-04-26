@@ -322,15 +322,15 @@ export default function JoinByInvitePage() {
                   sx={{ width: 84, height: 84, border: "2px solid #7795de" }}
                 />
 
-                <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+                <Stack spacing={0.5} sx={{ minWidth: 0, flex: 1 }}>
                   <Typography
                     variant="h5"
                     sx={{
                       fontFamily: "Century Gothic, sans-serif",
                       fontWeight: 700,
                       color: "#0f3eb5",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
+                      wordBreak: "break-word",
+                      overflowWrap: "anywhere",
                     }}
                   >
                     {organization.name}
@@ -342,6 +342,8 @@ export default function JoinByInvitePage() {
                         fontFamily: "Century Gothic, sans-serif",
                         color: "#7795de",
                         fontSize: "0.95rem",
+                        wordBreak: "break-word",
+                        overflowWrap: "anywhere",
                       }}
                     >
                       {organization.location}
@@ -356,6 +358,8 @@ export default function JoinByInvitePage() {
                     fontFamily: "Century Gothic, sans-serif",
                     color: "#0f3eb5",
                     whiteSpace: "pre-wrap",
+                    wordBreak: "break-word",
+                    overflowWrap: "anywhere",
                     lineHeight: 1.55,
                   }}
                 >

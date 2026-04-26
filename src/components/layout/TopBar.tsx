@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Avatar, Badge, Box, Button, Divider, ListItemIcon, Menu, MenuItem, Typography } from "@mui/material";
+import { Avatar, Badge, Box, Button, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "../../hooks/useAuth";
 import { useOrganization } from "../../hooks/useOrganization";
 import OrgSwitcherDropdown from "./OrgSwitcherDropdown";
+import NotificationsDropdown from "./NotificationsDropdown";
 
 interface TopBarProps {
   unreadCount: number;
@@ -31,13 +32,14 @@ export default function TopBar({ unreadCount }: TopBarProps) {
   const open = Boolean(anchor);
 
   const [orgAnchor, setOrgAnchor] = useState<null | HTMLElement>(null);
+  const [notifAnchor, setNotifAnchor] = useState<null | HTMLElement>(null);
 
   const handleOpen = (e: React.MouseEvent<HTMLElement>) => setAnchor(e.currentTarget);
   const handleClose = () => setAnchor(null);
 
   const handleProfile = () => {
     handleClose();
-    navigate("/settings");
+    navigate("/profile");
   };
 
   const handleLogout = () => {
@@ -93,9 +95,21 @@ export default function TopBar({ unreadCount }: TopBarProps) {
 
       <OrgSwitcherDropdown anchorEl={orgAnchor} onClose={() => setOrgAnchor(null)} />
 
-      <Badge badgeContent={unreadCount} color="error" showZero={false}>
-        <NotificationsIcon sx={{ color: "#fff" }} />
-      </Badge>
+      <IconButton
+        onClick={(e) => setNotifAnchor(e.currentTarget)}
+        sx={{
+          bgcolor: "transparent",
+          color: "#fff",
+          "&:hover": { bgcolor: "rgba(255,255,255,0.15)" },
+          p: 0.5,
+        }}
+      >
+        <Badge badgeContent={unreadCount} color="error" showZero={false}>
+          <NotificationsIcon sx={{ color: "#fff" }} />
+        </Badge>
+      </IconButton>
+
+      <NotificationsDropdown anchorEl={notifAnchor} onClose={() => setNotifAnchor(null)} />
 
       <Typography
         sx={{
@@ -154,7 +168,7 @@ export default function TopBar({ unreadCount }: TopBarProps) {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem onClick={handleProfile}>
+        <MenuItem onClick={handleProfile} sx={{ borderRadius: "8px 8px 0 0" }}>
           <ListItemIcon>
             <PersonIcon fontSize="small" sx={{ color: "#0f3eb5" }} />
           </ListItemIcon>
@@ -165,7 +179,7 @@ export default function TopBar({ unreadCount }: TopBarProps) {
 
         <Divider />
 
-        <MenuItem onClick={handleLogout}>
+        <MenuItem onClick={handleLogout} sx={{ borderRadius: "0 0 8px 8px" }}>
           <ListItemIcon>
             <LogoutIcon fontSize="small" sx={{ color: "error.main" }} />
           </ListItemIcon>

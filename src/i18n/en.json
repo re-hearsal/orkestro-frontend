@@ -77,6 +77,46 @@
     "profile": "My profile",
     "logout": "Log out"
   },
+  "profile": {
+    "title": "My Profile",
+    "editButton": "Edit Profile",
+    "generalInfo": "General Information",
+    "username": "Username",
+    "name": "Name",
+    "email": "Email",
+    "location": "City",
+    "birthDate": "Date of Birth",
+    "empty": "—",
+    "instruments": "Your Instruments",
+    "addInstrument": "Add Instrument",
+    "removeInstrument": "Remove",
+    "searchInstrument": "Search instrument",
+    "save": "Save",
+    "cancel": "Cancel",
+    "saveSuccess": "Profile updated",
+    "channel": {
+      "title": "Preferred Notification Channel",
+      "EMAIL": "Email",
+      "TELEGRAM": "Telegram",
+      "VK": "VKontakte"
+    },
+    "telegram": {
+      "link": "Link Telegram",
+      "unlink": "Unlink Telegram",
+      "linked": "Telegram linked",
+      "copyLink": "Copy link",
+      "copied": "Link copied",
+      "success": "Telegram successfully linked",
+      "unlinked": "Telegram unlinked",
+      "waitingHint": "Follow the link in Telegram and press Start"
+    },
+    "avatar": {
+      "upload": "Upload photo",
+      "remove": "Remove photo",
+      "uploadError": "Photo upload error",
+      "removeError": "Photo remove error"
+    }
+  },
   "nav": {
     "organizations": "My organizations",
     "calendar": "My calendar",
@@ -299,6 +339,11 @@
     "deleteConfirm": "Delete this role? This action cannot be undone.",
     "deleteButton": "Delete",
     "rolesSection": "Technical roles"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications",
+    "loadMore": "Load more"
   },
   "permissions": {
     "ORG_EDIT": "Edit organization",

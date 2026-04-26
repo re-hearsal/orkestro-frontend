@@ -11,6 +11,7 @@ import CreateOrgPage from './pages/CreateOrgPage';
 import OrganizationProfilePage from './pages/OrganizationProfilePage';
 import CalendarPage from './pages/CalendarPage';
 import SettingsPage from './pages/SettingsPage';
+import UserProfilePage from './pages/UserProfilePage';
 import { useAuth } from './hooks/useAuth';
 
 const PENDING_INVITE_CODE_KEY = 'pendingInviteCode';
@@ -63,6 +64,7 @@ export default function App() {
             <Route path="/organizations/:organizationId/edit" element={<div />} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/profile" element={<UserProfilePage />} />
           </Route>
         </Route>
       </Routes>

@@ -4,7 +4,9 @@ import type { components } from "../api/schema";
 import { withFlatPagination } from "../utils/pagination";
 import { useAuth } from "./useAuth";
 import { JOIN_REQUESTS_UPDATED_EVENT } from "../utils/joinRequestsEvents";
-import { NOTIFICATIONS_UPDATED_EVENT } from "../utils/notificationsEvents";
+import { NOTIFICATIONS_UPDATED_EVENT, emitNotificationsUpdated } from "../utils/notificationsEvents";
+
+export { emitNotificationsUpdated };
 
 const POLL_INTERVAL_MS = 10000;
 

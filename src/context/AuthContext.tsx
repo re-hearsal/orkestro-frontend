@@ -5,6 +5,7 @@ import client from '../api/client';
 import { emitJoinRequestsUpdated } from '../utils/joinRequestsEvents';
 import { emitNotificationsUpdated } from '../utils/notificationsEvents';
 import { emitMemberRoleUpdated } from '../utils/memberRoleEvents';
+import { isBlobUrl, toRenderableImageSource } from '../utils/imageSource';
 
 export interface AuthUser {
   token: string;
@@ -21,6 +22,7 @@ export interface UserProfile {
   preferredLanguage?: string;
   profileImageFileId?: number;
   telegramUserId?: number;
+  notificationChannel?: 'TELEGRAM' | 'EMAIL' | 'VK';
 }
 
 interface AuthContextValue {
@@ -30,6 +32,7 @@ interface AuthContextValue {
   initialized: boolean;
   login: (token: string, username: string) => Promise<void>;
   logout: () => void;
+  refreshProfile: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
@@ -52,10 +55,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         parseAs: 'blob',
       });
       if (data) {
-        if (avatarUrlRef.current) URL.revokeObjectURL(avatarUrlRef.current);
-        const objectUrl = URL.createObjectURL(data as unknown as Blob);
-        avatarUrlRef.current = objectUrl;
-        setAvatarUrl(objectUrl);
+        if (avatarUrlRef.current && isBlobUrl(avatarUrlRef.current)) URL.revokeObjectURL(avatarUrlRef.current);
+        const renderable = await toRenderableImageSource(data as unknown as Blob);
+        avatarUrlRef.current = renderable;
+        setAvatarUrl(renderable);
       }
     } catch (e) {
       console.error('[avatar] fetch error:', e);
@@ -121,7 +124,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         stomp.subscribe(`/user/${userId}/queue/profile-updated`, (msg) => {
           try {
             const updated: UserProfile = JSON.parse(msg.body);
-            setProfile(updated);
+            setProfile((prev) => {
+              if (prev?.profileImageFileId !== updated.profileImageFileId) {
+                if (updated.profileImageFileId) {
+                  void fetchAvatar(token, updated.profileImageFileId);
+                } else {
+                  if (avatarUrlRef.current && isBlobUrl(avatarUrlRef.current)) {
+                    URL.revokeObjectURL(avatarUrlRef.current);
+                    avatarUrlRef.current = null;
+                  }
+                  setAvatarUrl(null);
+                }
+              }
+              return updated;
+            });
           } catch {
             // ignore malformed messages
           }
@@ -150,7 +166,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             localStorage.removeItem('orkestro_token');
             localStorage.removeItem('orkestro_username');
 
-            if (avatarUrlRef.current) {
+            if (avatarUrlRef.current && isBlobUrl(avatarUrlRef.current)) {
               URL.revokeObjectURL(avatarUrlRef.current);
               avatarUrlRef.current = null;
             }
@@ -176,6 +192,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => { disconnectWebSocket(); };
   }, []);
 
+  const refreshProfile = async () => {
+    const token = user?.token;
+    if (token) {
+      await fetchProfile(token);
+    }
+  };
+
   const login = async (token: string, username: string) => {
     localStorage.setItem('orkestro_token', token);
     localStorage.setItem('orkestro_username', username);
@@ -185,7 +208,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     disconnectWebSocket();
-    if (avatarUrlRef.current) {
+    if (avatarUrlRef.current && isBlobUrl(avatarUrlRef.current)) {
       URL.revokeObjectURL(avatarUrlRef.current);
       avatarUrlRef.current = null;
     }
@@ -197,7 +220,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, avatarUrl, initialized, login, logout }}>
+    <AuthContext.Provider value={{ user, profile, avatarUrl, initialized, login, logout, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );
