@@ -2,9 +2,12 @@ import { createContext, useState, useEffect, useRef, type ReactNode } from 'reac
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import client from '../api/client';
+import type { components } from '../api/schema';
 import { emitJoinRequestsUpdated } from '../utils/joinRequestsEvents';
 import { emitNotificationsUpdated } from '../utils/notificationsEvents';
 import { emitMemberRoleUpdated } from '../utils/memberRoleEvents';
+import { emitFundRealtimeSnapshot } from '../utils/fundEvents';
+import { emitSongDeleted } from '../utils/songEvents';
 import { isBlobUrl, toRenderableImageSource } from '../utils/imageSource';
 
 export interface AuthUser {
@@ -38,6 +41,8 @@ interface AuthContextValue {
 export const AuthContext = createContext<AuthContextValue | null>(null);
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? (import.meta.env.DEV ? '' : 'http://localhost:8080');
+
+type OrganizationListItem = Pick<components['schemas']['OrganizationDTO'], 'id'>;
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -120,6 +125,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         for (const destination of destinations) {
           stomp.subscribe(destination, handleRealtimeUpdate);
         }
+
+        const subscribeFundTopics = async () => {
+          try {
+            const { data, error } = await client.GET('/api/v1/users/me/organizations', {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+
+            if (error || !data) {
+              return;
+            }
+
+            const organizations = (data as OrganizationListItem[]) ?? [];
+            for (const org of organizations) {
+              if (typeof org.id !== 'number') {
+                continue;
+              }
+
+              stomp.subscribe(`/topic/organizations/${org.id}/fund`, (msg) => {
+                try {
+                  const snapshot = JSON.parse(msg.body) as components['schemas']['OrgFundRealtimeSnapshotDTO'];
+                  emitFundRealtimeSnapshot(snapshot);
+                } catch {
+                  // ignore malformed messages
+                }
+              });
+
+              stomp.subscribe(`/topic/organizations/${org.id}/repertoire`, (msg) => {
+                try {
+                  const payload = JSON.parse(msg.body) as { type?: string; songId?: number };
+                  if (payload.type === 'SONG_DELETED' && typeof payload.songId === 'number') {
+                    emitSongDeleted({ organizationId: org.id as number, songId: payload.songId });
+                  }
+                } catch {
+                  // ignore malformed messages
+                }
+              });
+            }
+          } catch {
+            // ignore subscription bootstrap errors
+          }
+        };
+
+        void subscribeFundTopics();
 
         stomp.subscribe(`/user/${userId}/queue/profile-updated`, (msg) => {
           try {

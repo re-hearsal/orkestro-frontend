@@ -17,10 +17,12 @@ interface NotificationsDropdownProps {
 }
 
 function formatDate(iso?: string): string {
-  if (!iso) return '';
-  const d = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  if (!iso) return '-';
+  const parsed = new Date(iso);
+  if (Number.isNaN(parsed.getTime())) return '-';
+  const datePart = parsed.toLocaleDateString('ru-RU');
+  const timePart = parsed.toLocaleString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+  return `${datePart} ${timePart}`;
 }
 
 export default function NotificationsDropdown({ anchorEl, onClose }: NotificationsDropdownProps) {

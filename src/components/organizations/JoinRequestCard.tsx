@@ -37,24 +37,13 @@ function getInitials(request: JoinRequestDTO): string {
   return `${parts[0][0] ?? ""}${parts[1][0] ?? ""}`.toUpperCase();
 }
 
-function formatDateLabel(value: string | undefined, language: string): string {
-  if (!value) {
-    return "-";
-  }
-
+function formatDateLabel(value: string | undefined): string {
+  if (!value) return "-";
   const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return value;
-  }
-
-  const locale = language === "ru" ? "ru-RU" : "en-GB";
-  return parsed.toLocaleString(locale, {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  if (Number.isNaN(parsed.getTime())) return "-";
+  const datePart = parsed.toLocaleDateString("ru-RU");
+  const timePart = parsed.toLocaleString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+  return `${datePart} ${timePart}`;
 }
 
 export default function JoinRequestCard({
@@ -63,7 +52,7 @@ export default function JoinRequestCard({
   onApprove,
   onReject,
 }: JoinRequestCardProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { user } = useAuth();
 
   const objectUrlRef = useRef<string | null>(null);
@@ -126,8 +115,8 @@ export default function JoinRequestCard({
   const displayName = useMemo(() => getDisplayName(request), [request]);
   const showUsername = Boolean(request.username && request.username !== displayName);
   const dateLabel = useMemo(
-    () => formatDateLabel(request.joinedAt, i18n.language),
-    [i18n.language, request.joinedAt]
+    () => formatDateLabel(request.joinedAt),
+    [request.joinedAt]
   );
 
   const handleAction = async (

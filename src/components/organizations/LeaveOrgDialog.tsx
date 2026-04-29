@@ -1,10 +1,10 @@
 import {
+  Box,
   Button,
   Dialog,
-  DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
+  Typography,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
@@ -24,26 +24,35 @@ export default function LeaveOrgDialog({
   const { t } = useTranslation();
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      slotProps={{ paper: { sx: { borderRadius: "16px" } } }}
+    >
       <DialogTitle sx={{ fontFamily: "Century Gothic, sans-serif", color: "#0f3eb5", fontWeight: 700 }}>
         {t("organizations.leaveDialog.title")}
       </DialogTitle>
 
-      <DialogContent>
-        <DialogContentText sx={{ fontFamily: "Century Gothic, sans-serif", color: "#0f3eb5" }}>
+      <DialogContent dividers>
+        <Typography sx={{ fontFamily: "Century Gothic, sans-serif", color: "#0f3eb5" }}>
           {isLeader
             ? t("organizations.leaveDialog.leaderWarning")
             : t("organizations.leaveDialog.confirmText")}
-        </DialogContentText>
+        </Typography>
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 2 }}>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, px: 3, py: 2 }}>
         <Button
           onClick={onClose}
+          variant="outlined"
           sx={{
+            borderRadius: "8px",
+            borderColor: "#7795de",
+            color: "#7795de",
             fontFamily: "Century Gothic, sans-serif",
             textTransform: "none",
-            color: "#0f3eb5",
           }}
         >
           {t("organizations.leaveDialog.cancel")}
@@ -52,16 +61,16 @@ export default function LeaveOrgDialog({
         <Button
           onClick={onConfirm}
           color="error"
-          variant="contained"
+          variant="outlined"
           sx={{
+            borderRadius: "8px",
             fontFamily: "Century Gothic, sans-serif",
             textTransform: "none",
-            borderRadius: "8px",
           }}
         >
           {t("organizations.leaveDialog.confirm")}
         </Button>
-      </DialogActions>
+      </Box>
     </Dialog>
   );
 }

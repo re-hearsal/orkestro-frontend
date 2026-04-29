@@ -4,6 +4,8 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import SettingsIcon from "@mui/icons-material/Settings";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
 import LanguageIcon from "@mui/icons-material/Language";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -53,9 +55,19 @@ export default function Sidebar() {
   const activeOrganizationId = currentOrganization?.id ?? null;
   const userToken = user?.token ?? null;
 
-  const { permissions } = useOrgMemberContext(currentOrganizationId);
+  const {
+    permissions,
+    loading: memberContextLoading,
+    initialized: memberContextInitialized,
+    error: memberContextError,
+  } = useOrgMemberContext(currentOrganizationId);
   const canViewJoinRequests =
     activeOrganizationId !== null && permissions.has("ORG_JOIN_REQUEST_VIEW");
+  const canViewFund =
+    activeOrganizationId !== null &&
+    memberContextInitialized &&
+    !memberContextLoading &&
+    memberContextError == null;
 
   const [pendingJoinRequestsCount, setPendingJoinRequestsCount] = useState(0);
 
@@ -134,6 +146,24 @@ export default function Sidebar() {
     [location.pathname]
   );
 
+  const isFundRoute = useMemo(
+    () => location.pathname.includes("/fund"),
+    [location.pathname]
+  );
+
+  const isRepertoireRoute = useMemo(
+    () => location.pathname.includes("/repertoire"),
+    [location.pathname]
+  );
+
+  const fundPath = activeOrganizationId
+    ? `/organizations/${activeOrganizationId}/fund`
+    : "/organizations";
+
+  const repertoirePath = activeOrganizationId
+    ? `/organizations/${activeOrganizationId}/repertoire`
+    : "/organizations";
+
   const isActive = (path: string) => location.pathname.startsWith(path);
 
   const topItemSx = (active: boolean) => ({
@@ -192,11 +222,11 @@ export default function Sidebar() {
       {/* All nav items in one list */}
       <List disablePadding sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
         <Box sx={{ height: "50%", display: "flex", flexDirection: "column", justifyContent: "space-evenly" }}>
-          <ListItemButton
-            component={Link}
-            to="/organizations"
-            sx={topItemSx(isActive("/organizations") && !isJoinRequestsRoute)}
-          >
+            <ListItemButton
+              component={Link}
+              to="/organizations"
+              sx={topItemSx(isActive("/organizations") && !isJoinRequestsRoute && !isFundRoute && !isRepertoireRoute)}
+            >
             <ListItemIcon sx={itemIconSx}>
               <GroupsIcon />
             </ListItemIcon>
@@ -216,6 +246,24 @@ export default function Sidebar() {
                 </Badge>
               </ListItemIcon>
               <ListItemText sx={{ my: 0 }} primary={t("sidebar.joinRequests")} slotProps={{ primary: { sx: textSx } }} />
+            </ListItemButton>
+          )}
+
+          {canViewFund && (
+            <ListItemButton component={Link} to={fundPath} sx={topItemSx(isFundRoute)}>
+              <ListItemIcon sx={itemIconSx}>
+                <AccountBalanceWalletIcon />
+              </ListItemIcon>
+              <ListItemText sx={{ my: 0 }} primary={t("sidebar.fund")} slotProps={{ primary: { sx: textSx } }} />
+            </ListItemButton>
+          )}
+
+          {activeOrganizationId !== null && (
+            <ListItemButton component={Link} to={repertoirePath} sx={topItemSx(isRepertoireRoute)}>
+              <ListItemIcon sx={itemIconSx}>
+                <LibraryMusicIcon />
+              </ListItemIcon>
+              <ListItemText sx={{ my: 0 }} primary={t("sidebar.repertoire")} slotProps={{ primary: { sx: textSx } }} />
             </ListItemButton>
           )}
 

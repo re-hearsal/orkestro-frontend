@@ -1,4 +1,5 @@
 import { Menu, MenuItem, Typography } from '@mui/material';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useOrganization } from '../../hooks/useOrganization';
 
 interface OrgSwitcherDropdownProps {
@@ -8,9 +9,23 @@ interface OrgSwitcherDropdownProps {
 
 export default function OrgSwitcherDropdown({ anchorEl, onClose }: OrgSwitcherDropdownProps) {
   const { organizations, currentOrganization, setCurrentOrganization } = useOrganization();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSelect = (org: (typeof organizations)[number]) => {
     setCurrentOrganization(org);
+
+    if (typeof org.id === 'number') {
+      const nextPathname = location.pathname.replace(
+        /^\/organizations\/\d+/,
+        `/organizations/${org.id}`
+      );
+
+      if (nextPathname !== location.pathname) {
+        navigate(`${nextPathname}${location.search}${location.hash}`);
+      }
+    }
+
     onClose();
   };
 

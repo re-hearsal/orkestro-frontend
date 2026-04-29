@@ -16,17 +16,22 @@ export default function AppLayout() {
           flexDirection: "column",
           flex: 1,
           ml: "220px",
+          backgroundColor: "#0f3eb5",
         }}
       >
         <TopBar unreadCount={unreadCount} />
         <Box
           sx={{
             flex: 1,
-            overflow: "auto",
-            backgroundColor: "#f5f5f5",
+            backgroundColor: "#fff",
+            borderTopLeftRadius: "32px",
+            position: "relative",
+            overflow: "hidden",
           }}
         >
-          <Outlet />
+          <Box sx={{ height: "100%", overflow: "auto", backgroundColor: "#fff" }}>
+            <Outlet />
+          </Box>
         </Box>
       </Box>
     </Box>

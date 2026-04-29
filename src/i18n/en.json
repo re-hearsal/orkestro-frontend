@@ -123,7 +123,9 @@
     "settings": "Settings"
   },
   "sidebar": {
-    "joinRequests": "Requests"
+    "joinRequests": "Requests",
+    "fund": "Fund",
+    "repertoire": "Repertoire"
   },
   "language": {
     "current": "ENG"
@@ -326,6 +328,44 @@
     "rejected": "Request rejected",
     "empty": "No pending requests"
   },
+  "fund": {
+    "page": {
+      "title": "Organization fund",
+      "balanceLabel": "Current balance",
+      "transactionsTitle": "Transactions",
+      "empty": "No transactions yet",
+      "retry": "Retry",
+      "prev": "Back",
+      "next": "Next",
+      "pageIndicator": "{{current}} / {{total}}",
+      "noDescription": "No description",
+      "balanceLoadError": "Could not load fund balance",
+      "transactionsLoadError": "Could not load fund transactions"
+    },
+    "create": {
+      "openButton": "Create transaction",
+      "title": "Create transaction",
+      "operationLabel": "Operation type",
+      "operationDeposit": "Deposit",
+      "operationWithdrawal": "Withdrawal",
+      "amountLabel": "Amount",
+      "descriptionLabel": "Description",
+      "submit": "Create",
+      "cancel": "Cancel",
+      "success": "Transaction created successfully",
+      "amountInvalid": "Enter an amount greater than zero",
+      "createFailed": "Could not create transaction",
+      "overdraftError": "Insufficient funds: withdrawal amount exceeds current balance"
+    },
+    "export": {
+      "button": "Export CSV",
+      "loading": "Exporting...",
+      "exportFailed": "Could not export CSV",
+      "dateFrom": "Date from",
+      "dateTo": "Date to",
+      "invalidRange": "Check date range: 'from' must be earlier than 'to'"
+    }
+  },
   "roles": {
     "form": {
       "name": "Role name",
@@ -339,6 +379,73 @@
     "deleteConfirm": "Delete this role? This action cannot be undone.",
     "deleteButton": "Delete",
     "rolesSection": "Technical roles"
+  },
+  "repertoire": {
+    "title": "Repertoire",
+    "addSong": "Add song",
+    "searchPlaceholder": "Search by title or composer...",
+    "notFound": "No songs found",
+    "createStep1": "New song — basic info",
+    "createStep2": "New song — instrumentation",
+    "addInstrument": "Add instrument",
+    "create": "Create",
+    "next": "Next",
+    "back": "Back",
+    "fieldTitle": "Title",
+    "fieldComposer": "Composer",
+    "fieldDuration": "Duration (sec.)",
+    "fieldDescription": "Description",
+    "fieldVideoUrl": "Video URL",
+    "fieldTag": "Tag",
+    "titleRequired": "Enter the song title",
+    "instrumentationRequired": "Add at least one instrument",
+    "instrumentCountMin": "Count must be at least 1",
+    "composer": "Composer",
+    "description": "Description",
+    "editSong": "Edit song",
+    "saveChanges": "Save",
+    "addTag": "Add tag",
+    "deleteTag": "Delete tag",
+    "tagDeleted": "Tag deleted",
+    "tagAdded": "Tag added",
+    "loadSongsError": "Failed to load songs",
+    "songNotFound": "Song not found",
+    "fieldWhitespaceOnly": "Field cannot consist of spaces only",
+    "durationMin": "Duration must be at least 1 second",
+    "durationHint": "Optional",
+    "maxTagsReached": "Maximum 5 tags allowed",
+    "instrumentation": "Instrumentation",
+    "editInstrumentation": "Edit",
+    "saveInstrumentation": "Save instrumentation",
+    "instrumentationSaved": "Instrumentation saved",
+    "files": "Files",
+    "noFiles": "No files",
+    "uploadFile": "Upload file",
+    "fileInfo": "Info",
+    "download": "Download",
+    "deleteFile": "Delete file",
+    "confirmDeleteFile": "Are you sure you want to delete this file? This action cannot be undone.",
+    "fileType": "Type",
+    "fileName": "File name",
+    "fileSize": "Size",
+    "fileTypePdf": "PDF",
+    "fileTypePhoto": "Image",
+    "fileTypeAudio": "Audio",
+    "fileTypeVideo": "Video",
+    "fileTypeOther": "Other",
+    "fileTypeUnknown": "Unknown",
+    "fileDeleted": "File deleted",
+    "fileUploaded": "File uploaded",
+    "fileUploadFailed": "Could not upload the file. Please try again.",
+    "fileTooLarge": "File is too large. Maximum size is 30 MB.",
+    "fileTypeNotSupportedByServer": "This file type is not supported by the server.",
+    "fileUploadInvalidPayload": "Could not upload the file. Please check it and try again.",
+    "deleteSong": "Delete song",
+    "confirmDeleteSong": "Are you sure you want to delete this song? This action cannot be undone.",
+    "songDeleted": "Song deleted"
+  },
+  "common": {
+    "cancel": "Cancel"
   },
   "notifications": {
     "title": "Notifications",

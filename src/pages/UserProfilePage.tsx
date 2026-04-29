@@ -176,14 +176,19 @@ export default function UserProfilePage() {
       {/* Header row */}
       <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
         <Button
-          variant="contained"
+          variant="outlined"
           onClick={() => setEditOpen(true)}
           sx={{
+            borderRadius: "8px",
+            borderColor: "#0f3eb5",
+            color: "#0f3eb5",
             fontFamily: "Century Gothic, sans-serif",
-            fontWeight: 600,
-            borderRadius: "12px",
-            backgroundColor: "#0f3eb5",
-            "&:hover": { backgroundColor: "#0a2d8a" },
+            fontWeight: 700,
+            textTransform: "none",
+            "&:hover": {
+              borderColor: "#0f3eb5",
+              backgroundColor: "rgba(15,62,181,0.08)",
+            },
           }}
         >
           {t("profile.editButton")}
@@ -208,11 +213,11 @@ export default function UserProfilePage() {
       {/* General info section */}
       <Box
         sx={{
-          borderRadius: "16px",
-          border: "1px solid #c5d3f5",
+          borderRadius: "12px",
+          border: "1px solid #7795de",
           p: 3,
           mb: 3,
-          backgroundColor: "#f7f9ff",
+          backgroundColor: "#ffffff",
         }}
       >
         <Typography
@@ -249,7 +254,7 @@ export default function UserProfilePage() {
               sx={{
                 fontFamily: "Century Gothic, sans-serif",
                 fontWeight: 600,
-                color: "#3d5a99",
+                color: "#7795de",
                 minWidth: 140,
                 fontSize: "0.95rem",
               }}
@@ -259,7 +264,7 @@ export default function UserProfilePage() {
             <Typography
               sx={{
                 fontFamily: "Century Gothic, sans-serif",
-                color: value ? "#1a1a2e" : "#9aa5c0",
+                color: value ? "#0f3eb5" : "#7795de",
                 fontSize: "0.95rem",
               }}
             >
@@ -272,11 +277,11 @@ export default function UserProfilePage() {
       {/* Instruments section */}
       <Box
         sx={{
-          borderRadius: "16px",
-          border: "1px solid #c5d3f5",
+          borderRadius: "12px",
+          border: "1px solid #7795de",
           p: 3,
           mb: 3,
-          backgroundColor: "#f7f9ff",
+          backgroundColor: "#ffffff",
         }}
       >
         <Typography
@@ -305,7 +310,7 @@ export default function UserProfilePage() {
                   disabled={isRemoving}
                   sx={{
                     background: "none",
-                    border: "1px solid #c5d3f5",
+                    border: "1px solid #dce6f9",
                     borderRadius: "12px",
                     p: 1,
                     cursor: isRemoving ? "default" : "pointer",
@@ -320,7 +325,7 @@ export default function UserProfilePage() {
                   sx={{
                     fontFamily: "Century Gothic, sans-serif",
                     fontSize: "0.7rem",
-                    color: "#1a1a2e",
+                    color: "#0f3eb5",
                     textAlign: "center",
                     maxWidth: 64,
                     wordBreak: "break-word",
@@ -338,7 +343,7 @@ export default function UserProfilePage() {
             sx={{
               width: 64,
               height: 64,
-              border: "1px dashed #c5d3f5",
+              border: "1px dashed #dce6f9",
               borderRadius: "12px",
               color: "#0f3eb5",
               alignSelf: "flex-start",
@@ -357,14 +362,14 @@ export default function UserProfilePage() {
         onClose={() => setRemoveAnchor(null)}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         transformOrigin={{ vertical: "top", horizontal: "center" }}
-        PaperProps={{ sx: { borderRadius: "12px", p: 1.5 } }}
+        slotProps={{ paper: { sx: { borderRadius: "12px", p: 1.5 } } }}
       >
         <Button
           size="small"
           color="error"
-          variant="contained"
+          variant="outlined"
           onClick={() => removeAnchor && void handleRemoveInstrument(removeAnchor.id)}
-          sx={{ fontFamily: "Century Gothic, sans-serif", borderRadius: "8px" }}
+          sx={{ fontFamily: "Century Gothic, sans-serif", borderRadius: "8px", textTransform: "none" }}
         >
           {t("profile.removeInstrument")}
         </Button>
@@ -381,11 +386,11 @@ export default function UserProfilePage() {
       {/* Notification channel section */}
       <Box
         sx={{
-          borderRadius: "16px",
-          border: "1px solid #c5d3f5",
+          borderRadius: "12px",
+          border: "1px solid #7795de",
           p: 3,
           mb: 3,
-          backgroundColor: "#f7f9ff",
+          backgroundColor: "#ffffff",
         }}
       >
         <Typography
@@ -402,7 +407,7 @@ export default function UserProfilePage() {
               sx={{
                 fontFamily: "Century Gothic, sans-serif",
                 fontWeight: 600,
-                color: "#3d5a99",
+                color: "#7795de",
                 minWidth: 140,
                 fontSize: "0.95rem",
               }}
@@ -410,7 +415,7 @@ export default function UserProfilePage() {
               {t("profile.channel.title")}:
             </Typography>
             <Typography
-              sx={{ fontFamily: "Century Gothic, sans-serif", color: "#1a1a2e", fontSize: "0.95rem" }}
+              sx={{ fontFamily: "Century Gothic, sans-serif", color: "#0f3eb5", fontSize: "0.95rem" }}
             >
               {t(`profile.channel.${fullProfile.notificationChannel}`)}
             </Typography>
@@ -423,7 +428,7 @@ export default function UserProfilePage() {
           <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 1 }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <TelegramIcon sx={{ color: "#2AABEE" }} />
-              <Typography sx={{ fontFamily: "Century Gothic, sans-serif", color: "#1a1a2e", fontSize: "0.95rem" }}>
+              <Typography sx={{ fontFamily: "Century Gothic, sans-serif", color: "#0f3eb5", fontSize: "0.95rem" }}>
                 {t("profile.telegram.linked")}
               </Typography>
             </Box>
@@ -433,7 +438,7 @@ export default function UserProfilePage() {
               size="small"
               disabled={unlinkingTelegram}
               onClick={() => void handleUnlinkTelegram()}
-              sx={{ fontFamily: "Century Gothic, sans-serif", borderRadius: "8px" }}
+              sx={{ fontFamily: "Century Gothic, sans-serif", borderRadius: "8px", fontWeight: 700, textTransform: "none" }}
             >
               {unlinkingTelegram ? <CircularProgress size={16} /> : t("profile.telegram.unlink")}
             </Button>
@@ -445,7 +450,7 @@ export default function UserProfilePage() {
               /* Waiting for user to press Start in bot */
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                 <Typography
-                  sx={{ fontFamily: "Century Gothic, sans-serif", fontSize: "0.9rem", color: "#3d5a99" }}
+                  sx={{ fontFamily: "Century Gothic, sans-serif", fontSize: "0.9rem", color: "#7795de" }}
                 >
                   {t("profile.telegram.waitingHint")}
                 </Typography>

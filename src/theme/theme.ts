@@ -17,6 +17,25 @@ const theme = createTheme({
     borderRadius: 12,
   },
   components: {
+    MuiDialog: {
+      defaultProps: {
+        disableRestoreFocus: true,
+      },
+    },
+    MuiButtonBase: {
+      defaultProps: {
+        disableRipple: false,
+        focusRipple: false,
+      },
+      styleOverrides: {
+        root: {
+          '&.Mui-focusVisible': {
+            outline: 'none',
+            boxShadow: 'none',
+          },
+        },
+      },
+    },
     MuiCssBaseline: {
       styleOverrides: `
         @font-face {

@@ -140,8 +140,7 @@ export default function EditProfileDialog({
             onChange={(e) => setBirthDate(e.target.value)}
             fullWidth
             size="small"
-            slotProps={{ inputLabel: { shrink: true } }}
-            inputProps={{ max: new Date().toISOString().split("T")[0] }}
+            slotProps={{ inputLabel: { shrink: true }, htmlInput: { max: new Date().toISOString().split("T")[0] } }}
           />
         </Stack>
       </DialogContent>

@@ -400,6 +400,7 @@ export default function OrganizationProfilePage() {
           sx={{
             borderRadius: "8px",
             fontFamily: "Century Gothic, sans-serif",
+            fontWeight: 700,
             textTransform: "none",
           }}
         >

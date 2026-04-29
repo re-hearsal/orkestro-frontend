@@ -2,12 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Box,
   Button,
+  Chip,
   CircularProgress,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  OutlinedInput,
-  Select,
   TextField,
   Typography,
 } from "@mui/material";
@@ -561,107 +557,114 @@ export default function OrgMembersList({ organizationId, permissions }: OrgMembe
   const canEditInvite = permissions.has("ORG_EDIT");
   const canAssignRole = permissions.has("ORG_ASSIGN_TECH_ROLE");
 
+  const toggleRole = (id: number) => {
+    setRoleIds((prev) =>
+      prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
+    );
+    setPage(0);
+  };
+
+  const toggleInstrument = (id: number) => {
+    setInstrumentIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+    setPage(0);
+  };
+
   return (
     <Box sx={{ mt: 2 }}>
+      {/* Search */}
+      <TextField
+        value={query}
+        onChange={(event) => {
+          setQuery(event.target.value);
+          setPage(0);
+        }}
+        placeholder={t("organizations.members.searchPlaceholder")}
+        size="small"
+        fullWidth
+        sx={{ mb: 1.5 }}
+      />
+
+      {/* Filters block */}
       <Box
         sx={{
+          border: "1px solid #dce6f9",
+          borderRadius: "10px",
+          p: 1.5,
+          mb: 2,
           display: "flex",
-          flexWrap: "wrap",
-          gap: 1.5,
-          alignItems: "center",
+          flexDirection: "column",
+          gap: 1.25,
         }}
       >
-        <TextField
-          value={query}
-          onChange={(event) => {
-            setQuery(event.target.value);
-            setPage(0);
-          }}
-          placeholder={t("organizations.members.searchPlaceholder")}
-          size="small"
-          sx={{ minWidth: 220, flex: { xs: "1 1 100%", sm: "1 1 220px" } }}
-        />
-
-        <FormControl size="small" sx={{ minWidth: 220, flex: { xs: "1 1 100%", sm: "1 1 220px" } }}>
-          <InputLabel id="members-role-filter-label">
-            {t("organizations.members.filterByRole")}
-          </InputLabel>
-          <Select
-            labelId="members-role-filter-label"
-            multiple
-            value={roleIds}
-            input={<OutlinedInput label={t("organizations.members.filterByRole")} />}
-            renderValue={(selected) =>
-              roles
-                .filter((role) => role.id != null && selected.includes(role.id))
-                .map((role) => getLocalizedRoleName(role.name, t))
-                .filter(Boolean)
-                .join(", ")
-            }
-            onChange={(event) => {
-              const value = event.target.value;
-              const nextRoleIds = Array.isArray(value)
-                ? value.map((item) => Number(item)).filter((id) => Number.isFinite(id))
-                : [];
-
-              setRoleIds(nextRoleIds);
-              setPage(0);
-            }}
-          >
+        {/* Role filter */}
+        {roles.length > 0 && (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+            <Typography
+              sx={{
+                fontFamily: "Century Gothic, sans-serif",
+                fontSize: "0.8rem",
+                fontWeight: 600,
+                color: "#7795de",
+                whiteSpace: "nowrap",
+                minWidth: 56,
+              }}
+            >
+              {t("organizations.members.filterByRole")}:
+            </Typography>
             {roles.map((role) => (
-              <MenuItem key={role.id} value={role.id}>
-                {getLocalizedRoleName(role.name, t)}
-              </MenuItem>
+              <Chip
+                key={role.id}
+                label={getLocalizedRoleName(role.name, t)}
+                size="small"
+                color={role.id != null && roleIds.includes(role.id) ? "primary" : "default"}
+                onClick={() => role.id != null && toggleRole(role.id)}
+                sx={{ cursor: "pointer" }}
+              />
             ))}
-          </Select>
-        </FormControl>
+          </Box>
+        )}
 
-        <FormControl size="small" sx={{ minWidth: 220, flex: { xs: "1 1 100%", sm: "1 1 220px" } }}>
-          <InputLabel id="members-instrument-filter-label">
-            {t("organizations.members.filterByInstrument")}
-          </InputLabel>
-          <Select
-            labelId="members-instrument-filter-label"
-            multiple
-            value={instrumentIds}
-            input={<OutlinedInput label={t("organizations.members.filterByInstrument")} />}
-            MenuProps={{
-              slotProps: {
-                paper: {
-                  sx: {
-                    maxHeight: 176,
-                    overflowY: "auto",
-                  },
-                },
-              },
-            }}
-            renderValue={(selected) =>
-              instruments
-                .filter((instrument) => selected.includes(instrument.id))
-                .map((instrument) => getInstrumentLabel(instrument.name))
-                .join(", ")
-            }
-            onChange={(event) => {
-              const value = event.target.value;
-              const nextInstrumentIds = Array.isArray(value)
-                ? value.map((item) => Number(item)).filter((id) => Number.isFinite(id))
-                : [];
-
-              setInstrumentIds(nextInstrumentIds);
-              setPage(0);
-            }}
-          >
-            {instruments.map((instrument) => (
-              <MenuItem
-                key={instrument.id}
-                value={instrument.id}
-                sx={{ minHeight: 30, py: 0.4, fontSize: "0.82rem" }}
-              >
-                {getInstrumentLabel(instrument.name)}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        {/* Instrument filter */}
+        {instruments.length > 0 && (
+          <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
+            <Typography
+              sx={{
+                fontFamily: "Century Gothic, sans-serif",
+                fontSize: "0.8rem",
+                fontWeight: 600,
+                color: "#7795de",
+                whiteSpace: "nowrap",
+                minWidth: 56,
+                pt: "4px",
+              }}
+            >
+              {t("organizations.members.filterByInstrument")}:
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 0.75,
+                maxHeight: 96,
+                overflowY: "auto",
+                flex: 1,
+              }}
+            >
+              {instruments.map((instrument) => (
+                <Chip
+                  key={instrument.id}
+                  label={getInstrumentLabel(instrument.name)}
+                  size="small"
+                  color={instrumentIds.includes(instrument.id) ? "primary" : "default"}
+                  onClick={() => toggleInstrument(instrument.id)}
+                  sx={{ cursor: "pointer" }}
+                />
+              ))}
+            </Box>
+          </Box>
+        )}
       </Box>
 
       {loading && members.length === 0 ? (

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import AuthPage from './pages/AuthPage';
 import JoinByInvitePage from './pages/JoinByInvitePage';
@@ -9,6 +9,9 @@ import AppLayout from './components/layout/AppLayout';
 import OrganizationsPage from './pages/OrganizationsPage';
 import CreateOrgPage from './pages/CreateOrgPage';
 import OrganizationProfilePage from './pages/OrganizationProfilePage';
+import OrgFundPage from './pages/OrgFundPage';
+import OrgRepertoirePage from './pages/OrgRepertoirePage';
+import OrgSongPage from './pages/OrgSongPage';
 import CalendarPage from './pages/CalendarPage';
 import SettingsPage from './pages/SettingsPage';
 import UserProfilePage from './pages/UserProfilePage';
@@ -56,10 +59,12 @@ export default function App() {
         <Route path="/join" element={<JoinByInvitePage />} />
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
-            <Route index element={<Navigate to="/organizations" replace />} />
             <Route path="/organizations" element={<OrganizationsPage />} />
             <Route path="/organizations/create" element={<CreateOrgPage />} />
             <Route path="/organizations/:organizationId" element={<OrganizationProfilePage />} />
+            <Route path="/organizations/:organizationId/fund" element={<OrgFundPage />} />
+            <Route path="/organizations/:organizationId/repertoire" element={<OrgRepertoirePage />} />
+            <Route path="/organizations/:organizationId/repertoire/songs/:songId" element={<OrgSongPage />} />
             <Route path="/organizations/:organizationId/join-requests" element={<JoinRequestsPage />} />
             <Route path="/organizations/:organizationId/edit" element={<div />} />
             <Route path="/calendar" element={<CalendarPage />} />

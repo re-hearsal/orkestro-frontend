@@ -551,10 +551,30 @@ export interface paths {
         put?: never;
         /**
          * Загрузить и прикрепить файл к песне
-         * @description Загружает файл (аудио, ноты, лирика) и прикрепляет его к песне.
+         * @description Загружает файл любого поддерживаемого сервером типа и прикрепляет его к песне.
          */
         post: operations["uploadAndAttachFile"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{organizationId}/repertoire/songs/{songId}/files/{fileId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Удалить файл из песни
+         * @description Отвязывает файл от песни и удаляет его из хранилища, если он больше нигде не используется.
+         */
+        delete: operations["deleteFileFromSong"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1809,6 +1829,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/files/{fileId}/info": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Получить метаданные файла
+         * @description Возвращает метаданные файла по его ID.
+         */
+        get: operations["getFileInfo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/files/{fileId}": {
         parameters: {
             query?: never;
@@ -1975,8 +2015,7 @@ export interface components {
             videoUrl?: string;
             instrumentation?: components["schemas"]["SongInstrumentDTO"][];
             tags?: string[];
-            sheetFileIds?: number[];
-            audioFileIds?: number[];
+            fileIds?: number[];
         };
         SongDTO: {
             /**
@@ -2021,8 +2060,7 @@ export interface components {
             createdAt?: string;
             instrumentation?: components["schemas"]["SongInstrumentDTO"][];
             tags?: string[];
-            sheetFileIds?: number[];
-            audioFileIds?: number[];
+            fileIds?: number[];
         };
         EventUpdateRequestDTO: {
             title?: string;
@@ -2230,8 +2268,7 @@ export interface components {
             videoUrl?: string;
             instrumentation: components["schemas"]["SongInstrumentDTO"][];
             tags?: string[];
-            sheetFiles?: string[];
-            audioFiles?: string[];
+            files?: string[];
         };
         /** @description Файл для загрузки */
         SongFileUploadRequestDTO: {
@@ -2271,8 +2308,18 @@ export interface components {
             /** Format: int64 */
             performedByUserId?: number;
             performedByName?: string;
+            /** Format: int64 */
+            performedByProfileImageFileId?: number;
             /** Format: date-time */
             createdAt?: string;
+        };
+        OrgFundRealtimeSnapshotDTO: {
+            /** Format: int64 */
+            organizationId?: number;
+            balance?: number;
+            transactions?: components["schemas"]["OrgFundTransactionDTO"][];
+            /** Format: int64 */
+            totalTransactions?: number;
         };
         /** @description Данные для создания события */
         EventCreateRequestDTO: {
@@ -2365,6 +2412,15 @@ export interface components {
             fileType?: "PDF" | "PHOTO" | "AUDIO" | "VIDEO" | "OTHER";
             /** Format: int64 */
             uploadedByUserId?: number;
+        };
+        FileMetadataDTO: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            /** @enum {string} */
+            fileType?: "PDF" | "PHOTO" | "AUDIO" | "VIDEO" | "OTHER";
+            /** Format: int64 */
+            size?: number;
         };
         FileUploadResponseDTO: {
             /** Format: int64 */
@@ -2589,6 +2645,24 @@ export interface components {
         PagedModelInAppNotificationDTO: {
             content?: components["schemas"]["InAppNotificationDTO"][];
             page?: components["schemas"]["PageMetadata"];
+        };
+        InstrumentDTO: {
+            /**
+             * Format: int64
+             * @description Идентификатор инструмента
+             * @example 1
+             */
+            id?: number;
+            /**
+             * @description Название инструмента
+             * @example Скрипка
+             */
+            name?: string;
+            /**
+             * @description URL иконки инструмента
+             * @example /img/instruments/violin.svg
+             */
+            pictureUrl?: string;
         };
     };
     responses: never;
@@ -5011,6 +5085,69 @@ export interface operations {
                 };
             };
             /** @description Песня не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Внутренняя ошибка сервера */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    deleteFileFromSong: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID организации */
+                organizationId: number;
+                /** @description ID песни */
+                songId: number;
+                /** @description ID файла */
+                fileId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Файл удален из песни */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SongDTO"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Доступ запрещен */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Песня или файл не найдены */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -7964,7 +8101,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": string;
+                    "application/json": components["schemas"]["InstrumentDTO"][];
                 };
             };
             /** @description Внутренняя ошибка сервера */
@@ -8870,6 +9007,50 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    getFileInfo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description ID файла
+                 * @example 1
+                 */
+                fileId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Метаданные файла */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileMetadataDTO"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Файл не найден */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
                 };
             };
         };

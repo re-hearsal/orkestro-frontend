@@ -5,7 +5,6 @@ import {
   Checkbox,
   CircularProgress,
   Dialog,
-  DialogActions,
   DialogContent,
   DialogTitle,
   FormControlLabel,
@@ -161,7 +160,7 @@ export default function CreateRoleDialog({
       }}
       fullWidth
       maxWidth="sm"
-      slotProps={{ paper: { sx: { borderRadius: "24px" } } }}
+      slotProps={{ paper: { sx: { borderRadius: "16px" } } }}
     >
       <DialogTitle
         sx={{
@@ -173,7 +172,7 @@ export default function CreateRoleDialog({
         {isEdit ? t("roles.editTitle") : t("roles.createTitle")}
       </DialogTitle>
 
-      <DialogContent>
+      <DialogContent dividers>
         <TextField
           label={t("roles.form.name")}
           value={name}
@@ -238,34 +237,36 @@ export default function CreateRoleDialog({
         )}
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, px: 3, py: 2 }}>
         <Button
           onClick={onClose}
           disabled={loading}
-          sx={{ textTransform: "none", fontFamily: "Century Gothic, sans-serif" }}
+          variant="outlined"
+          sx={{
+            borderRadius: "8px",
+            borderColor: "#7795de",
+            color: "#7795de",
+            fontFamily: "Century Gothic, sans-serif",
+            textTransform: "none",
+          }}
         >
           {t("organizations.leaveDialog.cancel")}
         </Button>
         <Button
           onClick={() => void handleSubmit()}
           disabled={loading}
-          variant="outlined"
-          startIcon={loading ? <CircularProgress size={16} /> : null}
+          variant="contained"
           sx={{
-            textTransform: "none",
-            fontFamily: "Century Gothic, sans-serif",
             borderRadius: "8px",
-            borderColor: "#0f3eb5",
-            color: "#0f3eb5",
-            "&:hover": {
-              borderColor: "#0f3eb5",
-              backgroundColor: "rgba(15,62,181,0.08)",
-            },
+            backgroundColor: "#0f3eb5",
+            fontFamily: "Century Gothic, sans-serif",
+            textTransform: "none",
+            "&:hover": { backgroundColor: "#0c32a0" },
           }}
         >
-          {isEdit ? t("roles.editTitle") : t("roles.createTitle")}
+          {loading ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : (isEdit ? t("roles.editTitle") : t("roles.createTitle"))}
         </Button>
-      </DialogActions>
+      </Box>
     </Dialog>
   );
 }
