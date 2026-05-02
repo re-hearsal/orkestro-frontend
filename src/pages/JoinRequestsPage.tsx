@@ -75,7 +75,7 @@ function getErrorMessage(error: unknown): string | null {
 export default function JoinRequestsPage() {
   const { t } = useTranslation();
   const { organizationId: rawOrganizationId } = useParams();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { showAlert } = useAppAlert();
 
   const organizationId = useMemo(() => Number(rawOrganizationId), [rawOrganizationId]);
@@ -266,6 +266,7 @@ export default function JoinRequestsPage() {
               key={`${request.userId}-${request.joinedAt ?? ""}`}
               request={request}
               canManage={canManageJoinRequests}
+              currentUserId={profile?.id}
               onApprove={handleApprove}
               onReject={handleReject}
             />

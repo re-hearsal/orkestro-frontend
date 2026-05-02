@@ -12,10 +12,16 @@ import OrganizationProfilePage from './pages/OrganizationProfilePage';
 import OrgFundPage from './pages/OrgFundPage';
 import OrgRepertoirePage from './pages/OrgRepertoirePage';
 import OrgSongPage from './pages/OrgSongPage';
+import OrgTasksPage from './pages/OrgTasksPage';
+import OrgClosedTasksPage from './pages/OrgClosedTasksPage';
+import OrgTaskPage from './pages/OrgTaskPage';
 import CalendarPage from './pages/CalendarPage';
 import SettingsPage from './pages/SettingsPage';
 import UserProfilePage from './pages/UserProfilePage';
 import { useAuth } from './hooks/useAuth';
+import UserPublicProfilePage from './pages/UserPublicProfilePage';
+import OrgSectionsPage from './pages/OrgSectionsPage';
+import SectionProfilePage from './pages/SectionProfilePage';
 
 const PENDING_INVITE_CODE_KEY = 'pendingInviteCode';
 
@@ -65,11 +71,17 @@ export default function App() {
             <Route path="/organizations/:organizationId/fund" element={<OrgFundPage />} />
             <Route path="/organizations/:organizationId/repertoire" element={<OrgRepertoirePage />} />
             <Route path="/organizations/:organizationId/repertoire/songs/:songId" element={<OrgSongPage />} />
+            <Route path="/organizations/:organizationId/tasks" element={<OrgTasksPage />} />
+            <Route path="/organizations/:organizationId/tasks/closed" element={<OrgClosedTasksPage />} />
+            <Route path="/organizations/:organizationId/tasks/:taskId" element={<OrgTaskPage />} />
             <Route path="/organizations/:organizationId/join-requests" element={<JoinRequestsPage />} />
             <Route path="/organizations/:organizationId/edit" element={<div />} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/profile" element={<UserProfilePage />} />
+            <Route path="/users/:userId" element={<UserPublicProfilePage />} />
+            <Route path="/organizations/:organizationId/sections" element={<OrgSectionsPage />} />
+            <Route path="/organizations/:organizationId/sections/:sectionId" element={<SectionProfilePage />} />
           </Route>
         </Route>
       </Routes>

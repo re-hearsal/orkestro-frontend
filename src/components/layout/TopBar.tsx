@@ -23,7 +23,8 @@ function getInitials(name: string): string {
 export default function TopBar({ unreadCount }: TopBarProps) {
   const { t } = useTranslation();
   const { profile, avatarUrl, logout } = useAuth();
-  const { currentOrganization } = useOrganization();
+  const { organizations, currentOrganization } = useOrganization();
+  const hasOrganizations = organizations.length > 0;
   const navigate = useNavigate();
   const name = profile?.name ?? "";
   const initials = name ? getInitials(name) : "";
@@ -60,7 +61,7 @@ export default function TopBar({ unreadCount }: TopBarProps) {
         gap: 2,
       }}
     >
-      {currentOrganization && (
+      {hasOrganizations && currentOrganization && (
         <Button
           onClick={(e) => setOrgAnchor(e.currentTarget)}
           sx={{
@@ -105,7 +106,7 @@ export default function TopBar({ unreadCount }: TopBarProps) {
         }}
       >
         <Badge badgeContent={unreadCount} color="error" showZero={false}>
-          <NotificationsIcon sx={{ color: "#fff" }} />
+          <NotificationsIcon sx={{ color: "#0f3eb5" }} />
         </Badge>
       </IconButton>
 
@@ -142,6 +143,7 @@ export default function TopBar({ unreadCount }: TopBarProps) {
         anchorEl={anchor}
         open={open}
         onClose={handleClose}
+        disableAutoFocusItem
         slotProps={{
           paper: {
             elevation: 4,

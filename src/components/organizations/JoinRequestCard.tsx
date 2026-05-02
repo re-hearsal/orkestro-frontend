@@ -1,16 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Avatar, Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import client from "../../api/client";
 import type { components } from "../../api/schema";
 import { useAuth } from "../../hooks/useAuth";
 import { isBlobUrl, toRenderableImageSource } from "../../utils/imageSource";
+import { navigateToUser } from "../../utils/navigateToUser";
 
 export type JoinRequestDTO = components["schemas"]["OrganizationJoinRequestDTO"];
 
 interface JoinRequestCardProps {
   request: JoinRequestDTO;
   canManage: boolean;
+  currentUserId?: number;
   onApprove: (request: JoinRequestDTO) => Promise<void>;
   onReject: (request: JoinRequestDTO) => Promise<void>;
 }
@@ -49,11 +52,13 @@ function formatDateLabel(value: string | undefined): string {
 export default function JoinRequestCard({
   request,
   canManage,
+  currentUserId,
   onApprove,
   onReject,
 }: JoinRequestCardProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const objectUrlRef = useRef<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -150,6 +155,18 @@ export default function JoinRequestCard({
         gap: 1.5,
       }}
     >
+      <Box
+        onClick={() => navigateToUser(request.userId, currentUserId, navigate)}
+        sx={{
+          cursor: request.userId ? "pointer" : "default",
+          display: "flex",
+          alignItems: "center",
+          gap: 1.5,
+          flex: 1,
+          minWidth: 0,
+          "&:hover": request.userId ? { opacity: 0.85 } : {},
+        }}
+      >
       <Avatar
         src={avatarUrl ?? undefined}
         alt={displayName}
@@ -207,6 +224,7 @@ export default function JoinRequestCard({
           {t("joinRequests.submittedAt", { date: dateLabel })}
         </Typography>
       </Stack>
+      </Box>
 
       {canManage && (
         <Stack direction={{ xs: "column", sm: "row" }} spacing={0.8}>

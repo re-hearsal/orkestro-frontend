@@ -212,26 +212,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users/me/organizations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Получить организации текущего пользователя
-         * @description Возвращает список организаций, в которых состоит текущий пользователь.
-         */
-        get: operations["getMyOrganizations"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/users/me/musical-roles": {
         parameters: {
             query?: never;
@@ -352,6 +332,34 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/sections/{sectionId}/members/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Получить контекст участника секции
+         * @description Возвращает техническую роль и список прав текущего пользователя в секции. Для участников организации без роли в секции вернет пустой контекст.
+         */
+        get: operations["getMyMemberContext"];
+        put?: never;
+        /**
+         * Вступить в секцию
+         * @description Текущий аутентифицированный пользователь вступает в секцию. Для вложенной секции пользователь должен состоять в родительской секции.
+         */
+        post: operations["joinSection"];
+        /**
+         * Покинуть секцию
+         * @description Текущий аутентифицированный пользователь покидает секцию. Лидер не может покинуть секцию, пока есть другие участники.
+         */
+        delete: operations["leaveSection"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/sections/{sectionId}/info-messages": {
         parameters: {
             query?: never;
@@ -383,7 +391,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Получить дочерние секции
+         * @description Возвращает список дочерних секций для указанной секции. Доступно принятым участникам организации, в которой создана секция.
+         */
+        get: operations["getChildSections"];
         put?: never;
         /**
          * Создать вложенную секцию
@@ -483,7 +495,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Получить секции организации
+         * @description Возвращает список секций организации. Доступно только участникам организации.
+         */
+        get: operations["getSectionsByOrganization"];
         put?: never;
         /**
          * Создать секцию в организации
@@ -551,30 +567,10 @@ export interface paths {
         put?: never;
         /**
          * Загрузить и прикрепить файл к песне
-         * @description Загружает файл любого поддерживаемого сервером типа и прикрепляет его к песне.
+         * @description Загружает файл (аудио, ноты, лирика) и прикрепляет его к песне.
          */
         post: operations["uploadAndAttachFile"];
         delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/organizations/{organizationId}/repertoire/songs/{songId}/files/{fileId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Удалить файл из песни
-         * @description Отвязывает файл от песни и удаляет его из хранилища, если он больше нигде не используется.
-         */
-        delete: operations["deleteFileFromSong"];
         options?: never;
         head?: never;
         patch?: never;
@@ -658,6 +654,26 @@ export interface paths {
          * @description Одобряет запрос пользователя на вступление в организацию.
          */
         post: operations["approveJoinRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{organizationId}/invite/regenerate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Обновить пригласительный код
+         * @description Генерирует новый пригласительный код для организации. Требует права ORG_EDIT.
+         */
+        post: operations["regenerateInviteCode"];
         delete?: never;
         options?: never;
         head?: never;
@@ -836,7 +852,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/files/upload": {
+    "/api/v1/organizations/join/invite": {
         parameters: {
             query?: never;
             header?: never;
@@ -846,9 +862,25 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Загрузить файл
-         * @description Загружает файл в хранилище. Если параметр uploadedByUserId не указан, файл загружается от имени текущего аутентифицированного пользователя. Поддерживаемые типы файлов: PDF, PHOTO, AUDIO, VIDEO, OTHER. Максимальный размер файла: 30MB.
+         * Вступить в организацию по коду приглашения
+         * @description Подаёт заявку на вступление в организацию по коду приглашения. Требует авторизации.
          */
+        post: operations["joinByInviteCode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/files/upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
         post: operations["upload"];
         delete?: never;
         options?: never;
@@ -960,6 +992,34 @@ export interface paths {
         patch: operations["updateCurrentUserProfileImage"];
         trace?: never;
     };
+    "/api/v1/sections/{sectionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Получить секцию по ID
+         * @description Возвращает данные секции. Доступно принятым участникам организации, в которой создана секция.
+         */
+        get: operations["getSectionById"];
+        put?: never;
+        post?: never;
+        /**
+         * Удалить секцию
+         * @description Удаляет секцию. Удаление возможно только если в секции нет участников.
+         */
+        delete: operations["deleteSection"];
+        options?: never;
+        head?: never;
+        /**
+         * Обновить секцию
+         * @description Частично обновляет секцию. Обновляются только переданные поля.
+         */
+        patch: operations["updateSection"];
+        trace?: never;
+    };
     "/api/v1/organizations/{organizationId}": {
         parameters: {
             query?: never;
@@ -1045,6 +1105,46 @@ export interface paths {
         patch: operations["updateProfile"];
         trace?: never;
     };
+    "/api/v1/users/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Получить публичный профиль пользователя
+         * @description Возвращает публичную информацию о профиле пользователя по его ID.
+         */
+        get: operations["getPublicUserProfile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{userId}/musical-roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Получить музыкальные роли пользователя
+         * @description Возвращает список инструментов пользователя по его ID.
+         */
+        get: operations["getUserMusicalRoles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/me": {
         parameters: {
             query?: never;
@@ -1057,6 +1157,26 @@ export interface paths {
          * @description Возвращает полную информацию о профиле аутентифицированного пользователя. Включает персональные данные, канал уведомлений, язык интерфейса и ссылку на изображение профиля.
          */
         get: operations["getCurrentUserProfile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/me/organizations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Получить организации текущего пользователя
+         * @description Возвращает список организаций, в которых состоит текущий пользователь.
+         */
+        get: operations["getMyOrganizations"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1185,6 +1305,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/organizations/{organizationId}/members/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Получить контекст участника
+         * @description Возвращает техническую роль и список прав текущего пользователя в организации.
+         */
+        get: operations["getMyMemberContext_1"];
+        put?: never;
+        post?: never;
+        /**
+         * Покинуть организацию
+         * @description Текущий пользователь покидает организацию.
+         */
+        delete: operations["leaveOrganization"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/organizations/{organizationId}/join-requests/pending": {
         parameters: {
             query?: never;
@@ -1197,6 +1341,26 @@ export interface paths {
          * @description Возвращает список пользователей, ожидающих одобрения вступления в организацию.
          */
         get: operations["getPendingJoinRequests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{organizationId}/invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Получить пригласительный код
+         * @description Возвращает текущий пригласительный код организации. Требует права ORG_EDIT.
+         */
+        get: operations["getInviteCode"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1405,46 +1569,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/organizations/{organizationId}/invite": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Получить пригласительный код
-         * @description Возвращает текущий пригласительный код организации. Требует права ORG_EDIT.
-         */
-        get: operations["getInviteCode"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/organizations/{organizationId}/invite/regenerate": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Обновить пригласительный код
-         * @description Генерирует новый пригласительный код для организации. Требует права ORG_EDIT.
-         */
-        post: operations["regenerateInviteCode"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/organizations/invite-info": {
         parameters: {
             query?: never;
@@ -1459,26 +1583,6 @@ export interface paths {
         get: operations["getOrganizationByInviteCode"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/organizations/join/invite": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Вступить в организацию по коду приглашения
-         * @description Подаёт заявку на вступление в организацию по коду приглашения. Требует авторизации.
-         */
-        post: operations["joinByInviteCode"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1517,6 +1621,50 @@ export interface paths {
          * @description Возвращает отсортированный по имени список всех доступных музыкальных инструментов.
          */
         get: operations["getAllInstruments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/files/{fileId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Загрузить файл
+         * @description Загружает файл в хранилище. Если параметр uploadedByUserId не указан, файл загружается от имени текущего аутентифицированного пользователя. Поддерживаемые типы файлов: PDF, PHOTO, AUDIO, VIDEO, OTHER. Максимальный размер файла: 30MB.
+         */
+        get: operations["download"];
+        put?: never;
+        post?: never;
+        /**
+         * Удалить файл
+         * @description Удаляет файл из хранилища по его ID. Файл можно удалить только если он не привязан к каким-либо сущностям (событиям, задачам и т.д.). Перед удалением проверяется наличие ссылок на файл.
+         */
+        delete: operations["delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/files/{fileId}/info": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Получить метаданные файла
+         * @description Возвращает метаданные файла по его ID.
+         */
+        get: operations["getFileInfo"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1625,66 +1773,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/sections/{sectionId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Удалить секцию
-         * @description Удаляет секцию. Удаление возможно только если в секции нет участников.
-         */
-        delete: operations["deleteSection"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/sections/{sectionId}/members/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Покинуть секцию
-         * @description Текущий аутентифицированный пользователь покидает секцию. Лидер не может покинуть секцию, пока есть другие участники.
-         */
-        delete: operations["leaveSection"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/sections/{sectionId}/leave": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Покинуть секцию
-         * @description Текущий пользователь покидает указанную секцию. Если пользователь является единственным лидером и в секции есть другие участники - операция запрещена.
-         */
-        delete: operations["leaveSection_1"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/organizations/{organizationId}/tasks/{taskId}/files/{fileId}": {
         parameters: {
             query?: never;
@@ -1765,30 +1853,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/organizations/{organizationId}/members/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Получить контекст участника
-         * @description Возвращает техническую роль и список прав текущего пользователя в организации.
-         */
-        get: operations["getMyMemberContext"];
-        put?: never;
-        post?: never;
-        /**
-         * Покинуть организацию
-         * @description Текущий пользователь покидает организацию.
-         */
-        delete: operations["leaveOrganization"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/organizations/{organizationId}/events/{eventId}/files/{fileId}": {
         parameters: {
             query?: never;
@@ -1829,50 +1893,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/files/{fileId}/info": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Получить метаданные файла
-         * @description Возвращает метаданные файла по его ID.
-         */
-        get: operations["getFileInfo"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/files/{fileId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Скачать файл
-         * @description Возвращает содержимое файла из хранилища по его ID.
-         */
-        get: operations["downloadFile"];
-        put?: never;
-        post?: never;
-        /**
-         * Удалить файл
-         * @description Удаляет файл из хранилища по его ID. Файл можно удалить только если он не привязан к каким-либо сущностям (событиям, задачам и т.д.). Перед удалением проверяется наличие ссылок на файл.
-         */
-        delete: operations["delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/auth/account": {
         parameters: {
             query?: never;
@@ -1901,6 +1921,16 @@ export interface components {
             name: string;
             permissionCodes?: string[];
         };
+        ApiErrorResponse: {
+            /** Format: date-time */
+            timestamp?: string;
+            /** Format: int32 */
+            status?: number;
+            error?: string;
+            message?: string;
+            path?: string;
+            details?: string[];
+        };
         TechnicalRoleDTO: {
             /** Format: int64 */
             id?: number;
@@ -1913,16 +1943,6 @@ export interface components {
             name?: string;
             system?: boolean;
             permissionCodes?: string[];
-        };
-        ApiErrorResponse: {
-            /** Format: date-time */
-            timestamp?: string;
-            /** Format: int32 */
-            status?: number;
-            error?: string;
-            message?: string;
-            path?: string;
-            details?: string[];
         };
         TaskUpdateRequestDTO: {
             title?: string;
@@ -1952,8 +1972,6 @@ export interface components {
             id?: number;
             /** Format: int64 */
             organizationId?: number;
-            /** Format: int64 */
-            sectionId?: number;
             title?: string;
             description?: string;
             /** Format: int64 */
@@ -2015,7 +2033,8 @@ export interface components {
             videoUrl?: string;
             instrumentation?: components["schemas"]["SongInstrumentDTO"][];
             tags?: string[];
-            fileIds?: number[];
+            sheetFileIds?: number[];
+            audioFileIds?: number[];
         };
         SongDTO: {
             /**
@@ -2060,7 +2079,8 @@ export interface components {
             createdAt?: string;
             instrumentation?: components["schemas"]["SongInstrumentDTO"][];
             tags?: string[];
-            fileIds?: number[];
+            sheetFileIds?: number[];
+            audioFileIds?: number[];
         };
         EventUpdateRequestDTO: {
             title?: string;
@@ -2200,15 +2220,6 @@ export interface components {
             linkType: "WEBSITE" | "VK" | "YOUTUBE" | "INSTAGRAM" | "FACEBOOK" | "TELEGRAM" | "OTHER";
             url: string;
         };
-        OrgMemberContextDTO: {
-            role?: components["schemas"]["OrgMemberRoleInfo"];
-            permissions?: string[];
-        };
-        OrgMemberRoleInfo: {
-            /** Format: int64 */
-            id?: number;
-            name?: string;
-        };
         OrganizationDTO: {
             /** Format: int64 */
             id?: number;
@@ -2268,7 +2279,8 @@ export interface components {
             videoUrl?: string;
             instrumentation: components["schemas"]["SongInstrumentDTO"][];
             tags?: string[];
-            files?: string[];
+            sheetFiles?: string[];
+            audioFiles?: string[];
         };
         /** @description Файл для загрузки */
         SongFileUploadRequestDTO: {
@@ -2283,19 +2295,6 @@ export interface components {
              */
             description?: string;
         };
-        OrganizationJoinRequestDTO: {
-            /** Format: int64 */
-            userId?: number;
-            username?: string;
-            name?: string;
-            /** Format: int64 */
-            profileImageFileId?: number;
-            /** @enum {string} */
-            status?: "PENDING" | "ACCEPTED" | "REJECTED";
-            /** Format: date-time */
-            joinedAt?: string;
-            description?: string;
-        };
         OrgFundTransactionCreateRequestDTO: {
             amount: number;
             description?: string;
@@ -2308,18 +2307,8 @@ export interface components {
             /** Format: int64 */
             performedByUserId?: number;
             performedByName?: string;
-            /** Format: int64 */
-            performedByProfileImageFileId?: number;
             /** Format: date-time */
             createdAt?: string;
-        };
-        OrgFundRealtimeSnapshotDTO: {
-            /** Format: int64 */
-            organizationId?: number;
-            balance?: number;
-            transactions?: components["schemas"]["OrgFundTransactionDTO"][];
-            /** Format: int64 */
-            totalTransactions?: number;
         };
         /** @description Данные для создания события */
         EventCreateRequestDTO: {
@@ -2413,15 +2402,6 @@ export interface components {
             /** Format: int64 */
             uploadedByUserId?: number;
         };
-        FileMetadataDTO: {
-            /** Format: int64 */
-            id?: number;
-            name?: string;
-            /** @enum {string} */
-            fileType?: "PDF" | "PHOTO" | "AUDIO" | "VIDEO" | "OTHER";
-            /** Format: int64 */
-            size?: number;
-        };
         FileUploadResponseDTO: {
             /** Format: int64 */
             id?: number;
@@ -2458,6 +2438,11 @@ export interface components {
             username: string;
             password: string;
         };
+        /** @description Данные для обновления секции */
+        SectionUpdateRequestDTO: {
+            name?: string;
+            description?: string;
+        };
         /** @description Данные для обновления */
         OrganizationUpdateRequestDTO: {
             name?: string;
@@ -2475,7 +2460,7 @@ export interface components {
             /** Format: int64 */
             id?: number;
             /** @enum {string} */
-            type?: "NEW_INFO_MESSAGE" | "NEW_EVENT" | "RSVP_REQUEST" | "NEW_TASK" | "REMINDER" | "EVENT_COMMENT" | "TASK_STATUS_CHANGED";
+            type?: "NEW_INFO_MESSAGE" | "NEW_EVENT" | "RSVP_REQUEST" | "NEW_TASK" | "REMINDER" | "EVENT_COMMENT" | "TASK_STATUS_CHANGED" | "TASK_UPDATED" | "TASK_DELETED" | "TASK_ASSIGNEE_ADDED" | "TASK_ASSIGNEE_REMOVED" | "TASK_DEADLINE_OVERDUE" | "JOIN_REQUEST_RECEIVED" | "JOIN_REQUEST_APPROVED" | "JOIN_REQUEST_REJECTED" | "ROLE_ASSIGNED" | "ROLE_REMOVED";
             title?: string;
             body?: string;
             /** Format: int64 */
@@ -2495,6 +2480,26 @@ export interface components {
             /** @enum {string} */
             preferredLanguage?: "RU" | "EN";
         };
+        MusicalRoleDTO: {
+            /** Format: int64 */
+            instrumentId?: number;
+            instrumentName?: string;
+        };
+        PublicUserProfileDTO: {
+            /** Format: int64 */
+            id?: number;
+            username?: string;
+            name?: string;
+            email?: string;
+            location?: string;
+            /** Format: date */
+            birthDate?: string;
+            /** @enum {string} */
+            preferredLanguage?: "RU" | "EN";
+            /** Format: int64 */
+            profileImageFileId?: number;
+            instruments?: components["schemas"]["MusicalRoleDTO"][];
+        };
         CurrentUserResponseDTO: {
             /** Format: int64 */
             id?: number;
@@ -2513,11 +2518,6 @@ export interface components {
             /** Format: int64 */
             telegramUserId?: number;
         };
-        MusicalRoleDTO: {
-            /** Format: int64 */
-            instrumentId?: number;
-            instrumentName?: string;
-        };
         Pageable: {
             /** Format: int32 */
             page?: number;
@@ -2535,24 +2535,36 @@ export interface components {
             /** Format: int64 */
             totalPages?: number;
         };
-        OrganizationMemberDTO: {
+        PagedModel: {
+            content?: Record<string, never>[];
+            page?: components["schemas"]["PageMetadata"];
+        };
+        RoleInfo: {
             /** Format: int64 */
             id?: number;
+            name?: string;
+        };
+        SectionMemberContextDTO: {
+            member?: boolean;
+            role?: components["schemas"]["RoleInfo"];
+            permissions?: string[];
+        };
+        OrgMemberContextDTO: {
+            role?: components["schemas"]["RoleInfo"];
+            permissions?: string[];
+        };
+        OrganizationJoinRequestDTO: {
+            /** Format: int64 */
+            userId?: number;
             username?: string;
             name?: string;
             /** Format: int64 */
             profileImageFileId?: number;
+            /** @enum {string} */
+            status?: "PENDING" | "ACCEPTED" | "REJECTED";
             /** Format: date-time */
             joinedAt?: string;
-            role?: components["schemas"]["OrgMemberRoleInfo"];
-        };
-        PagedModelOrganizationMemberDTO: {
-            content?: components["schemas"]["OrganizationMemberDTO"][];
-            page?: components["schemas"]["PageMetadata"];
-        };
-        PagedModel: {
-            content?: Record<string, never>[];
-            page?: components["schemas"]["PageMetadata"];
+            description?: string;
         };
         OrgFundDTO: {
             /** Format: int64 */
@@ -2592,11 +2604,11 @@ export interface components {
             title?: string;
             tags?: string[];
             scopeValid?: boolean;
-            sectionIdsSizeValid?: boolean;
-            dateOrderValid?: boolean;
-            dateRangeValid?: boolean;
             sectionIdProvidedForSectionScope?: boolean;
             sectionIdsProvidedForSectionsScope?: boolean;
+            dateOrderValid?: boolean;
+            dateRangeValid?: boolean;
+            sectionIdsSizeValid?: boolean;
         };
         EventCalendarDTO: {
             /** Format: int64 */
@@ -2646,23 +2658,14 @@ export interface components {
             content?: components["schemas"]["InAppNotificationDTO"][];
             page?: components["schemas"]["PageMetadata"];
         };
-        InstrumentDTO: {
-            /**
-             * Format: int64
-             * @description Идентификатор инструмента
-             * @example 1
-             */
+        FileMetadataDTO: {
+            /** Format: int64 */
             id?: number;
-            /**
-             * @description Название инструмента
-             * @example Скрипка
-             */
             name?: string;
-            /**
-             * @description URL иконки инструмента
-             * @example /img/instruments/violin.svg
-             */
-            pictureUrl?: string;
+            /** @enum {string} */
+            fileType?: "PDF" | "PHOTO" | "AUDIO" | "VIDEO" | "OTHER";
+            /** Format: int64 */
+            size?: number;
         };
     };
     responses: never;
@@ -3723,35 +3726,6 @@ export interface operations {
             };
         };
     };
-    getMyOrganizations: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Список организаций получен */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OrganizationDTO"][];
-                };
-            };
-            /** @description Не аутентифицирован */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-        };
-    };
     getMyMusicalRoles: {
         parameters: {
             query?: never;
@@ -4312,6 +4286,197 @@ export interface operations {
             };
         };
     };
+    getMyMemberContext: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID секции */
+                sectionId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Контекст участника секции получен */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SectionMemberContextDTO"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Доступ запрещен */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Секция не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Внутренняя ошибка сервера */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    joinSection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID секции */
+                sectionId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Пользователь вступил в секцию */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Нарушение бизнес-правил */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Доступ запрещен */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Секция не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Внутренняя ошибка сервера */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    leaveSection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID секции */
+                sectionId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Секция покинута */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Нарушение бизнес-правил (лидер не может покинуть секцию) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Доступ запрещен */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Секция не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Внутренняя ошибка сервера */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
     getMessages: {
         parameters: {
             query: {
@@ -4391,6 +4556,68 @@ export interface operations {
             };
             /** @description Секция не найдена */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    getChildSections: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description ID родительской секции
+                 * @example 1
+                 */
+                parentSectionId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Список дочерних секций получен */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SectionDTO"][];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Доступ запрещен */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Секция не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Внутренняя ошибка сервера */
+            500: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4752,6 +4979,65 @@ export interface operations {
             };
         };
     };
+    getSectionsByOrganization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID организации */
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Список секций получен */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SectionDTO"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Доступ запрещен */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Организация не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Внутренняя ошибка сервера */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
     createSectionInOrganization: {
         parameters: {
             query?: never;
@@ -5104,69 +5390,6 @@ export interface operations {
             };
         };
     };
-    deleteFileFromSong: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID организации */
-                organizationId: number;
-                /** @description ID песни */
-                songId: number;
-                /** @description ID файла */
-                fileId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Файл удален из песни */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SongDTO"];
-                };
-            };
-            /** @description Не аутентифицирован */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Доступ запрещен */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Песня или файл не найдены */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Внутренняя ошибка сервера */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-        };
-    };
     assignOrganizationRoleToUser: {
         parameters: {
             query?: never;
@@ -5312,7 +5535,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Организация приватная */
+            /** @description Организация приватная, пользователь уже состоит в организации или заявка уже подана */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -5330,7 +5553,7 @@ export interface operations {
                     "*/*": components["schemas"]["ApiErrorResponse"];
                 };
             };
-            /** @description Уже состоите в организации */
+            /** @description Доступ запрещен */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5486,6 +5709,56 @@ export interface operations {
             };
             /** @description Внутренняя ошибка сервера */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    regenerateInviteCode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID организации */
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Новый код сгенерирован */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": string;
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Доступ запрещен */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Организация не найдена */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6178,6 +6451,49 @@ export interface operations {
             };
         };
     };
+    joinByInviteCode: {
+        parameters: {
+            query: {
+                /** @description Код приглашения */
+                code: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrganizationJoinCreateRequestDTO"];
+            };
+        };
+        responses: {
+            /** @description Заявка подана */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Некорректный код приглашения, пользователь уже состоит в организации или заявка уже подана */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
     upload: {
         parameters: {
             query?: never;
@@ -6191,49 +6507,13 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Файл успешно загружен */
-            201: {
+            /** @description OK */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["FileUploadResponseDTO"];
-                };
-            };
-            /** @description Ошибка валидации / Нарушение бизнес-правил */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Не аутентифицирован */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Не поддерживаемый тип контента */
-            415: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Внутренняя ошибка сервера */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
+                    "*/*": components["schemas"]["FileUploadResponseDTO"];
                 };
             };
         };
@@ -6509,6 +6789,212 @@ export interface operations {
             };
             /** @description Не поддерживаемый тип контента */
             415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Внутренняя ошибка сервера */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    getSectionById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description ID секции
+                 * @example 1
+                 */
+                sectionId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Секция найдена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SectionDTO"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Доступ запрещен */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Секция не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Внутренняя ошибка сервера */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    deleteSection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description ID секции
+                 * @example 1
+                 */
+                sectionId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Секция успешно удалена */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Нарушение бизнес-правил - в секции есть участники */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Доступ запрещен */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Секция не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Внутренняя ошибка сервера */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    updateSection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description ID секции
+                 * @example 1
+                 */
+                sectionId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SectionUpdateRequestDTO"];
+            };
+        };
+        responses: {
+            /** @description Секция обновлена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SectionDTO"];
+                };
+            };
+            /** @description Ошибка валидации */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Доступ запрещен */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Секция не найдена */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6882,6 +7368,94 @@ export interface operations {
             };
         };
     };
+    getPublicUserProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description ID пользователя
+                 * @example 1
+                 */
+                userId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Публичный профиль пользователя успешно получен */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicUserProfileDTO"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Пользователь не найден */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    getUserMusicalRoles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description ID пользователя
+                 * @example 1
+                 */
+                userId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Список инструментов пользователя успешно получен */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MusicalRoleDTO"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Пользователь не найден */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
     getCurrentUserProfile: {
         parameters: {
             query?: never;
@@ -6920,6 +7494,35 @@ export interface operations {
             };
             /** @description Внутренняя ошибка сервера */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    getMyOrganizations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Список организаций получен */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7259,7 +7862,123 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["PagedModelOrganizationMemberDTO"];
+                    "*/*": components["schemas"]["PagedModel"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Доступ запрещен */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Организация не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Внутренняя ошибка сервера */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    getMyMemberContext_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID организации */
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Контекст участника получен */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrgMemberContextDTO"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Не является участником организации */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Организация не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    leaveOrganization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID организации */
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Пользователь покинул организацию */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Последний лидер не может покинуть организацию */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
                 };
             };
             /** @description Не аутентифицирован */
@@ -7350,6 +8069,56 @@ export interface operations {
             };
             /** @description Внутренняя ошибка сервера */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    getInviteCode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID организации */
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Код получен */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": string;
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Доступ запрещен */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Организация не найдена */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7910,95 +8679,10 @@ export interface operations {
             };
         };
     };
-    getInviteCode: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                organizationId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Код получен */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "text/plain": string;
-                };
-            };
-            /** @description Не аутентифицирован */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Доступ запрещен */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Организация не найдена */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    regenerateInviteCode: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                organizationId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Новый код сгенерирован */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "text/plain": string;
-                };
-            };
-            /** @description Не аутентифицирован */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Доступ запрещен */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Организация не найдена */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     getOrganizationByInviteCode: {
         parameters: {
             query: {
+                /** @description Код приглашения */
                 code: string;
             };
             header?: never;
@@ -8021,45 +8705,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
-            };
-        };
-    };
-    joinByInviteCode: {
-        parameters: {
-            query: {
-                code: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["OrganizationJoinCreateRequestDTO"];
-            };
-        };
-        responses: {
-            /** @description Заявка подана */
-            204: {
-                headers: {
-                    [name: string]: unknown;
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
                 };
-                content?: never;
-            };
-            /** @description Некорректный код приглашения */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Не аутентифицирован */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
@@ -8101,7 +8749,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["InstrumentDTO"][];
+                    "*/*": string;
                 };
             };
             /** @description Внутренняя ошибка сервера */
@@ -8111,6 +8759,164 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    download: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                fileId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Файл успешно загружен */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileUploadResponseDTO"];
+                };
+            };
+            /** @description Ошибка валидации / Нарушение бизнес-правил */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Не поддерживаемый тип контента */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Внутренняя ошибка сервера */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description ID файла для удаления
+                 * @example 1
+                 */
+                fileId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Файл успешно удален */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Нарушение бизнес-правил - файл привязан к сущностям */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Файл не найден */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Внутренняя ошибка сервера */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    getFileInfo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                fileId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Метаданные файла */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileMetadataDTO"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Файл не найден */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
                 };
             };
         };
@@ -8303,210 +9109,6 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-        };
-    };
-    deleteSection: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description ID секции
-                 * @example 1
-                 */
-                sectionId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Секция успешно удалена */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Нарушение бизнес-правил - в секции есть участники */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Не аутентифицирован */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Доступ запрещен */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Секция не найдена */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Внутренняя ошибка сервера */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-        };
-    };
-    leaveSection: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID секции */
-                sectionId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Секция покинута */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Нарушение бизнес-правил (лидер не может покинуть секцию) */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Не аутентифицирован */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Доступ запрещен */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Секция не найдена */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Внутренняя ошибка сервера */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-        };
-    };
-    leaveSection_1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description ID секции
-                 * @example 1
-                 */
-                sectionId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Пользователь покинул секцию */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Нарушение бизнес-правил */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Не аутентифицирован */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Доступ запрещен */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Секция не найдена */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Внутренняя ошибка сервера */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
                 };
             };
         };
@@ -8771,122 +9373,6 @@ export interface operations {
             };
         };
     };
-    getMyMemberContext: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID организации */
-                organizationId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Контекст участника получен */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OrgMemberContextDTO"];
-                };
-            };
-            /** @description Не аутентифицирован */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Не является участником организации */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Организация не найдена */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-        };
-    };
-    leaveOrganization: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID организации */
-                organizationId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Пользователь покинул организацию */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Последний лидер не может покинуть организацию */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Не аутентифицирован */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Доступ запрещен */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Организация не найдена */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Внутренняя ошибка сервера */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-        };
-    };
     deleteFileFromEvent: {
         parameters: {
             query?: never;
@@ -9007,154 +9493,6 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-        };
-    };
-    getFileInfo: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description ID файла
-                 * @example 1
-                 */
-                fileId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Метаданные файла */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FileMetadataDTO"];
-                };
-            };
-            /** @description Не аутентифицирован */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Файл не найден */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-        };
-    };
-    downloadFile: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description ID файла
-                 * @example 1
-                 */
-                fileId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Файл успешно получен */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/octet-stream": string;
-                };
-            };
-            /** @description Не аутентифицирован */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Файл не найден */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-        };
-    };
-    delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description ID файла для удаления
-                 * @example 1
-                 */
-                fileId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Файл успешно удален */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Нарушение бизнес-правил - файл привязан к сущностям */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Не аутентифицирован */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Файл не найден */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
-                };
-            };
-            /** @description Внутренняя ошибка сервера */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApiErrorResponse"];
                 };
             };
         };

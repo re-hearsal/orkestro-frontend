@@ -88,6 +88,8 @@
     "birthDate": "Date of Birth",
     "empty": "—",
     "instruments": "Your Instruments",
+    "noInstruments": "No instruments selected",
+    "instrumentsPublic": "Instruments",
     "addInstrument": "Add Instrument",
     "removeInstrument": "Remove",
     "searchInstrument": "Search instrument",
@@ -125,7 +127,8 @@
   "sidebar": {
     "joinRequests": "Requests",
     "fund": "Fund",
-    "repertoire": "Repertoire"
+    "repertoire": "Repertoire",
+    "tasks": "Tasks"
   },
   "language": {
     "current": "ENG"
@@ -223,7 +226,11 @@
       "removeRole": "Delete",
       "changeRole": "Change role",
       "roleAssigned": "Role assigned",
-      "roleRemoved": "Role removed"
+      "roleRemoved": "Role removed",
+      "remove": "Remove from organization",
+      "removeConfirmTitle": "Remove member",
+      "removeConfirmText": "Are you sure you want to remove {{name}} from the organization?",
+      "removed": "Member removed"
     },
     "instrumentNames": {
       "conductor": "Conductor",
@@ -378,6 +385,7 @@
     "editTitle": "Edit role",
     "deleteConfirm": "Delete this role? This action cannot be undone.",
     "deleteButton": "Delete",
+    "deleteError": "Failed to delete role",
     "rolesSection": "Technical roles"
   },
   "repertoire": {
@@ -444,8 +452,90 @@
     "confirmDeleteSong": "Are you sure you want to delete this song? This action cannot be undone.",
     "songDeleted": "Song deleted"
   },
+  "tasks": {
+    "title": "Tasks",
+    "createButton": "Create task",
+    "status": {
+      "open": "Open",
+      "inProgress": "In progress",
+      "done": "Done",
+      "cancelled": "Cancelled"
+    },
+    "empty": "No tasks",
+    "closedButton": "Done and cancelled",
+    "form": {
+      "title": "Title",
+      "description": "Description",
+      "deadline": "Deadline",
+      "deadlinePast": "The specified deadline is in the past",
+      "visibility": "Visibility"
+    },
+    "visibility": {
+      "allMembers": "All members",
+      "roleRestricted": "Selected roles only"
+    },
+    "assignees": {
+      "add": "Role",
+      "remove": "Remove from assignees",
+      "section": "Assignees"
+    },
+    "editButton": "Edit task",
+    "deleted": "Task deleted",
+    "files": {
+      "section": "Files",
+      "maxReached": "Maximum 50 files"
+    },
+    "description": {
+      "section": "Description"
+    },
+    "deadline": {
+      "section": "Deadline"
+    },
+    "author": "Author",
+    "createdAt": "Created",
+    "updatedAt": "Updated",
+    "closedAt": "Closed",
+    "loadMore": "Load more",
+    "deleteButton": "Delete task",
+    "confirmDelete": "Are you sure you want to delete this task? This action cannot be undone."
+  },
+  "users": {
+    "viewProfile": "View profile",
+    "publicProfileTitle": "User profile",
+    "notFound": "User not found"
+  },
+  "sections": {
+    "sections": "Sections",
+    "createSection": "Create section",
+    "sectionName": "Section name",
+    "sectionDescription": "Section description",
+    "noSections": "No sections yet",
+    "leaveSection": "Leave section",
+    "deleteSection": "Delete section",
+    "confirmLeaveSection": "Are you sure you want to leave this section?",
+    "confirmDeleteSection": "Are you sure you want to delete this section? This action cannot be undone.",
+    "addMember": "Add member",
+    "removeMember": "Remove member",
+    "sectionMembers": "Section members",
+    "sectionRoles": "Section roles",
+    "editSection": "Edit section",
+    "showAll": "Show all",
+    "showMore": "more {{count}}",
+    "collapse": "Collapse",
+    "backToOrganization": "Back to organization",
+    "backToSection": "Back to section",
+    "childSections": "Subsections",
+    "nameRequired": "Enter section name",
+    "joinSection": "Join section",
+    "joinSuccess": "You have joined the section",
+    "joinError": "Could not join the section",
+    "yourRole": "Your role",
+    "upcomingEvents": "Upcoming events"
+  },
   "common": {
-    "cancel": "Cancel"
+    "back": "Back",
+    "cancel": "Cancel",
+    "edit": "Edit"
   },
   "notifications": {
     "title": "Notifications",
@@ -472,6 +562,13 @@
     "EVENT_DELETION": "Delete events",
     "EVENT_MANAGE_DESCRIPTIONS": "Manage event description templates",
     "EVENT_WRITE_COMMENT": "Write event comments",
-    "TASK_MANAGE": "Manage tasks"
+    "TASK_MANAGE": "Manage tasks",
+    "SECTION_EDIT": "Edit section",
+    "SECTION_DELETE": "Delete section",
+    "SECTION_WRITE_INFO": "Write info messages",
+    "SECTION_MEMBER_ADD": "Add members",
+    "SECTION_MEMBER_REMOVE": "Remove members",
+    "SECTION_ASSIGN_TECH_ROLE": "Assign technical roles",
+    "SECTION_TECH_ROLE_MANAGE": "Manage technical roles"
   }
 }

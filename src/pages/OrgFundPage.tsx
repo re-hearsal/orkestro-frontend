@@ -67,7 +67,7 @@ function toUserTimezoneBoundaryIso(value: string, boundary: "start" | "end"): st
 export default function OrgFundPage() {
   const { t } = useTranslation();
   const { organizationId: rawOrganizationId } = useParams();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { showAlert } = useAppAlert();
   const { organizations, currentOrganization, setCurrentOrganization } = useOrganization();
 
@@ -466,6 +466,7 @@ export default function OrgFundPage() {
               <FundTransactionRow
                 key={`${transaction.id ?? "tx"}-${transaction.createdAt ?? ""}`}
                 transaction={transaction}
+                currentUserId={profile?.id}
               />
             ))}
           </Box>

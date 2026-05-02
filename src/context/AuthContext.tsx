@@ -8,6 +8,7 @@ import { emitNotificationsUpdated } from '../utils/notificationsEvents';
 import { emitMemberRoleUpdated } from '../utils/memberRoleEvents';
 import { emitFundRealtimeSnapshot } from '../utils/fundEvents';
 import { emitSongDeleted } from '../utils/songEvents';
+import { emitTaskUpdated, emitTaskDeleted } from '../utils/taskEvents';
 import { isBlobUrl, toRenderableImageSource } from '../utils/imageSource';
 
 export interface AuthUser {
@@ -156,6 +157,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                   const payload = JSON.parse(msg.body) as { type?: string; songId?: number };
                   if (payload.type === 'SONG_DELETED' && typeof payload.songId === 'number') {
                     emitSongDeleted({ organizationId: org.id as number, songId: payload.songId });
+                  }
+                } catch {
+                  // ignore malformed messages
+                }
+              });
+
+              stomp.subscribe(`/topic/organizations/${org.id}/tasks`, (msg) => {
+                try {
+                  const payload = JSON.parse(msg.body) as { type?: string; taskId?: number };
+                  if (payload.type === 'TASK_UPDATED' && typeof payload.taskId === 'number') {
+                    emitTaskUpdated({ organizationId: org.id as number, taskId: payload.taskId });
+                  } else if (payload.type === 'TASK_DELETED' && typeof payload.taskId === 'number') {
+                    emitTaskDeleted({ organizationId: org.id as number, taskId: payload.taskId });
                   }
                 } catch {
                   // ignore malformed messages

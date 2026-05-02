@@ -1,8 +1,20 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Menu, MenuItem, Typography } from "@mui/material";
+import { useEffect, useRef, useState, useMemo } from "react";
+import {
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Menu,
+  MenuItem,
+  Typography,
+} from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutlined";
 import PersonIcon from "@mui/icons-material/Person";
-import MusicNoteIcon from "@mui/icons-material/MusicNote";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import client from "../../api/client";
@@ -15,7 +27,7 @@ import { navigateToUser } from "../../utils/navigateToUser";
 
 type TechnicalRoleDTO = components["schemas"]["TechnicalRoleDTO"];
 
-export interface OrgMemberCardData {
+export interface SectionMemberCardData {
   id?: number;
   name?: string;
   birthDate?: string;
@@ -24,9 +36,9 @@ export interface OrgMemberCardData {
   role?: { id: number; name: string };
 }
 
-interface OrgMemberCardProps {
-  member: OrgMemberCardData;
-  organizationId?: number;
+interface SectionMemberCardProps {
+  member: SectionMemberCardData;
+  sectionId: number;
   canAssignRole?: boolean;
   availableRoles?: TechnicalRoleDTO[];
   canRemoveMember?: boolean;
@@ -34,37 +46,34 @@ interface OrgMemberCardProps {
   onMemberRemoved?: () => void;
 }
 
-export default function OrgMemberCard({
+export default function SectionMemberCard({
   member,
-  organizationId,
+  sectionId,
   canAssignRole = false,
   availableRoles = [],
   canRemoveMember = false,
   currentUserId,
   onMemberRemoved,
-}: OrgMemberCardProps) {
+}: SectionMemberCardProps) {
   const { t } = useTranslation();
-  const { i18n } = useTranslation();
   const { user } = useAuth();
   const { showAlert } = useAppAlert();
   const navigate = useNavigate();
 
   const objectUrlRef = useRef<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [failedIcons, setFailedIcons] = useState<Set<string>>(new Set());
 
-  const [currentRole, setCurrentRole] = useState<{ id: number; name: string } | undefined>(
-    member.role
-  );
+  const [currentRole, setCurrentRole] = useState<{ id: number; name: string } | undefined>(member.role);
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const [menuAnchorUser, setMenuAnchorUser] = useState<HTMLElement | null>(null);
   const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
   const [removing, setRemoving] = useState(false);
+  const [roleLoading, setRoleLoading] = useState(false);
+  const canOpenRoleMenu = canAssignRole && Boolean(member.id);
 
   useEffect(() => {
     setCurrentRole(member.role);
   }, [member.role]);
-  const [roleLoading, setRoleLoading] = useState(false);
 
   useEffect(() => {
     const revoke = () => {
@@ -89,56 +98,29 @@ export default function OrgMemberCard({
           headers: { Authorization: `Bearer ${user.token}` },
           parseAs: "blob",
         });
-
-        if (cancelled || !data) {
-          return;
-        }
-
+        if (cancelled || !data) return;
         revoke();
         const nextUrl = await toRenderableImageSource(data as unknown as Blob);
         objectUrlRef.current = nextUrl;
-
-        if (!cancelled) {
-          setAvatarUrl(nextUrl);
-        }
+        if (!cancelled) setAvatarUrl(nextUrl);
       } catch {
-        if (!cancelled) {
-          revoke();
-          setAvatarUrl(null);
-        }
+        if (!cancelled) { revoke(); setAvatarUrl(null); }
       }
     };
 
     void loadAvatar();
-
-    return () => {
-      cancelled = true;
-      revoke();
-    };
+    return () => { cancelled = true; revoke(); };
   }, [member.profileImageFileId, user]);
 
-  const formattedBirthDate = useMemo(() => {
-    if (!member.birthDate) {
-      return "";
+  const nonSystemRoles = useMemo(() => availableRoles.filter((r) => r.system !== true), [availableRoles]);
+  const otherRoles = useMemo(() => nonSystemRoles.filter((r) => r.id !== currentRole?.id), [nonSystemRoles, currentRole]);
+
+  const extractErrorMessage = (err: unknown): string => {
+    if (err && typeof err === "object" && "message" in err && typeof (err as Record<string, unknown>).message === "string") {
+      return (err as Record<string, unknown>).message as string;
     }
-
-    const parsed = new Date(member.birthDate);
-    if (Number.isNaN(parsed.getTime())) {
-      return member.birthDate;
-    }
-
-    return parsed.toLocaleDateString(i18n.language === "ru" ? "ru-RU" : "en-GB");
-  }, [i18n.language, member.birthDate]);
-
-  const nonSystemRoles = useMemo(
-    () => availableRoles.filter((r) => r.system !== true),
-    [availableRoles]
-  );
-
-  const otherRoles = useMemo(
-    () => nonSystemRoles.filter((r) => r.id !== currentRole?.id),
-    [nonSystemRoles, currentRole]
-  );
+    return String(t("organizations.members.loadError"));
+  };
 
   const handleUserClick = (event: React.MouseEvent<HTMLElement>) => {
     if (canRemoveMember) {
@@ -148,72 +130,21 @@ export default function OrgMemberCard({
     }
   };
 
-  const handleRemoveMember = async () => {
-    if (!user || !organizationId || !member.id) return;
-    setRemoving(true);
-    try {
-      const { error } = await client.DELETE(
-        "/api/v1/organizations/{organizationId}/members/{userId}",
-        {
-          params: { path: { organizationId, userId: member.id } },
-          headers: { Authorization: `Bearer ${user.token}` },
-        }
-      );
-      if (error) throw error;
-      setRemoveDialogOpen(false);
-      setMenuAnchorUser(null);
-      showAlert(String(t("organizations.members.removed")), "success");
-      onMemberRemoved?.();
-    } catch (err) {
-      showAlert(extractErrorMessage(err), "warning");
-    } finally {
-      setRemoving(false);
-    }
-  };
-
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    if (!canAssignRole || !organizationId || !member.id) return;
-    setMenuAnchor(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setMenuAnchor(null);
-  };
-
-  const extractErrorMessage = (err: unknown): string => {
-    if (err && typeof err === "object") {
-      if ("message" in err && typeof (err as Record<string, unknown>).message === "string") {
-        return (err as Record<string, unknown>).message as string;
-      }
-    }
-    return String(t("organizations.members.loadError"));
-  };
-
   const handleAssignRole = async (role: TechnicalRoleDTO) => {
-    if (!user || !organizationId || !member.id || !role.id) return;
-    handleMenuClose();
+    if (!user || !member.id || !role.id) return;
+    setMenuAnchor(null);
     setRoleLoading(true);
     try {
       if (currentRole) {
         const { error: deleteError } = await client.DELETE(
-          "/api/v1/organizations/{organizationId}/members/{userId}/roles/{roleId}",
-          {
-            params: {
-              path: { organizationId, userId: member.id, roleId: currentRole.id },
-            },
-            headers: { Authorization: `Bearer ${user.token}` },
-          }
+          "/api/v1/sections/{sectionId}/members/{userId}/roles/{roleId}",
+          { params: { path: { sectionId, userId: member.id, roleId: currentRole.id } }, headers: { Authorization: `Bearer ${user.token}` } }
         );
         if (deleteError) throw deleteError;
       }
       const { error: postError } = await client.POST(
-        "/api/v1/organizations/{organizationId}/members/{userId}/roles/{roleId}",
-        {
-          params: {
-            path: { organizationId, userId: member.id, roleId: role.id },
-          },
-          headers: { Authorization: `Bearer ${user.token}` },
-        }
+        "/api/v1/sections/{sectionId}/members/{userId}/roles/{roleId}",
+        { params: { path: { sectionId, userId: member.id, roleId: role.id } }, headers: { Authorization: `Bearer ${user.token}` } }
       );
       if (postError) throw postError;
       setCurrentRole({ id: role.id, name: role.name ?? "" });
@@ -226,18 +157,13 @@ export default function OrgMemberCard({
   };
 
   const handleRemoveRole = async () => {
-    if (!user || !organizationId || !member.id || !currentRole) return;
-    handleMenuClose();
+    if (!user || !member.id || !currentRole) return;
+    setMenuAnchor(null);
     setRoleLoading(true);
     try {
       const { error: deleteError } = await client.DELETE(
-        "/api/v1/organizations/{organizationId}/members/{userId}/roles/{roleId}",
-        {
-          params: {
-            path: { organizationId, userId: member.id, roleId: currentRole.id },
-          },
-          headers: { Authorization: `Bearer ${user.token}` },
-        }
+        "/api/v1/sections/{sectionId}/members/{userId}/roles/{roleId}",
+        { params: { path: { sectionId, userId: member.id, roleId: currentRole.id } }, headers: { Authorization: `Bearer ${user.token}` } }
       );
       if (deleteError) throw deleteError;
       setCurrentRole(undefined);
@@ -246,6 +172,26 @@ export default function OrgMemberCard({
       showAlert(extractErrorMessage(err), "warning");
     } finally {
       setRoleLoading(false);
+    }
+  };
+
+  const handleRemoveMember = async () => {
+    if (!user || !member.id) return;
+    setRemoving(true);
+    try {
+      const { error } = await client.DELETE(
+        "/api/v1/sections/{sectionId}/members/{userId}",
+        { params: { path: { sectionId, userId: member.id } }, headers: { Authorization: `Bearer ${user.token}` } }
+      );
+      if (error) throw error;
+      setRemoveDialogOpen(false);
+      setMenuAnchorUser(null);
+      showAlert(String(t("organizations.members.removed")), "success");
+      onMemberRemoved?.();
+    } catch (err) {
+      showAlert(extractErrorMessage(err), "warning");
+    } finally {
+      setRemoving(false);
     }
   };
 
@@ -280,16 +226,10 @@ export default function OrgMemberCard({
       >
         <Box
           sx={{
-            width: 44,
-            height: 44,
-            minWidth: 44,
-            borderRadius: "50%",
-            overflow: "hidden",
-            border: "1px solid #7795de",
-            backgroundColor: "#e8f0ff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            width: 44, height: 44, minWidth: 44,
+            borderRadius: "50%", overflow: "hidden",
+            border: "1px solid #7795de", backgroundColor: "#e8f0ff",
+            display: "flex", alignItems: "center", justifyContent: "center",
           }}
         >
           {avatarUrl ? (
@@ -319,64 +259,10 @@ export default function OrgMemberCard({
           >
             {member.name ?? ""}
           </Typography>
-
-          {formattedBirthDate && (
-            <Typography
-              sx={{
-                fontFamily: "Century Gothic, sans-serif",
-                color: "#7795de",
-                fontSize: "0.7rem",
-              }}
-            >
-              {formattedBirthDate}
-            </Typography>
-          )}
         </Box>
       </Box>
 
-      <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, flexWrap: "wrap" }}>
-        {member.instruments.map((instrumentName) => {
-          const iconKey = instrumentName.trim().toLowerCase();
-          const iconFailed = failedIcons.has(iconKey);
-
-          return (
-            <Box
-              key={`${member.id ?? member.name}-${instrumentName}`}
-              sx={{
-                width: 18,
-                height: 18,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#0f3eb5",
-              }}
-            >
-              {iconFailed ? (
-                <MusicNoteIcon sx={{ fontSize: 15 }} />
-              ) : (
-                <Box
-                  component="img"
-                  src={`/icons/${instrumentName}.svg`}
-                  alt={instrumentName}
-                  onError={(event) => {
-                    event.currentTarget.style.display = "none";
-                    setFailedIcons((prev) => {
-                      const next = new Set(prev);
-                      next.add(iconKey);
-                      return next;
-                    });
-                  }}
-                  sx={{ width: 15, height: 15, objectFit: "contain", display: "block" }}
-                />
-              )}
-            </Box>
-          );
-        })}
-      </Box>
-
-      {roleLoading && (
-        <CircularProgress size={18} sx={{ color: "#7795de", flexShrink: 0 }} />
-      )}
+      {roleLoading && <CircularProgress size={18} sx={{ color: "#7795de", flexShrink: 0 }} />}
 
       {!roleLoading && (
         <>
@@ -384,7 +270,7 @@ export default function OrgMemberCard({
             <Chip
               label={getLocalizedRoleName(currentRole.name, t)}
               size="small"
-              onClick={canAssignRole && organizationId && member.id ? handleMenuOpen : undefined}
+              onClick={canOpenRoleMenu ? (e) => setMenuAnchor(e.currentTarget) : undefined}
               sx={{
                 borderRadius: "24px",
                 border: "1px solid #7795de",
@@ -394,33 +280,29 @@ export default function OrgMemberCard({
                 fontSize: "0.72rem",
                 fontWeight: 600,
                 flexShrink: 0,
-                cursor: canAssignRole && organizationId && member.id ? "pointer" : "default",
-                "&:hover": canAssignRole && organizationId && member.id
-                  ? { backgroundColor: "rgba(119,149,222,0.1)" }
-                  : {},
+                cursor: canOpenRoleMenu ? "pointer" : "default",
+                "&:hover": canOpenRoleMenu ? { backgroundColor: "rgba(119,149,222,0.1)" } : {},
               }}
             />
           ) : (
-            canAssignRole && organizationId && member.id && (
+            canOpenRoleMenu ? (
               <IconButton
                 size="small"
-                onClick={handleMenuOpen}
+                onClick={(e) => setMenuAnchor(e.currentTarget)}
                 title={String(t("organizations.members.assignRole"))}
                 sx={{ color: "#7795de", flexShrink: 0, p: 0.25 }}
               >
                 <AddCircleOutlineIcon fontSize="small" />
               </IconButton>
-            )
+            ) : null
           )}
 
-          {canAssignRole && organizationId && member.id && (
+          {canOpenRoleMenu && (
             <Menu
               anchorEl={menuAnchor}
               open={Boolean(menuAnchor)}
-              onClose={handleMenuClose}
-              slotProps={{
-                paper: { sx: { borderRadius: "12px", minWidth: 160 } },
-              }}
+              onClose={() => setMenuAnchor(null)}
+              slotProps={{ paper: { sx: { borderRadius: "12px", minWidth: 160 } } }}
             >
               {otherRoles.map((role) => (
                 <MenuItem
@@ -431,20 +313,14 @@ export default function OrgMemberCard({
                   {getLocalizedRoleName(role.name, t)}
                 </MenuItem>
               ))}
-
               {currentRole && (
                 <MenuItem
                   onClick={() => void handleRemoveRole()}
-                  sx={{
-                    fontFamily: "Century Gothic, sans-serif",
-                    fontSize: "0.88rem",
-                    color: "error.main",
-                  }}
+                  sx={{ fontFamily: "Century Gothic, sans-serif", fontSize: "0.88rem", color: "error.main" }}
                 >
                   {t("organizations.members.removeRole")}
                 </MenuItem>
               )}
-
               {otherRoles.length === 0 && !currentRole && (
                 <MenuItem disabled sx={{ fontFamily: "Century Gothic, sans-serif", fontSize: "0.85rem" }}>
                   {t("organizations.members.assignRole")}
@@ -459,10 +335,7 @@ export default function OrgMemberCard({
         anchorEl={menuAnchorUser}
         open={Boolean(menuAnchorUser)}
         onClose={() => setMenuAnchorUser(null)}
-        disableAutoFocusItem
-        slotProps={{
-          paper: { sx: { borderRadius: "12px", minWidth: 180 } },
-        }}
+        slotProps={{ paper: { sx: { borderRadius: "12px", minWidth: 180 } } }}
       >
         <MenuItem
           onClick={() => { setMenuAnchorUser(null); navigateToUser(member.id, currentUserId, navigate); }}
@@ -475,7 +348,7 @@ export default function OrgMemberCard({
             onClick={() => { setMenuAnchorUser(null); setRemoveDialogOpen(true); }}
             sx={{ fontFamily: "Century Gothic, sans-serif", fontSize: "0.88rem", color: "error.main" }}
           >
-            {t("organizations.members.remove")}
+            {t("sections.removeMember")}
           </MenuItem>
         )}
       </Menu>
@@ -488,7 +361,7 @@ export default function OrgMemberCard({
         PaperProps={{ sx: { borderRadius: "16px" } }}
       >
         <DialogTitle sx={{ color: "error.main", fontFamily: "Century Gothic, sans-serif" }}>
-          {t("organizations.members.removeConfirmTitle")}
+          {t("sections.removeMember")}
         </DialogTitle>
         <DialogContent>
           <Typography sx={{ fontFamily: "Century Gothic, sans-serif" }}>
@@ -510,7 +383,7 @@ export default function OrgMemberCard({
             variant="outlined"
             sx={{ fontFamily: "Century Gothic, sans-serif", borderRadius: "8px" }}
           >
-            {removing ? <CircularProgress size={16} /> : t("organizations.members.remove")}
+            {removing ? <CircularProgress size={16} /> : t("sections.removeMember")}
           </Button>
         </DialogActions>
       </Dialog>

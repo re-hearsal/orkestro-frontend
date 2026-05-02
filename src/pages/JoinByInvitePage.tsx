@@ -398,7 +398,7 @@ export default function JoinByInvitePage() {
                   <Alert severity="success">{t("join.successMessage")}</Alert>
                   <Button
                     variant="outlined"
-                    onClick={() => navigate("/")}
+                    onClick={() => navigate("/organizations")}
                     sx={{
                       alignSelf: "flex-start",
                       borderRadius: "8px",

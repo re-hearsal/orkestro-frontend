@@ -11,6 +11,8 @@ import OrgMembersList from "../components/organizations/OrgMembersList";
 import OrgRolesManager from "../components/organizations/OrgRolesManager";
 import EditOrgDialog from "../components/organizations/EditOrgDialog";
 import OrgSocialLinks from "../components/organizations/OrgSocialLinks";
+import SectionCard from "../components/sections/SectionCard";
+import CreateSectionDialog from "../components/sections/CreateSectionDialog";
 import { useAppAlert } from "../hooks/useAppAlert";
 import { useAuth } from "../hooks/useAuth";
 import { useOrgMemberContext } from "../hooks/useOrgMemberContext";
@@ -18,6 +20,7 @@ import { useOrganization } from "../hooks/useOrganization";
 import { getLocalizedRoleName } from "../utils/roleNameI18n";
 
 type OrganizationDTO = components["schemas"]["OrganizationDTO"];
+type SectionDTO = components["schemas"]["SectionDTO"];
 
 function getErrorMessage(error: unknown): string | null {
   if (!error || typeof error !== "object") {
@@ -54,6 +57,7 @@ export default function OrganizationProfilePage() {
     role,
     permissions,
     loading: memberContextLoading,
+    initialized: memberContextInitialized,
     error: memberContextError,
   } = useOrgMemberContext(organizationId);
 
@@ -63,6 +67,12 @@ export default function OrganizationProfilePage() {
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
   const [leaveActionLoading, setLeaveActionLoading] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+
+  const [sections, setSections] = useState<SectionDTO[]>([]);
+  const [sectionsLoaded, setSectionsLoaded] = useState(false);
+  const [sectionsLoadedOk, setSectionsLoadedOk] = useState(false);
+  const [sectionsExpanded, setSectionsExpanded] = useState(false);
+  const [createSectionDialogOpen, setCreateSectionDialogOpen] = useState(false);
 
   const eventsRange = useMemo(() => {
     const now = new Date();
@@ -128,6 +138,45 @@ export default function OrganizationProfilePage() {
       cancelled = true;
     };
   }, [isValidOrganizationId, organizationId, setCurrentOrganization, user]);
+
+  useEffect(() => {
+    if (!user || !isValidOrganizationId) {
+      setSections([]);
+      setSectionsLoaded(false);
+      setSectionsLoadedOk(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadSections = async () => {
+      try {
+        const { data } = await client.GET(
+          "/api/v1/organizations/{organizationId}/sections",
+          {
+            params: { path: { organizationId } },
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+        if (!cancelled) {
+          setSections((data as SectionDTO[] | undefined) ?? []);
+          setSectionsLoaded(true);
+          setSectionsLoadedOk(true);
+        }
+      } catch {
+        if (!cancelled) {
+          setSectionsLoaded(true);
+          setSectionsLoadedOk(false);
+        }
+      }
+    };
+
+    void loadSections();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isValidOrganizationId, organizationId, user]);
 
   useEffect(() => {
     if (memberContextError) {
@@ -212,6 +261,22 @@ export default function OrganizationProfilePage() {
     user,
   ]);
 
+  const handleCreateSection = useCallback(
+    async (data: { name: string; description?: string }) => {
+      const { data: newSection, error: responseError } = await client.POST(
+        "/api/v1/organizations/{organizationId}/sections",
+        {
+          params: { path: { organizationId } },
+          headers: { Authorization: `Bearer ${user!.token}` },
+          body: data,
+        }
+      );
+      if (responseError) throw responseError;
+      return newSection as SectionDTO;
+    },
+    [organizationId, user]
+  );
+
   if (!isValidOrganizationId) {
     return <Navigate to="/organizations" replace />;
   }
@@ -229,7 +294,13 @@ export default function OrganizationProfilePage() {
   }
 
   const canEdit = permissions.has("ORG_EDIT");
+  const canManageRoles = permissions.has("ORG_TECH_ROLE_MANAGE");
   const isLeader = role?.name === "Leader" || role?.name?.toLowerCase() === "leader";
+
+  const SECTIONS_PREVIEW = 5;
+  const visibleSections = sectionsExpanded ? sections : sections.slice(0, SECTIONS_PREVIEW);
+  // Show the block only if we successfully loaded (user is a member) AND either there are sections or we can create
+  const showSectionsBlock = sectionsLoadedOk && (sections.length > 0 || sectionsLoaded);
 
   return (
     <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1040, mx: "auto" }}>
@@ -367,6 +438,90 @@ export default function OrganizationProfilePage() {
         <OrgMembersList organizationId={organizationId} permissions={permissions} />
       </Box>
 
+      {showSectionsBlock && (
+        <Box sx={{ mt: 4 }}>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1.5 }}>
+            <Typography
+              sx={{
+                fontFamily: "Century Gothic, sans-serif",
+                fontWeight: 700,
+                color: "#0f3eb5",
+                fontSize: "1.15rem",
+              }}
+            >
+              {t("sections.sections")}
+            </Typography>
+            {sectionsLoaded && (
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() => setCreateSectionDialogOpen(true)}
+                sx={{
+                  borderRadius: "8px",
+                  borderColor: "#0f3eb5",
+                  color: "#0f3eb5",
+                  fontFamily: "Century Gothic, sans-serif",
+                  fontWeight: 700,
+                  textTransform: "none",
+                  fontSize: "0.8rem",
+                  "&:hover": { borderColor: "#0f3eb5", backgroundColor: "rgba(15,62,181,0.08)" },
+                }}
+              >
+                {t("sections.createSection")}
+              </Button>
+            )}
+          </Box>
+
+          {sections.length === 0 ? (
+            <Typography sx={{ color: "#7795de", fontFamily: "Century Gothic, sans-serif", fontSize: "0.9rem" }}>
+              {t("sections.noSections")}
+            </Typography>
+          ) : (
+            <>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))" },
+                  gap: 1.25,
+                }}
+              >
+                {visibleSections.map((section) => (
+                  <SectionCard
+                    key={section.id}
+                    section={section}
+                    showAvatar={false}
+                    onClick={() => navigate(`/organizations/${organizationId}/sections/${section.id}`)}
+                  />
+                ))}
+              </Box>
+
+              {sections.length > SECTIONS_PREVIEW && (
+                <Button
+                  size="small"
+                  onClick={() => setSectionsExpanded((prev) => !prev)}
+                  sx={{
+                    mt: 1,
+                    color: "#7795de",
+                    fontSize: "0.8rem",
+                    fontFamily: "Century Gothic, sans-serif",
+                    textTransform: "none",
+                  }}
+                >
+                  {sectionsExpanded ? t("sections.collapse") : t("sections.showAll")}
+                </Button>
+              )}
+            </>
+          )}
+        </Box>
+      )}
+
+      <CreateSectionDialog
+        open={createSectionDialogOpen}
+        onClose={() => setCreateSectionDialogOpen(false)}
+        createFn={handleCreateSection}
+        onCreated={(newSection) => setSections((prev) => [...prev, newSection])}
+      />
+
       <Box sx={{ mt: 4 }}>
         <Typography
           sx={{
@@ -386,8 +541,8 @@ export default function OrganizationProfilePage() {
         />
       </Box>
 
-      {permissions.has("ORG_TECH_ROLE_MANAGE") && (
-        <OrgRolesManager organizationId={organizationId} />
+      {memberContextInitialized && (
+        <OrgRolesManager organizationId={organizationId} canManage={canManageRoles} />
       )}
 
       <Box sx={{ mt: 6 }}>

@@ -1,15 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Avatar, Box, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import client from "../../api/client";
 import type { components } from "../../api/schema";
 import { useAuth } from "../../hooks/useAuth";
 import { isBlobUrl, toRenderableImageSource } from "../../utils/imageSource";
+import { navigateToUser } from "../../utils/navigateToUser";
 
 type OrgFundTransactionDTO = components["schemas"]["OrgFundTransactionDTO"];
 
 interface FundTransactionRowProps {
   transaction: OrgFundTransactionDTO;
+  currentUserId?: number;
 }
 
 function getPerformerName(transaction: OrgFundTransactionDTO): string {
@@ -66,9 +69,10 @@ function formatDate(value?: string): string {
   return `${datePart} ${timePart}`;
 }
 
-export default function FundTransactionRow({ transaction }: FundTransactionRowProps) {
+export default function FundTransactionRow({ transaction, currentUserId }: FundTransactionRowProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const objectUrlRef = useRef<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -140,7 +144,16 @@ export default function FundTransactionRow({ transaction }: FundTransactionRowPr
         alignItems: { xs: "flex-start", md: "center" },
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <Box
+        onClick={() => navigateToUser(transaction.performedByUserId ?? undefined, currentUserId, navigate)}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          cursor: transaction.performedByUserId ? "pointer" : "default",
+          "&:hover": transaction.performedByUserId ? { opacity: 0.8 } : {},
+        }}
+      >
         <Avatar
           src={avatarUrl ?? undefined}
           alt={performerName}

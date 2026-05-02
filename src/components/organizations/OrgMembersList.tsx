@@ -14,7 +14,9 @@ import { useAuth } from "../../hooks/useAuth";
 import { useAppAlert } from "../../hooks/useAppAlert";
 import { withFlatPagination } from "../../utils/pagination";
 import { getLocalizedRoleName } from "../../utils/roleNameI18n";
+import { getInstrumentLabel as getInstrumentLabelUtil } from "../../utils/instrumentI18n";
 import { MEMBER_ROLE_UPDATED_EVENT } from "../../utils/memberRoleEvents";
+import { ORG_ROLES_UPDATED_EVENT } from "../../utils/orgRolesEvents";
 import OrgMemberCard, { type OrgMemberCardData } from "./OrgMemberCard";
 import OrgInviteLink from "./OrgInviteLink";
 
@@ -38,139 +40,6 @@ interface PagedModelLike {
 }
 
 const PAGE_SIZE = 6;
-
-const INSTRUMENT_NAME_ALIASES: Record<string, string> = {
-  conductor: "conductor",
-  "дирижер": "conductor",
-  "дирижёр": "conductor",
-  violin: "violin",
-  "скрипка": "violin",
-  viola: "viola",
-  "альт": "viola",
-  cello: "cello",
-  violoncello: "cello",
-  "виолончель": "cello",
-  "double bass": "doubleBass",
-  "double-bass": "doubleBass",
-  contrabass: "doubleBass",
-  "контрабас": "doubleBass",
-  flute: "flute",
-  "флейта": "flute",
-  "alto flute": "altoFlute",
-  "альтовая флейта": "altoFlute",
-  piccolo: "piccolo",
-  "пикколо": "piccolo",
-  oboe: "oboe",
-  "гобой": "oboe",
-  "english horn": "englishHorn",
-  "английский рожок": "englishHorn",
-  clarinet: "clarinet",
-  "кларнет": "clarinet",
-  "bass clarinet": "bassClarinet",
-  "бас кларнет": "bassClarinet",
-  "бас-кларнет": "bassClarinet",
-  bassoon: "bassoon",
-  "фагот": "bassoon",
-  contrabassoon: "contrabassoon",
-  "контрафагот": "contrabassoon",
-  "soprano saxophone": "sopranoSaxophone",
-  "soprano-saxophone": "sopranoSaxophone",
-  "сопрано саксофон": "sopranoSaxophone",
-  "саксофон сопрано": "sopranoSaxophone",
-  "alto saxophone": "altoSaxophone",
-  "alto-saxophone": "altoSaxophone",
-  "альт саксофон": "altoSaxophone",
-  "tenor saxophone": "tenorSaxophone",
-  "tenor-saxophone": "tenorSaxophone",
-  "тенор саксофон": "tenorSaxophone",
-  "baritone saxophone": "baritoneSaxophone",
-  "baritone-saxophone": "baritoneSaxophone",
-  "баритон саксофон": "baritoneSaxophone",
-  saxophone: "saxophone",
-  "саксофон": "saxophone",
-  trumpet: "trumpet",
-  "труба": "trumpet",
-  cornet: "cornet",
-  "корнет": "cornet",
-  flugelhorn: "flugelhorn",
-  "флюгельгорн": "flugelhorn",
-  trombone: "trombone",
-  "тромбон": "trombone",
-  "bass trombone": "bassTrombone",
-  "bass-trombone": "bassTrombone",
-  "бас тромбон": "bassTrombone",
-  "бас-тромбон": "bassTrombone",
-  tuba: "tuba",
-  "туба": "tuba",
-  euphonium: "euphonium",
-  "эуфониум": "euphonium",
-  horn: "frenchHorn",
-  "french horn": "frenchHorn",
-  "валторна": "frenchHorn",
-  triangle: "triangle",
-  "треугольник": "triangle",
-  "tam tam": "tamTam",
-  "tam-tam": "tamTam",
-  "там там": "tamTam",
-  "там-там": "tamTam",
-  timpani: "timpani",
-  "литавры": "timpani",
-  xylophone: "xylophone",
-  "ксилофон": "xylophone",
-  marimba: "marimba",
-  "маримба": "marimba",
-  vibraphone: "vibraphone",
-  "вибрафон": "vibraphone",
-  glockenspiel: "glockenspiel",
-  "колокольчики": "glockenspiel",
-  "tubular bells": "tubularBells",
-  "tubular-bells": "tubularBells",
-  "трубчатые колокола": "tubularBells",
-  piano: "piano",
-  "фортепиано": "piano",
-  harpsichord: "harpsichord",
-  "клавесин": "harpsichord",
-  organ: "organ",
-  "орган": "organ",
-  keyboard: "keyboard",
-  synthesizer: "synthesizer",
-  "синтезатор": "synthesizer",
-  "клавиши": "keyboard",
-  guitar: "guitar",
-  "гитара": "guitar",
-  "electric guitar": "electricGuitar",
-  "электрогитара": "electricGuitar",
-  "bass guitar": "bassGuitar",
-  "бас-гитара": "bassGuitar",
-  drums: "drums",
-  drum: "drums",
-  "барабаны": "drums",
-  percussion: "percussion",
-  "перкуссия": "percussion",
-  vocal: "vocal",
-  voice: "vocal",
-  "вокал": "vocal",
-  "choir soprano": "choirSoprano",
-  "choir-soprano": "choirSoprano",
-  "хор сопрано": "choirSoprano",
-  "choir alto": "choirAlto",
-  "choir-alto": "choirAlto",
-  "хор альт": "choirAlto",
-  "choir tenor": "choirTenor",
-  "choir-tenor": "choirTenor",
-  "хор тенор": "choirTenor",
-  "choir bass": "choirBass",
-  "choir-bass": "choirBass",
-  "хор бас": "choirBass",
-  choir: "choir",
-  "хор": "choir",
-  accordion: "accordion",
-  "аккордеон": "accordion",
-  harp: "harp",
-  "арфа": "harp",
-  ukulele: "ukulele",
-  "укулеле": "ukulele",
-};
 
 function getErrorMessage(error: unknown): string | null {
   if (!error || typeof error !== "object") {
@@ -230,6 +99,33 @@ function extractInstruments(member: Record<string, unknown>): string[] {
   return Array.from(new Set(names.map((name) => name.trim()).filter(Boolean)));
 }
 
+function normalizeRole(rawRole: unknown): { id: number; name: string } | undefined {
+  const role = asRecord(rawRole);
+  if (!role) {
+    return undefined;
+  }
+
+  const id =
+    typeof role.id === "number"
+      ? role.id
+      : typeof role.roleId === "number"
+        ? role.roleId
+        : undefined;
+
+  const name =
+    typeof role.name === "string"
+      ? role.name
+      : typeof role.roleName === "string"
+        ? role.roleName
+        : undefined;
+
+  if (id == null || !name) {
+    return undefined;
+  }
+
+  return { id, name };
+}
+
 function normalizeMember(rawMember: unknown): OrgMemberCardData {
   const member = asRecord(rawMember) ?? {};
   const user = asRecord(member.user);
@@ -270,11 +166,23 @@ function normalizeMember(rawMember: unknown): OrgMemberCardData {
         ? user.profileImageFileId
         : undefined;
 
-  const rawRole = asRecord(member.role);
-  const role =
-    rawRole && typeof rawRole.id === "number" && typeof rawRole.name === "string"
-      ? { id: rawRole.id, name: rawRole.name }
-      : undefined;
+  const singleRoleCandidates = [
+    member.role,
+    member.technicalRole,
+    member.organizationRole,
+    member.memberRole,
+  ];
+  const arrayRoleBuckets = [member.roles, member.technicalRoles, member.organizationRoles];
+
+  const roleFromSingles = singleRoleCandidates
+    .map(normalizeRole)
+    .find((candidate): candidate is { id: number; name: string } => candidate !== undefined);
+
+  const roleFromArrays = arrayRoleBuckets
+    .find((bucket) => Array.isArray(bucket))
+    ?.find((item) => normalizeRole(item) != null);
+
+  const role = roleFromSingles ?? normalizeRole(roleFromArrays);
 
   return {
     id,
@@ -325,88 +233,10 @@ function normalizeInstrumentOptions(raw: unknown): InstrumentOption[] {
     .filter((option): option is InstrumentOption => option !== null);
 }
 
-function normalizeInstrumentName(name: string): string {
-  return name
-    .trim()
-    .toLowerCase()
-    .replace(/[._/-]+/g, " ")
-    .replace(/\s+/g, " ");
-}
-
-function resolveInstrumentTranslationKey(name: string): string | null {
-  const normalized = normalizeInstrumentName(name);
-
-  const direct = INSTRUMENT_NAME_ALIASES[normalized];
-  if (direct) {
-    return direct;
-  }
-
-  if (normalized.includes("саксофон") || normalized.includes("saxophone")) {
-    return "saxophone";
-  }
-
-  if (normalized.includes("гитар") || normalized.includes("guitar")) {
-    if (normalized.includes("бас") || normalized.includes("bass")) {
-      return "bassGuitar";
-    }
-    if (normalized.includes("электр") || normalized.includes("electric")) {
-      return "electricGuitar";
-    }
-    return "guitar";
-  }
-
-  if (normalized.includes("клавиш") || normalized.includes("keyboard") || normalized.includes("synth")) {
-    return normalized.includes("synth") ? "synthesizer" : "keyboard";
-  }
-
-  if (normalized.includes("фортеп") || normalized.includes("пиано") || normalized.includes("piano")) {
-    return "piano";
-  }
-
-  if (normalized.includes("барабан") || normalized.includes("drum")) {
-    return "drums";
-  }
-
-  if (normalized.includes("перкус") || normalized.includes("percussion")) {
-    return "percussion";
-  }
-
-  if (normalized.includes("вокал") || normalized.includes("vocal") || normalized.includes("voice")) {
-    return "vocal";
-  }
-
-  if (normalized.includes("хор") || normalized.includes("choir") || normalized.includes("chorus")) {
-    return "choir";
-  }
-
-  if (normalized.includes("валтор") || normalized.includes("french horn") || normalized.includes("horn")) {
-    return "frenchHorn";
-  }
-
-  if (normalized.includes("контрабас") || normalized.includes("double bass") || normalized.includes("contrabass")) {
-    return "doubleBass";
-  }
-
-  if (normalized.includes("виолонч") || normalized.includes("cello") || normalized.includes("violoncello")) {
-    return "cello";
-  }
-
-  return null;
-}
-
 export default function OrgMembersList({ organizationId, permissions }: OrgMembersListProps) {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { showAlert } = useAppAlert();
-
-  const getInstrumentLabel = (name: string): string => {
-    const key = resolveInstrumentTranslationKey(name);
-    if (!key) {
-      return name;
-    }
-
-    return String(t(`organizations.instrumentNames.${key}`, { defaultValue: name }));
-  };
 
   const [query, setQuery] = useState("");
   const [roleIds, setRoleIds] = useState<number[]>([]);
@@ -420,6 +250,7 @@ export default function OrgMembersList({ organizationId, permissions }: OrgMembe
 
   const [roles, setRoles] = useState<TechnicalRoleDTO[]>([]);
   const [instruments, setInstruments] = useState<InstrumentOption[]>([]);
+  const [rolesRefreshCounter, setRolesRefreshCounter] = useState(0);
 
   const refreshCounterRef = useRef(refreshCounter);
   refreshCounterRef.current = refreshCounter;
@@ -431,6 +262,12 @@ export default function OrgMembersList({ organizationId, permissions }: OrgMembe
     };
     window.addEventListener(MEMBER_ROLE_UPDATED_EVENT, handler);
     return () => window.removeEventListener(MEMBER_ROLE_UPDATED_EVENT, handler);
+  }, []);
+
+  useEffect(() => {
+    const handler = () => setRolesRefreshCounter((c) => c + 1);
+    window.addEventListener(ORG_ROLES_UPDATED_EVENT, handler);
+    return () => window.removeEventListener(ORG_ROLES_UPDATED_EVENT, handler);
   }, []);
 
   useEffect(() => {
@@ -473,7 +310,7 @@ export default function OrgMembersList({ organizationId, permissions }: OrgMembe
     return () => {
       cancelled = true;
     };
-  }, [organizationId, user]);
+  }, [organizationId, user, rolesRefreshCounter]);
 
   useEffect(() => {
     if (!user || !Number.isFinite(organizationId) || organizationId <= 0) {
@@ -556,6 +393,12 @@ export default function OrgMembersList({ organizationId, permissions }: OrgMembe
   );
   const canEditInvite = permissions.has("ORG_EDIT");
   const canAssignRole = permissions.has("ORG_ASSIGN_TECH_ROLE");
+  const canRemoveMember = permissions.has("ORG_MEMBER_REMOVE");
+
+  const reloadMembers = () => {
+    setPage(0);
+    setRefreshCounter((c) => c + 1);
+  };
 
   const toggleRole = (id: number) => {
     setRoleIds((prev) =>
@@ -655,7 +498,7 @@ export default function OrgMembersList({ organizationId, permissions }: OrgMembe
               {instruments.map((instrument) => (
                 <Chip
                   key={instrument.id}
-                  label={getInstrumentLabel(instrument.name)}
+                  label={getInstrumentLabelUtil(instrument.name, t)}
                   size="small"
                   color={instrumentIds.includes(instrument.id) ? "primary" : "default"}
                   onClick={() => toggleInstrument(instrument.id)}
@@ -699,6 +542,9 @@ export default function OrgMembersList({ organizationId, permissions }: OrgMembe
                   organizationId={organizationId}
                   canAssignRole={canAssignRole}
                   availableRoles={roles}
+                  canRemoveMember={canRemoveMember}
+                  currentUserId={profile?.id}
+                  onMemberRemoved={reloadMembers}
                 />
               ))}
 

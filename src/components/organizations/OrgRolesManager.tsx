@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Box,
   Chip,
@@ -12,15 +12,17 @@ import client from "../../api/client";
 import { useAuth } from "../../hooks/useAuth";
 import type { components } from "../../api/schema";
 import { getLocalizedRoleName } from "../../utils/roleNameI18n";
+import { emitOrgRolesUpdated } from "../../utils/orgRolesEvents";
 import CreateRoleDialog from "./CreateRoleDialog";
 
 type TechnicalRoleDTO = components["schemas"]["TechnicalRoleDTO"];
 
 interface OrgRolesManagerProps {
   organizationId: number;
+  canManage?: boolean;
 }
 
-export default function OrgRolesManager({ organizationId }: OrgRolesManagerProps) {
+export default function OrgRolesManager({ organizationId, canManage = false }: OrgRolesManagerProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
 
@@ -80,6 +82,7 @@ export default function OrgRolesManager({ organizationId }: OrgRolesManagerProps
       setRoles((prev) => prev.filter((r) => r.id !== popoverRole.id));
       setAnchorEl(null);
       setPopoverRole(null);
+      emitOrgRolesUpdated();
     } finally {
       setDeleting(false);
     }
@@ -105,6 +108,7 @@ export default function OrgRolesManager({ organizationId }: OrgRolesManagerProps
     });
     setDialogOpen(false);
     setEditingRole(undefined);
+    emitOrgRolesUpdated();
   };
 
   const popoverOpen = Boolean(anchorEl);
@@ -145,25 +149,39 @@ export default function OrgRolesManager({ organizationId }: OrgRolesManagerProps
             />
           ))}
 
-          <Chip
-            label="+"
-            onClick={(e) => {
-              (e.currentTarget as HTMLElement).blur();
-              setEditingRole(undefined);
-              setDialogOpen(true);
-            }}
-            sx={{
-              borderRadius: "24px",
-              border: "1px solid #7795de",
-              backgroundColor: "#ffffff",
-              fontFamily: "Century Gothic, sans-serif",
-              color: "#7795de",
-              fontWeight: 700,
-              fontSize: "1.1rem",
-              cursor: "pointer",
-              "&:hover": { backgroundColor: "rgba(119,149,222,0.1)" },
-            }}
-          />
+          {roles.length === 0 && (
+            <Typography
+              sx={{
+                fontFamily: "Century Gothic, sans-serif",
+                color: "#7795de",
+                fontSize: "0.85rem",
+              }}
+            >
+              —
+            </Typography>
+          )}
+
+          {canManage && (
+            <Chip
+              label="+"
+              onClick={(e) => {
+                (e.currentTarget as HTMLElement).blur();
+                setEditingRole(undefined);
+                setDialogOpen(true);
+              }}
+              sx={{
+                borderRadius: "24px",
+                border: "1px solid #7795de",
+                backgroundColor: "#ffffff",
+                fontFamily: "Century Gothic, sans-serif",
+                color: "#7795de",
+                fontWeight: 700,
+                fontSize: "1.1rem",
+                cursor: "pointer",
+                "&:hover": { backgroundColor: "rgba(119,149,222,0.1)" },
+              }}
+            />
+          )}
         </Box>
       )}
 
@@ -221,7 +239,7 @@ export default function OrgRolesManager({ organizationId }: OrgRolesManagerProps
               )}
             </Box>
 
-            {popoverRole.system !== true && (
+            {popoverRole.system !== true && canManage && (
               <Box sx={{ display: "flex", gap: 1 }}>
                 <Button
                   size="small"

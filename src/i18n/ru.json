@@ -88,6 +88,8 @@
     "birthDate": "Дата рождения",
     "empty": "—",
     "instruments": "Ваши инструменты",
+    "noInstruments": "Выбранных инструментов нет",
+    "instrumentsPublic": "Инструменты",
     "addInstrument": "Добавить инструмент",
     "removeInstrument": "Удалить",
     "searchInstrument": "Поиск инструмента",
@@ -125,7 +127,8 @@
   "sidebar": {
     "joinRequests": "Заявки",
     "fund": "Денежный фонд",
-    "repertoire": "Репертуар"
+    "repertoire": "Репертуар",
+    "tasks": "Задачи"
   },
   "language": {
     "current": "РУС"
@@ -223,7 +226,11 @@
       "removeRole": "Удалить",
       "changeRole": "Сменить роль",
       "roleAssigned": "Роль назначена",
-      "roleRemoved": "Роль убрана"
+      "roleRemoved": "Роль убрана",
+      "remove": "Удалить из организации",
+      "removeConfirmTitle": "Удалить участника",
+      "removeConfirmText": "Вы уверены, что хотите удалить {{name}} из организации?",
+      "removed": "Участник удалён"
     },
     "instrumentNames": {
       "conductor": "Дирижёр",
@@ -378,6 +385,7 @@
     "editTitle": "Редактировать роль",
     "deleteConfirm": "Удалить эту роль? Действие необратимо.",
     "deleteButton": "Удалить",
+    "deleteError": "Не удалось удалить роль",
     "rolesSection": "Технические роли"
   },
   "repertoire": {
@@ -444,8 +452,90 @@
     "confirmDeleteSong": "Вы уверены, что хотите удалить это произведение? Это действие необратимо.",
     "songDeleted": "Произведение удалено"
   },
+  "tasks": {
+    "title": "Задачи",
+    "createButton": "Создать задачу",
+    "status": {
+      "open": "Открыта",
+      "inProgress": "В работе",
+      "done": "Выполнена",
+      "cancelled": "Отменена"
+    },
+    "empty": "Задач нет",
+    "closedButton": "Выполненные и отменённые",
+    "form": {
+      "title": "Заголовок",
+      "description": "Описание",
+      "deadline": "Срок выполнения",
+      "deadlinePast": "Указанный срок уже прошёл",
+      "visibility": "Видимость"
+    },
+    "visibility": {
+      "allMembers": "Все участники",
+      "roleRestricted": "Только выбранные роли"
+    },
+    "assignees": {
+      "add": "Роль",
+      "remove": "Удалить из исполнителей",
+      "section": "Исполнители"
+    },
+    "editButton": "Редактировать задачу",
+    "deleted": "Задача удалена",
+    "files": {
+      "section": "Файлы",
+      "maxReached": "Максимум 50 файлов"
+    },
+    "description": {
+      "section": "Описание"
+    },
+    "deadline": {
+      "section": "Срок выполнения"
+    },
+    "author": "Автор",
+    "createdAt": "Создана",
+    "updatedAt": "Обновлена",
+    "closedAt": "Закрыта",
+    "loadMore": "Загрузить ещё",
+    "deleteButton": "Удалить задачу",
+    "confirmDelete": "Вы уверены, что хотите удалить эту задачу? Это действие необратимо."
+  },
+  "users": {
+    "viewProfile": "Просмотреть профиль",
+    "publicProfileTitle": "Профиль пользователя",
+    "notFound": "Пользователь не найден"
+  },
+  "sections": {
+    "sections": "Секции",
+    "createSection": "Создать секцию",
+    "sectionName": "Название секции",
+    "sectionDescription": "Описание секции",
+    "noSections": "Секций пока нет",
+    "leaveSection": "Покинуть секцию",
+    "deleteSection": "Удалить секцию",
+    "confirmLeaveSection": "Вы уверены, что хотите покинуть секцию?",
+    "confirmDeleteSection": "Вы уверены, что хотите удалить эту секцию? Это действие необратимо.",
+    "addMember": "Добавить участника",
+    "removeMember": "Удалить участника",
+    "sectionMembers": "Участники секции",
+    "sectionRoles": "Роли секции",
+    "editSection": "Редактировать секцию",
+    "showAll": "Показать все",
+    "showMore": "ещё {{count}}",
+    "collapse": "Свернуть",
+    "backToOrganization": "К организации",
+    "backToSection": "К секции",
+    "childSections": "Подсекции",
+    "nameRequired": "Введите название секции",
+    "joinSection": "Вступить в секцию",
+    "joinSuccess": "Вы вступили в секцию",
+    "joinError": "Не удалось вступить в секцию",
+    "yourRole": "Ваша роль",
+    "upcomingEvents": "Ближайшие мероприятия"
+  },
   "common": {
-    "cancel": "Отмена"
+    "back": "Назад",
+    "cancel": "Отмена",
+    "edit": "Редактировать"
   },
   "notifications": {
     "title": "Уведомления",
@@ -472,6 +562,13 @@
     "EVENT_DELETION": "Удалять мероприятия",
     "EVENT_MANAGE_DESCRIPTIONS": "Управлять шаблонами описаний событий",
     "EVENT_WRITE_COMMENT": "Писать комментарии к мероприятиям",
-    "TASK_MANAGE": "Управлять задачами"
+    "TASK_MANAGE": "Управлять задачами",
+    "SECTION_EDIT": "Редактировать секцию",
+    "SECTION_DELETE": "Удалить секцию",
+    "SECTION_WRITE_INFO": "Писать информационные сообщения",
+    "SECTION_MEMBER_ADD": "Добавлять участников",
+    "SECTION_MEMBER_REMOVE": "Удалять участников",
+    "SECTION_ASSIGN_TECH_ROLE": "Назначать технические роли",
+    "SECTION_TECH_ROLE_MANAGE": "Управлять техническими ролями"
   }
 }
