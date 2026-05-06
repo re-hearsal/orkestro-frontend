@@ -6,9 +6,12 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
+  IconButton,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
+import CakeIcon from "@mui/icons-material/Cake";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -22,6 +25,7 @@ import CreateSectionDialog from "../components/sections/CreateSectionDialog";
 import SectionMembersList from "../components/sections/SectionMembersList";
 import SectionRolesManager from "../components/sections/SectionRolesManager";
 import LeaveSectionDialog from "../components/sections/LeaveSectionDialog";
+import OrgInfoMessageSection from "../components/organizations/OrgInfoMessageSection";
 import { getLocalizedRoleName } from "../utils/roleNameI18n";
 
 type SectionDTO = components["schemas"]["SectionDTO"];
@@ -228,8 +232,12 @@ export default function SectionProfilePage() {
     setEditLoading(true);
     try {
       const body: Record<string, unknown> = {};
-      if (editName.trim()) body.name = editName.trim();
-      body.description = editDescription.trim() || undefined;
+      if (editName.trim() && editName.trim() !== (section?.name ?? "")) {
+        body.name = editName.trim();
+      }
+      if (editDescription.trim() !== (section?.description ?? "")) {
+        body.description = editDescription.trim();
+      }
 
       const { data, error } = await client.PATCH("/api/v1/sections/{sectionId}", {
         params: { path: { sectionId: section.id } },
@@ -375,7 +383,7 @@ export default function SectionProfilePage() {
         </Typography>
       </Box>
 
-      <Box
+      {section.description!= null && <Box
         sx={{
           mt: 2,
           border: "1px solid #7795de",
@@ -395,7 +403,7 @@ export default function SectionProfilePage() {
         >
           {section.description ?? ""}
         </Typography>
-      </Box>
+      </Box>}
 
       {permissionsLoaded && myRoleName && (
         <Typography sx={{ mt: 2, color: "#7795de", fontSize: "0.875rem", fontFamily: "Century Gothic, sans-serif" }}>
@@ -405,9 +413,27 @@ export default function SectionProfilePage() {
 
       {/* Members */}
       <Box sx={{ mt: 5 }}>
-        <Typography sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700, color: "#0f3eb5", fontSize: "1.15rem" }}>
-          {t("sections.sectionMembers")}
-        </Typography>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Typography
+            sx={{
+              fontFamily: "Century Gothic, sans-serif",
+              fontWeight: 700,
+              color: "#0f3eb5",
+              fontSize: "1.15rem",
+            }}
+          >
+            {t("sections.sectionMembers")}
+          </Typography>
+          <Tooltip title={t("birthdays.tooltipButton")}>
+            <IconButton
+              size="small"
+              onClick={() => navigate(`/organizations/${organizationId}/sections/${sectionId}/birthdays`)}
+              sx={{ color: "#7795de", "&:hover": { color: "#0f3eb5" } }}
+            >
+              <CakeIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
         <SectionMembersList
           sectionId={sectionId}
           organizationId={organizationId}
@@ -481,6 +507,8 @@ export default function SectionProfilePage() {
           )}
         </Box>
       )}
+
+      <OrgInfoMessageSection sectionId={sectionId} />
 
       {/* Destructive zone */}
       <Box sx={{ mt: 6, display: "flex", gap: 2, flexWrap: "wrap" }}>

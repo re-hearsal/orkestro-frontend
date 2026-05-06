@@ -169,7 +169,7 @@ export default function TaskFileSection({
       const loadedEntries = await Promise.all(
         fileIdsToLoad.map(async (fileId) => {
           try {
-            const { data, error } = await client.GET("/api/v1/files/{fileId}/info", {
+            const { data, error } = await client.GET("/api/v1/files/{fileId}/meta", {
               params: { path: { fileId } },
               headers: { Authorization: `Bearer ${user.token}` },
             });
@@ -221,7 +221,7 @@ export default function TaskFileSection({
     setInfoLoading(true);
 
     try {
-      const { data, error } = await client.GET("/api/v1/files/{fileId}/info", {
+      const { data, error } = await client.GET("/api/v1/files/{fileId}/meta", {
         params: { path: { fileId: target.id } },
         headers: { Authorization: `Bearer ${user.token}` },
       });

@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Badge, Box, List, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
 import GroupsIcon from "@mui/icons-material/Groups";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import SettingsIcon from "@mui/icons-material/Settings";
+import DateRangeIcon from "@mui/icons-material/DateRange";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
 import AssignmentIcon from "@mui/icons-material/Assignment";
+import FeedbackOutlinedIcon from "@mui/icons-material/FeedbackOutlined";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import LanguageIcon from "@mui/icons-material/Language";
 import { Link, useLocation } from "react-router-dom";
@@ -250,8 +250,18 @@ export default function Sidebar() {
     [location.pathname]
   );
 
+  const isScheduleRoute = useMemo(
+    () => location.pathname.includes("/schedule"),
+    [location.pathname]
+  );
+
   const isSectionsRoute = useMemo(
     () => location.pathname.includes("/sections"),
+    [location.pathname]
+  );
+
+  const isFeedbackRoute = useMemo(
+    () => location.pathname.includes("/feedback"),
     [location.pathname]
   );
 
@@ -269,6 +279,14 @@ export default function Sidebar() {
 
   const sectionsPath = activeOrganizationId
     ? `/organizations/${activeOrganizationId}/sections`
+    : "/organizations";
+
+  const feedbackPath = activeOrganizationId
+    ? `/organizations/${activeOrganizationId}/feedback`
+    : "/organizations";
+
+  const schedulePath = activeOrganizationId
+    ? `/organizations/${activeOrganizationId}/schedule`
     : "/organizations";
 
   const visibleSections = sectionsExpanded ? mySections : mySections.slice(0, 3);
@@ -351,7 +369,9 @@ export default function Sidebar() {
                   !isJoinRequestsRoute &&
                   !isFundRoute &&
                   !isRepertoireRoute &&
-                  !isSectionsRoute
+                  !isSectionsRoute &&
+                  !isScheduleRoute &&
+                  !isFeedbackRoute
               )}
             >
             <ListItemIcon sx={itemIconSx}>
@@ -360,19 +380,21 @@ export default function Sidebar() {
             <ListItemText sx={{ my: 0 }} primary={t("nav.organizations")} slotProps={{ primary: { sx: textSx } }} />
           </ListItemButton>
 
-          {hasOrganizations && canViewJoinRequests && (
-            <ListItemButton component={Link} to={joinRequestsPath} sx={topItemSx(isJoinRequestsRoute)}>
+          {hasOrganizations && activeOrganizationId !== null && (
+            <ListItemButton component={Link} to={schedulePath} sx={topItemSx(isScheduleRoute)}>
               <ListItemIcon sx={itemIconSx}>
-                <Badge
-                  badgeContent={pendingJoinRequestsCount}
-                  color="error"
-                  overlap="circular"
-                  showZero={false}
-                >
-                  <GroupAddIcon />
-                </Badge>
+                <DateRangeIcon />
               </ListItemIcon>
-              <ListItemText sx={{ my: 0 }} primary={t("sidebar.joinRequests")} slotProps={{ primary: { sx: textSx } }} />
+              <ListItemText sx={{ my: 0 }} primary={t("schedule.title")} slotProps={{ primary: { sx: textSx } }} />
+            </ListItemButton>
+          )}
+
+          {hasOrganizations && activeOrganizationId !== null && (
+            <ListItemButton component={Link} to={feedbackPath} sx={topItemSx(isFeedbackRoute)}>
+              <ListItemIcon sx={itemIconSx}>
+                <FeedbackOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText sx={{ my: 0 }} primary={t("sidebar.feedback")} slotProps={{ primary: { sx: textSx } }} />
             </ListItemButton>
           )}
 
@@ -479,24 +501,26 @@ export default function Sidebar() {
             </>
           )}
 
-          {hasOrganizations && (
-            <ListItemButton component={Link} to="/calendar" sx={topItemSx(isActive("/calendar"))}>
-              <ListItemIcon sx={itemIconSx}>
-                <CalendarMonthIcon />
-              </ListItemIcon>
-              <ListItemText sx={{ my: 0 }} primary={t("nav.calendar")} slotProps={{ primary: { sx: textSx } }} />
-            </ListItemButton>
-          )}
+
         </Box>
 
         {hasOrganizations && (
           <Box sx={{ mt: "auto" }}>
-            <ListItemButton component={Link} to="/settings" sx={bottomItemSx(isActive("/settings"))}>
-              <ListItemIcon sx={itemIconSx}>
-                <SettingsIcon />
-              </ListItemIcon>
-              <ListItemText sx={{ my: 0 }} primary={t("nav.settings")} slotProps={{ primary: { sx: textSx } }} />
-            </ListItemButton>
+            {canViewJoinRequests && (
+              <ListItemButton component={Link} to={joinRequestsPath} sx={bottomItemSx(isJoinRequestsRoute)}>
+                <ListItemIcon sx={itemIconSx}>
+                  <Badge
+                    badgeContent={pendingJoinRequestsCount}
+                    color="error"
+                    overlap="circular"
+                    showZero={false}
+                  >
+                    <GroupAddIcon />
+                  </Badge>
+                </ListItemIcon>
+                <ListItemText sx={{ my: 0 }} primary={t("sidebar.joinRequests")} slotProps={{ primary: { sx: textSx } }} />
+              </ListItemButton>
+            )}
 
             <ListItemButton
               onClick={() => i18n.changeLanguage(i18n.language === "ru" ? "en" : "ru")}

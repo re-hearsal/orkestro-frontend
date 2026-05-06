@@ -29,7 +29,7 @@ export default function AppLayout() {
             overflow: "hidden",
           }}
         >
-          <Box sx={{ height: "100%", overflow: "auto", backgroundColor: "#fff" }}>
+          <Box sx={{ height: "100%", overflow: "auto", backgroundColor: "#fff", scrollbarGutter: "stable" }}>
             <Outlet />
           </Box>
         </Box>

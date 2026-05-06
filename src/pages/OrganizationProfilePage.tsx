@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Box, Button, CircularProgress, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, IconButton, Tooltip, Typography } from "@mui/material";
+import CakeIcon from "@mui/icons-material/Cake";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import client from "../api/client";
@@ -11,6 +12,7 @@ import OrgMembersList from "../components/organizations/OrgMembersList";
 import OrgRolesManager from "../components/organizations/OrgRolesManager";
 import EditOrgDialog from "../components/organizations/EditOrgDialog";
 import OrgSocialLinks from "../components/organizations/OrgSocialLinks";
+import OrgInfoMessageSection from "../components/organizations/OrgInfoMessageSection";
 import SectionCard from "../components/sections/SectionCard";
 import CreateSectionDialog from "../components/sections/CreateSectionDialog";
 import { useAppAlert } from "../hooks/useAppAlert";
@@ -295,6 +297,7 @@ export default function OrganizationProfilePage() {
 
   const canEdit = permissions.has("ORG_EDIT");
   const canManageRoles = permissions.has("ORG_TECH_ROLE_MANAGE");
+  const canManageTemplates = permissions.has("EVENT_MANAGE_DESCRIPTIONS");
   const isLeader = role?.name === "Leader" || role?.name?.toLowerCase() === "leader";
 
   const SECTIONS_PREVIEW = 5;
@@ -315,6 +318,26 @@ export default function OrganizationProfilePage() {
           width: "100%",
         }}
       >
+        {canManageTemplates && organization.id != null && (
+          <Button
+            variant="outlined"
+            onClick={() => navigate(`/organizations/${organizationId}/event-templates`)}
+            sx={{
+              borderRadius: "8px",
+              borderColor: "#0f3eb5",
+              color: "#0f3eb5",
+              fontFamily: "Century Gothic, sans-serif",
+              fontWeight: 700,
+              textTransform: "none",
+              "&:hover": {
+                borderColor: "#0f3eb5",
+                backgroundColor: "rgba(15,62,181,0.08)",
+              },
+            }}
+          >
+            {t("events.templates.button")}
+          </Button>
+        )}
         {canEdit && organization.id != null && (
           <Button
             variant="outlined"
@@ -388,7 +411,7 @@ export default function OrganizationProfilePage() {
         <OrgSocialLinks links={organization.links} />
       </Box>
 
-      <Box
+      {organization.description!=null && <Box
         sx={{
           mt: 2,
           border: "1px solid #7795de",
@@ -408,7 +431,7 @@ export default function OrganizationProfilePage() {
         >
           {organization.description ?? ""}
         </Typography>
-      </Box>
+      </Box>}
 
       {!memberContextLoading && role?.name && (
         <Typography
@@ -424,16 +447,27 @@ export default function OrganizationProfilePage() {
       )}
 
       <Box sx={{ mt: 5 }}>
-        <Typography
-          sx={{
-            fontFamily: "Century Gothic, sans-serif",
-            fontWeight: 700,
-            color: "#0f3eb5",
-            fontSize: "1.15rem",
-          }}
-        >
-          {t("organizations.profile.membersSection")}
-        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Typography
+            sx={{
+              fontFamily: "Century Gothic, sans-serif",
+              fontWeight: 700,
+              color: "#0f3eb5",
+              fontSize: "1.15rem",
+            }}
+          >
+            {t("organizations.profile.membersSection")}
+          </Typography>
+          <Tooltip title={t("birthdays.tooltipButton")}>
+            <IconButton
+              size="small"
+              onClick={() => navigate(`/organizations/${organizationId}/birthdays`)}
+              sx={{ color: "#7795de", "&:hover": { color: "#0f3eb5" } }}
+            >
+              <CakeIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
 
         <OrgMembersList organizationId={organizationId} permissions={permissions} />
       </Box>
@@ -544,6 +578,8 @@ export default function OrganizationProfilePage() {
       {memberContextInitialized && (
         <OrgRolesManager organizationId={organizationId} canManage={canManageRoles} />
       )}
+
+      <OrgInfoMessageSection organizationId={organizationId} />
 
       <Box sx={{ mt: 6 }}>
         <Button

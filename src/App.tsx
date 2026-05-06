@@ -15,13 +15,19 @@ import OrgSongPage from './pages/OrgSongPage';
 import OrgTasksPage from './pages/OrgTasksPage';
 import OrgClosedTasksPage from './pages/OrgClosedTasksPage';
 import OrgTaskPage from './pages/OrgTaskPage';
-import CalendarPage from './pages/CalendarPage';
 import SettingsPage from './pages/SettingsPage';
 import UserProfilePage from './pages/UserProfilePage';
 import { useAuth } from './hooks/useAuth';
 import UserPublicProfilePage from './pages/UserPublicProfilePage';
 import OrgSectionsPage from './pages/OrgSectionsPage';
 import SectionProfilePage from './pages/SectionProfilePage';
+import SchedulePage from './pages/SchedulePage';
+import CreateEventPage from './pages/CreateEventPage';
+import EventPage from './pages/EventPage';
+import EventParticipantsPage from './pages/EventParticipantsPage';
+import FeedbackPage from './pages/FeedbackPage';
+import BirthdaysPage from './pages/BirthdaysPage';
+import EventDescriptionTemplatesPage from './pages/EventDescriptionTemplatesPage';
 
 const PENDING_INVITE_CODE_KEY = 'pendingInviteCode';
 
@@ -76,12 +82,19 @@ export default function App() {
             <Route path="/organizations/:organizationId/tasks/:taskId" element={<OrgTaskPage />} />
             <Route path="/organizations/:organizationId/join-requests" element={<JoinRequestsPage />} />
             <Route path="/organizations/:organizationId/edit" element={<div />} />
-            <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/profile" element={<UserProfilePage />} />
             <Route path="/users/:userId" element={<UserPublicProfilePage />} />
             <Route path="/organizations/:organizationId/sections" element={<OrgSectionsPage />} />
             <Route path="/organizations/:organizationId/sections/:sectionId" element={<SectionProfilePage />} />
+            <Route path="/organizations/:organizationId/schedule" element={<SchedulePage />} />
+            <Route path="/organizations/:organizationId/events/create" element={<CreateEventPage />} />
+            <Route path="/organizations/:organizationId/events/:eventId" element={<EventPage />} />
+            <Route path="/organizations/:organizationId/events/:eventId/participants" element={<EventParticipantsPage />} />
+            <Route path="/organizations/:organizationId/feedback" element={<FeedbackPage />} />
+            <Route path="/organizations/:organizationId/birthdays" element={<BirthdaysPage />} />
+            <Route path="/organizations/:organizationId/sections/:sectionId/birthdays" element={<BirthdaysPage />} />
+            <Route path="/organizations/:organizationId/event-templates" element={<EventDescriptionTemplatesPage />} />
           </Route>
         </Route>
       </Routes>

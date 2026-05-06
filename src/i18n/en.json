@@ -86,6 +86,11 @@
     "email": "Email",
     "location": "City",
     "birthDate": "Date of Birth",
+    "preferredLanguage": "Language",
+    "language": {
+      "RU": "Russian",
+      "EN": "English"
+    },
     "empty": "—",
     "instruments": "Your Instruments",
     "noInstruments": "No instruments selected",
@@ -117,7 +122,39 @@
       "remove": "Remove photo",
       "uploadError": "Photo upload error",
       "removeError": "Photo remove error"
+    },
+    "security": {
+      "title": "Security",
+      "changePassword": "Change Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "passwordMismatch": "Passwords do not match",
+      "passwordChanged": "Password changed successfully",
+      "passwordChangeError": "Failed to change password",
+      "deleteAccount": "Delete Account",
+      "deleteAccountConfirm": "Are you sure you want to delete your account?",
+      "deleteAccountWarning": "This action is irreversible. All data will be deleted.",
+      "deleteAccountConfirmButton": "Delete",
+      "deleteAccountError": "Failed to delete account"
     }
+  },
+  "schedule": {
+    "title": "My Schedule",
+    "filters": "Filters",
+    "filterTags": "Tags",
+    "filterSections": "Sections",
+    "noTags": "No tags",
+    "allEvents": "All events",
+    "bySection": "By section",
+    "addSection": "Add section",
+    "export": "Export",
+    "exportCsv": "Export CSV",
+    "exportIcal": "Export iCal",
+    "exportError": "Failed to export schedule",
+    "viewMonth": "Month",
+    "viewWeek": "Week",
+    "createEvent": "Create event",
+    "wholeOrganization": "Whole organization"
   },
   "nav": {
     "organizations": "My organizations",
@@ -128,7 +165,8 @@
     "joinRequests": "Requests",
     "fund": "Fund",
     "repertoire": "Repertoire",
-    "tasks": "Tasks"
+    "tasks": "Tasks",
+    "feedback": "Feedback"
   },
   "language": {
     "current": "ENG"
@@ -306,7 +344,56 @@
       "concert": "Concert",
       "other": "Other",
       "empty": "No events in this period",
-      "loadError": "Could not load events"
+      "loadError": "Could not load events",
+      "create": {
+        "title": "Create event",
+        "stepParticipants": "Participants",
+        "stepInfo": "Main info",
+        "stepDates": "Dates",
+        "stepFiles": "Files",
+        "eventType": "Event type",
+        "participantsMode": "Participants",
+        "allOrganization": "Whole organization",
+        "bySection": "By sections",
+        "addSection": "Add section",
+        "additionalParticipants": "Additional participants",
+        "additionalParticipantsHint": "Select at least one section to add individual participants",
+        "searchParticipants": "Search participants...",
+        "songs": "Songs from repertoire",
+        "addSong": "Add song",
+        "nameLabel": "Title",
+        "descriptionLabel": "Description",
+        "locationLabel": "Location",
+        "externalLinkLabel": "External link",
+        "tagsLabel": "Tags",
+        "addTagPlaceholder": "Add tag and press Enter",
+        "startTime": "Start time",
+        "endTime": "End time",
+        "duplicateSwitch": "Duplicate",
+        "duplicateHint": "After creation, duplicates will be added automatically.",
+        "addDate": "Add date",
+        "sendRsvp": "Send RSVP to participants",
+        "reminderSwitch": "Remind about event",
+        "reminderMinutes": "Minutes before",
+        "addFiles": "Add files",
+        "dragDrop": "Drag and drop files here",
+        "back": "Back",
+        "next": "Next",
+        "create": "Create",
+        "createSuccess": "Event created successfully",
+        "tooManyTags": "Maximum 5 tags allowed",
+        "tooManyFiles": "Maximum 100 files allowed",
+        "tooManySongs": "Maximum 50 songs allowed",
+        "startTimeInPast": "Start time must be now or in the future",
+        "endBeforeStart": "End time must be after start time",
+        "duplicateDateLimit": "Maximum 10 additional dates",
+        "nameRequired": "Title is required",
+        "nameMaxLength": "Title must be at most 30 characters",
+        "eventTypeRequired": "Event type is required",
+        "startTimeRequired": "Start time is required",
+        "endTimeRequired": "End time is required",
+        "duplicateError": "Failed to create some duplicates"
+      }
     },
     "invite": {
       "label": "Invite link",
@@ -532,10 +619,104 @@
     "yourRole": "Your role",
     "upcomingEvents": "Upcoming events"
   },
+  "events": {
+    "notFound": "Event not found",
+    "participants": "Participants",
+    "changeRsvp": "Change RSVP",
+    "rsvpAccepted": "Attending",
+    "rsvpDeclined": "Not attending",
+    "rsvpPending": "Undecided",
+    "rsvpUpdated": "RSVP updated",
+    "rsvpUpdateError": "Failed to update RSVP",
+    "reminder": "Reminder {{minutes}} min before",
+    "tagsLabel": "Tags",
+    "descriptionLabel": "Description",
+    "noDescription": "No description provided",
+    "songsSection": "Songs",
+    "noSongs": "No songs added",
+    "filesSection": "Files",
+    "filesMaxReached": "Maximum 100 files",
+    "commentsSection": "Feedback",
+    "writeComment": "Leave feedback",
+    "noComments": "No feedback yet",
+    "commentRating": "Rating (0–10)",
+    "commentText": "Feedback text",
+    "commentSubmit": "Submit",
+    "commentCreated": "Feedback added",
+    "commentCreateError": "Failed to add feedback",
+    "deleteComment": "Delete",
+    "commentDeleted": "Feedback deleted",
+    "commentDeleteError": "Failed to delete feedback",
+    "deleteEvent": "Delete event",
+    "confirmDeleteEvent": "Are you sure you want to delete this event? This action cannot be undone.",
+    "eventDeleted": "Event deleted",
+    "nParticipants": "{{count}} participants",
+    "myRsvpLabel": "Your attendance status",
+    "editDialogTitle": "Edit event",
+    "editSaveSuccess": "Event updated",
+    "editSaveError": "Failed to save event",
+    "colRsvp": "RSVP",
+    "colAttendance": "Attendance",
+    "searchParticipants": "Search by name",
+    "noParticipants": "No participants",
+    "exportCsv": "Export CSV",
+    "exportCsvError": "Failed to export CSV",
+    "markAttendance": "Mark attendance",
+    "attendanceUpdated": "Attendance updated",
+    "attendanceUpdateError": "Failed to update attendance",
+    "attendance": {
+      "ATTENDED": "Attended",
+      "ABSENT": "Absent",
+      "EXCUSED": "Excused",
+      "UNKNOWN": "Unknown"
+    },
+    "templates": {
+      "pageTitle": "Event Description Templates",
+      "tab": {
+        "rehearsal": "Rehearsal",
+        "concert": "Concert",
+        "other": "Other"
+      },
+      "empty": "No template created",
+      "create": "Create template",
+      "edit": "Edit",
+      "delete": "Delete",
+      "dialog": {
+        "titleField": "Title",
+        "contentField": "Template text"
+      },
+      "createdAt": "Created",
+      "createSuccess": "Template created",
+      "updateSuccess": "Template updated",
+      "deleteSuccess": "Template deleted",
+      "button": "Event Templates"
+    }
+  },
+  "feedback": {
+    "empty": "No event comments found"
+  },
+  "eventType": {
+    "REHEARSAL": "Rehearsal",
+    "CONCERT": "Concert",
+    "OTHER": "Other",
+    "all": "All types"
+  },
+  "searchByTitle": "Search by event title",
+  "dateFrom": "From date",
+  "dateTo": "To date",
+  "resetFilters": "Reset",
+  "sortBy": "Sort by",
+  "sort": {
+    "commentCreatedAt": "Comment date",
+    "eventStartTime": "Event date",
+    "rating": "Rating"
+  },
   "common": {
     "back": "Back",
     "cancel": "Cancel",
-    "edit": "Edit"
+    "edit": "Edit",
+    "save": "Save",
+    "send": "Send"
   },
   "notifications": {
     "title": "Notifications",
@@ -559,9 +740,9 @@
     "REPERTOIRE_MANAGE_TAGS": "Manage repertoire tags",
     "REPERTOIRE_MANAGE_INSTRUMENTATION": "Manage instrumentation",
     "EVENT_MARK_ATTENDANCE": "Mark attendance",
-    "EVENT_DELETION": "Delete events",
+    "EVENT_MANAGE": "Manage events",
     "EVENT_MANAGE_DESCRIPTIONS": "Manage event description templates",
-    "EVENT_WRITE_COMMENT": "Write event comments",
+    "EVENT_WRITE_COMMENT": "Leave event feedback",
     "TASK_MANAGE": "Manage tasks",
     "SECTION_EDIT": "Edit section",
     "SECTION_DELETE": "Delete section",
@@ -570,5 +751,23 @@
     "SECTION_MEMBER_REMOVE": "Remove members",
     "SECTION_ASSIGN_TECH_ROLE": "Assign technical roles",
     "SECTION_TECH_ROLE_MANAGE": "Manage technical roles"
+  },
+  "infoMessage": {
+    "newMessage": "New message",
+    "textLabel": "Message text",
+    "sent": "Message sent",
+    "error": "Failed to send message",
+    "empty": "No info messages yet",
+    "sectionTitle": "Info Messages",
+    "orgTarget": "Entire organization",
+    "sectionsTarget": "By sections",
+    "addSection": "Add section",
+    "selectTargets": "Select recipients",
+    "charCount": "{{count}} / 5000"
+  },
+  "birthdays": {
+    "title": "Birthdays",
+    "noBirthdays": "No birthdays found",
+    "tooltipButton": "Birthdays"
   }
 }

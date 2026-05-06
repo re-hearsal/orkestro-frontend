@@ -3,12 +3,16 @@ import { Avatar, Badge, Box, Button, Divider, IconButton, ListItemIcon, Menu, Me
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
+import AddIcon from "@mui/icons-material/Add";
+import EditNoteIcon from "@mui/icons-material/EditNote";
 import { useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../hooks/useAuth";
 import { useOrganization } from "../../hooks/useOrganization";
+import { useOrgMemberContext } from "../../hooks/useOrgMemberContext";
 import OrgSwitcherDropdown from "./OrgSwitcherDropdown";
 import NotificationsDropdown from "./NotificationsDropdown";
+import WriteInfoMessageDialog from "../organizations/WriteInfoMessageDialog";
 
 interface TopBarProps {
   unreadCount: number;
@@ -29,11 +33,19 @@ export default function TopBar({ unreadCount }: TopBarProps) {
   const name = profile?.name ?? "";
   const initials = name ? getInitials(name) : "";
 
+  const orgId = currentOrganization?.id ?? 0;
+  const { permissions: orgPermissions, role: orgRole } = useOrgMemberContext(orgId);
+  // Button is shown to any org member — dialog filters writable targets by actual permissions.
+  // ORG_WRITE_INFO is org-level; SECTION_WRITE_INFO is section-level (not in orgPermissions),
+  // so we show the button whenever the user has any role in the org.
+  const hasWriteInfoAccess = orgPermissions.has("ORG_WRITE_INFO") || orgRole !== undefined;
+
   const [anchor, setAnchor] = useState<null | HTMLElement>(null);
   const open = Boolean(anchor);
 
   const [orgAnchor, setOrgAnchor] = useState<null | HTMLElement>(null);
   const [notifAnchor, setNotifAnchor] = useState<null | HTMLElement>(null);
+  const [writeMessageOpen, setWriteMessageOpen] = useState(false);
 
   const handleOpen = (e: React.MouseEvent<HTMLElement>) => setAnchor(e.currentTarget);
   const handleClose = () => setAnchor(null);
@@ -96,6 +108,43 @@ export default function TopBar({ unreadCount }: TopBarProps) {
 
       <OrgSwitcherDropdown anchorEl={orgAnchor} onClose={() => setOrgAnchor(null)} />
 
+      {hasOrganizations && currentOrganization && (
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => navigate(`/organizations/${currentOrganization.id}/events/create`)}
+          sx={{
+            fontFamily: "Century Gothic, sans-serif",
+            fontWeight: 700,
+            fontSize: "0.85rem",
+            textTransform: "none",
+            bgcolor: "#0f3eb5",
+            color: "#fff",
+            borderRadius: 2,
+            boxShadow: "none",
+            border: "1.5px solid rgba(255,255,255,0.4)",
+            px: 2,
+            "&:hover": { bgcolor: "#0c34a0", boxShadow: "none" },
+          }}
+        >
+          {t("schedule.createEvent")}
+        </Button>
+      )}
+
+      {hasOrganizations && currentOrganization && hasWriteInfoAccess && (
+        <IconButton
+          onClick={() => setWriteMessageOpen(true)}
+          sx={{
+            bgcolor: "transparent",
+            color: "#fff",
+            "&:hover": { bgcolor: "rgba(255,255,255,0.15)" },
+            p: 0.5,
+          }}
+        >
+          <EditNoteIcon sx={{ color: "#0f3eb5", fontSize: 26 }} />
+        </IconButton>
+      )}
+
       <IconButton
         onClick={(e) => setNotifAnchor(e.currentTarget)}
         sx={{
@@ -111,6 +160,14 @@ export default function TopBar({ unreadCount }: TopBarProps) {
       </IconButton>
 
       <NotificationsDropdown anchorEl={notifAnchor} onClose={() => setNotifAnchor(null)} />
+
+      {hasOrganizations && currentOrganization && (
+        <WriteInfoMessageDialog
+          open={writeMessageOpen}
+          onClose={() => setWriteMessageOpen(false)}
+          organizationId={currentOrganization.id ?? 0}
+        />
+      )}
 
       <Typography
         sx={{

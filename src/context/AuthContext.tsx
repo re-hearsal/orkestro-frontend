@@ -9,6 +9,9 @@ import { emitMemberRoleUpdated } from '../utils/memberRoleEvents';
 import { emitFundRealtimeSnapshot } from '../utils/fundEvents';
 import { emitSongDeleted } from '../utils/songEvents';
 import { emitTaskUpdated, emitTaskDeleted } from '../utils/taskEvents';
+import { emitEventCommentCreated } from '../utils/eventCommentEvents';
+import { emitEventDeleted } from '../utils/eventDeletedEvents';
+import { emitInfoMessageCreated } from '../utils/infoMessageEvents';
 import { isBlobUrl, toRenderableImageSource } from '../utils/imageSource';
 
 export interface AuthUser {
@@ -37,6 +40,7 @@ interface AuthContextValue {
   login: (token: string, username: string) => Promise<void>;
   logout: () => void;
   refreshProfile: () => Promise<void>;
+  subscribeToEventWebSocket: (organizationId: number, eventId: number) => () => void;
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
@@ -114,9 +118,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           emitNotificationsUpdated();
           emitJoinRequestsUpdated();
           try {
-            const payload = JSON.parse(msg.body) as { type?: string };
+            const payload = JSON.parse(msg.body) as { type?: string; organizationId?: number; sectionId?: number };
             if (payload.type === 'ROLE_ASSIGNED' || payload.type === 'ROLE_REMOVED') {
               emitMemberRoleUpdated();
+            }
+            if (payload.type === 'NEW_INFO_MESSAGE') {
+              emitInfoMessageCreated({
+                organizationId: payload.organizationId,
+                sectionId: payload.sectionId,
+              });
             }
           } catch {
             // ignore parse errors
@@ -261,6 +271,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const subscribeToEventWebSocket = (organizationId: number, eventId: number): () => void => {
+    const stomp = stompRef.current;
+    if (!stomp?.active) {
+      return () => {};
+    }
+
+    const commentsSub = stomp.subscribe(
+      `/topic/organizations/${organizationId}/events/${eventId}/comments`,
+      () => {
+        emitEventCommentCreated({ organizationId, eventId });
+      }
+    );
+
+    const eventSub = stomp.subscribe(
+      `/topic/organizations/${organizationId}/events/${eventId}`,
+      (msg) => {
+        try {
+          const payload = JSON.parse(msg.body) as { type?: string };
+          if (payload.type === 'EVENT_DELETED') {
+            emitEventDeleted({ organizationId, eventId });
+          }
+        } catch {
+          // ignore malformed messages
+        }
+      }
+    );
+
+    return () => {
+      commentsSub.unsubscribe();
+      eventSub.unsubscribe();
+    };
+  };
+
   const login = async (token: string, username: string) => {
     localStorage.setItem('orkestro_token', token);
     localStorage.setItem('orkestro_username', username);
@@ -282,7 +325,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, avatarUrl, initialized, login, logout, refreshProfile }}>
+    <AuthContext.Provider value={{ user, profile, avatarUrl, initialized, login, logout, refreshProfile, subscribeToEventWebSocket }}>
       {children}
     </AuthContext.Provider>
   );

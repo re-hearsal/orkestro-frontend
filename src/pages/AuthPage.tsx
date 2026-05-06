@@ -22,7 +22,7 @@ export default function AuthPage() {
     >
       {/* Logo */}
       <Box sx={{ mb: 4, textAlign: 'center' }}>
-        <Box
+        {/* <Box
           sx={{
             width: 64,
             height: 64,
@@ -31,7 +31,13 @@ export default function AuthPage() {
             mx: 'auto',
             mb: 1,
           }}
-        />
+        /> */}
+        <img src="/img/logo_blue.svg" alt="logo" style={{
+          width: 128,
+          height: 128,
+          marginBlock: -20
+        }} />
+
         <Typography
           sx={{
             fontFamily: 'cs-mollwish-2, sans-serif',

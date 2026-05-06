@@ -7,6 +7,8 @@ import client from "../api/client";
 import type { components } from "../api/schema";
 import UserAvatar from "../components/profile/UserAvatar";
 import EditProfileDialog from "../components/profile/EditProfileDialog";
+import ChangePasswordDialog from "../components/profile/ChangePasswordDialog";
+import DeleteAccountDialog from "../components/profile/DeleteAccountDialog";
 import InstrumentPicker, { type InstrumentDTO, InstrumentIcon, instrumentI18nKey } from "../components/profile/InstrumentPicker";
 import { useAuth } from "../hooks/useAuth";
 import { useAppAlert } from "../hooks/useAppAlert";
@@ -33,6 +35,8 @@ export default function UserProfilePage() {
   const [fullProfile, setFullProfile] = useState<CurrentUserResponseDTO | null>(null);
   const [loading, setLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const [deleteAccountOpen, setDeleteAccountOpen] = useState(false);
 
   // Instruments state
   const [myInstruments, setMyInstruments] = useState<MusicalRoleDTO[]>([]);
@@ -237,6 +241,12 @@ export default function UserProfilePage() {
               label: t("profile.birthDate"),
               value: fullProfile?.birthDate
                 ? formatBirthDate(fullProfile.birthDate, i18n.language)
+                : undefined,
+            },
+            {
+              label: t("profile.preferredLanguage"),
+              value: fullProfile?.preferredLanguage
+                ? t(`profile.language.${fullProfile.preferredLanguage}`)
                 : undefined,
             },
           ] as { label: string; value: string | undefined }[]
@@ -491,6 +501,56 @@ export default function UserProfilePage() {
         )}
       </Box>
 
+      {/* Security section */}
+      <Box
+        sx={{
+          borderRadius: "12px",
+          border: "1px solid #7795de",
+          p: 3,
+          mb: 3,
+          backgroundColor: "#ffffff",
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700, mb: 2, color: "#0f3eb5" }}
+        >
+          {t("profile.security.title")}
+        </Typography>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+          <Button
+            variant="outlined"
+            onClick={() => setChangePasswordOpen(true)}
+            sx={{
+              borderRadius: "8px",
+              borderColor: "#0f3eb5",
+              color: "#0f3eb5",
+              fontFamily: "Century Gothic, sans-serif",
+              fontWeight: 700,
+              textTransform: "none",
+              alignSelf: "flex-start",
+              "&:hover": { borderColor: "#0f3eb5", backgroundColor: "rgba(15,62,181,0.08)" },
+            }}
+          >
+            {t("profile.security.changePassword")}
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={() => setDeleteAccountOpen(true)}
+            sx={{
+              borderRadius: "8px",
+              fontFamily: "Century Gothic, sans-serif",
+              fontWeight: 700,
+              textTransform: "none",
+              alignSelf: "flex-start",
+            }}
+          >
+            {t("profile.security.deleteAccount")}
+          </Button>
+        </Box>
+      </Box>
+
       {/* Edit profile dialog */}
       {fullProfile && (
         <EditProfileDialog
@@ -500,6 +560,21 @@ export default function UserProfilePage() {
           onSaved={(updated) => void handleProfileSaved(updated)}
         />
       )}
+
+      {/* Change password dialog */}
+      {fullProfile?.username && (
+        <ChangePasswordDialog
+          open={changePasswordOpen}
+          onClose={() => setChangePasswordOpen(false)}
+          username={fullProfile.username}
+        />
+      )}
+
+      {/* Delete account dialog */}
+      <DeleteAccountDialog
+        open={deleteAccountOpen}
+        onClose={() => setDeleteAccountOpen(false)}
+      />
     </Box>
   );
 }

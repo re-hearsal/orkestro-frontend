@@ -117,10 +117,25 @@ export default function EditOrgDialog({
     setSaving(true);
     try {
       const body: Record<string, unknown> = {};
-      if (name.trim()) body.name = name.trim();
-      if (location.trim()) body.location = location.trim();
-      if (description.trim()) body.description = description.trim();
-      body.links = links.map((l) => ({ linkType: l.linkType, url: l.url.trim() }));
+      if (name.trim() && name.trim() !== (organization.name ?? "")) {
+        body.name = name.trim();
+      }
+      if (location.trim() !== (organization.location ?? "")) {
+        body.location = location.trim() || null;
+      }
+      if (description.trim() !== (organization.description ?? "")) {
+        body.description = description.trim() || null;
+      }
+      const origLinks = (organization.links ?? []).map((l) => `${l.linkType}:${l.url}`).sort().join("|");
+      const curLinks = links.map((l) => `${l.linkType}:${l.url.trim()}`).sort().join("|");
+      if (curLinks !== origLinks) {
+        body.links = links.map((l) => ({ linkType: l.linkType, url: l.url.trim() }));
+      }
+
+      if (Object.keys(body).length === 0) {
+        onClose();
+        return;
+      }
 
       const { data, error } = await client.PATCH(
         "/api/v1/organizations/{organizationId}",

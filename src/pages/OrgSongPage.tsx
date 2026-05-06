@@ -248,11 +248,20 @@ export default function OrgSongPage() {
     try {
       const body: components["schemas"]["SongUpdateRequestDTO"] = {
         title: editTitle.trim(),
-        composer: editComposer.trim() || undefined,
-        durationSeconds: editDuration ? Number(editDuration) : undefined,
-        description: editDescription.trim() || undefined,
-        videoUrl: normalizeExternalUrl(editVideoUrl) ?? undefined,
       };
+      if (editComposer.trim() !== (song?.composer ?? "")) {
+        body.composer = editComposer.trim();
+      }
+      if (editDuration !== (song?.durationSeconds != null ? String(song.durationSeconds) : "")) {
+        body.durationSeconds = editDuration ? Number(editDuration) : undefined;
+      }
+      if (editDescription.trim() !== (song?.description ?? "")) {
+        body.description = editDescription.trim();
+      }
+      const normalizedVideo = normalizeExternalUrl(editVideoUrl) ?? "";
+      if (normalizedVideo !== (song?.videoUrl ?? "")) {
+        body.videoUrl = normalizedVideo || undefined;
+      }
       const { data, error } = await client.PUT(
         "/api/v1/organizations/{organizationId}/repertoire/songs/{songId}",
         {

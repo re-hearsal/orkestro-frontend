@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
+  MenuItem,
   Stack,
   TextField,
 } from "@mui/material";
@@ -33,7 +34,7 @@ export default function EditProfileDialog({
   profile,
   onSaved,
 }: EditProfileDialogProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { showAlert } = useAppAlert();
 
@@ -41,6 +42,7 @@ export default function EditProfileDialog({
   const [email, setEmail] = useState("");
   const [location, setLocation] = useState("");
   const [birthDate, setBirthDate] = useState("");
+  const [preferredLanguage, setPreferredLanguage] = useState<"RU" | "EN">("RU");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -49,6 +51,7 @@ export default function EditProfileDialog({
       setEmail(profile.email ?? "");
       setLocation(profile.location ?? "");
       setBirthDate(profile.birthDate ?? "");
+      setPreferredLanguage((profile.preferredLanguage as "RU" | "EN") ?? "RU");
     }
   }, [open, profile]);
 
@@ -61,6 +64,14 @@ export default function EditProfileDialog({
       if (email.trim() !== (profile.email ?? "")) body.email = email.trim() || undefined;
       if (location.trim() !== (profile.location ?? "")) body.location = location.trim() || undefined;
       if (birthDate !== (profile.birthDate ?? "")) body.birthDate = birthDate || undefined;
+      if (preferredLanguage !== ((profile.preferredLanguage as "RU" | "EN") ?? "RU")) {
+        body.preferredLanguage = preferredLanguage;
+      }
+
+      if (Object.keys(body).length === 0) {
+        onClose();
+        return;
+      }
 
       const { data, error } = await client.PATCH("/api/v1/auth/profile", {
         headers: { Authorization: `Bearer ${user.token}` },
@@ -69,6 +80,9 @@ export default function EditProfileDialog({
 
       if (error) throw error;
 
+      if (body.preferredLanguage) {
+        await i18n.changeLanguage(body.preferredLanguage === "RU" ? "ru" : "en");
+      }
       showAlert(String(t("profile.saveSuccess")), "success");
       onSaved((data as unknown as CurrentUserResponseDTO) ?? { ...profile, ...body });
       onClose();
@@ -142,6 +156,17 @@ export default function EditProfileDialog({
             size="small"
             slotProps={{ inputLabel: { shrink: true }, htmlInput: { max: new Date().toISOString().split("T")[0] } }}
           />
+          <TextField
+            select
+            label={t("profile.preferredLanguage")}
+            value={preferredLanguage}
+            onChange={(e) => setPreferredLanguage(e.target.value as "RU" | "EN")}
+            fullWidth
+            size="small"
+          >
+            <MenuItem value="RU">{t("profile.language.RU")}</MenuItem>
+            <MenuItem value="EN">{t("profile.language.EN")}</MenuItem>
+          </TextField>
         </Stack>
       </DialogContent>
 

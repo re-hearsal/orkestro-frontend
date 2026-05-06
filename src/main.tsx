@@ -1,5 +1,13 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+
+if (import.meta.env.DEV) {
+  const _origError = console.error.bind(console)
+  console.error = (...args: unknown[]) => {
+    if (typeof args[0] === 'string' && args[0].includes('outdated JSX transform')) return
+    _origError(...args)
+  }
+}
 import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import './index.css'

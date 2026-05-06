@@ -35,14 +35,22 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Получить задачу по ID
+         * @description Возвращает полную информацию о задаче для пользователя, имеющего к ней доступ.
+         */
+        get: operations["getTaskById"];
         /**
          * Обновить данные задачи
          * @description Обновляет данные задачи (кроме статуса): title, description, assigneeUserId, visibility, visibilityRoleIds, fileIds.
          */
         put: operations["updateTask"];
         post?: never;
-        delete?: never;
+        /**
+         * Удалить задачу
+         * @description Удаляет задачу. Доступно автору задачи или участнику с правом TASK_MANAGE.
+         */
+        delete: operations["deleteTask"];
         options?: never;
         head?: never;
         patch?: never;
@@ -143,6 +151,26 @@ export interface paths {
          * @description Удаляет событие из организации.
          */
         delete: operations["deleteEvent"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{organizationId}/events/{eventId}/rsvp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Обновить RSVP текущего пользователя
+         * @description Позволяет участнику события изменить свой RSVP-статус. Доступно только участникам события.
+         */
+        put: operations["updateMyRsvp"];
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1409,6 +1437,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/organizations/{organizationId}/events/{eventId}/participants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Получить список участников события
+         * @description Возвращает пагинированный список участников события с их RSVP и статусом посещаемости. Поддерживает поиск по имени.
+         */
+        get: operations["getEventParticipants"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{organizationId}/events/{eventId}/comments/page": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Получить комментарии одного мероприятия (постранично)
+         * @description Возвращает пагинированный список комментариев для одного мероприятия, отсортированных по убыванию даты создания.
+         */
+        get: operations["getEventCommentsPage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/organizations/{organizationId}/events/{eventId}/attendance/matrix": {
         parameters: {
             query?: never;
@@ -1461,6 +1529,26 @@ export interface paths {
          * @description Возвращает отсортированный список уникальных тэгов всех событий организации.
          */
         get: operations["getEventTags"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{organizationId}/events/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Получить обратную связь по мероприятиям
+         * @description Возвращает пагинированный список комментариев к мероприятиям организации, в которых участвует текущий пользователь. Поддерживает фильтрацию по названию, типу, периоду дат и тегам.
+         */
+        get: operations["getEventFeedback"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1653,7 +1741,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/files/{fileId}/info": {
+    "/api/v1/files/{fileId}/meta": {
         parameters: {
             query?: never;
             header?: never;
@@ -1951,10 +2039,9 @@ export interface components {
             visibility: "ALL_MEMBERS" | "ROLE_RESTRICTED";
             visibilityRoleIds?: number[];
             fileIds?: number[];
-        };
-        TaskAssigneeDTO: {
-            /** Format: int64 */
-            userId?: number;
+            /** Format: date-time */
+            deadline?: string;
+            clearDeadline?: boolean;
         };
         TaskCommentDTO: {
             /** Format: int64 */
@@ -1974,9 +2061,8 @@ export interface components {
             organizationId?: number;
             title?: string;
             description?: string;
-            /** Format: int64 */
-            authorUserId?: number;
-            assignees?: components["schemas"]["TaskAssigneeDTO"][];
+            author?: components["schemas"]["TaskUserInfoDTO"];
+            assignees?: components["schemas"]["TaskUserInfoDTO"][];
             /** @enum {string} */
             status?: "OPEN" | "IN_PROGRESS" | "DONE" | "CANCELLED";
             /** @enum {string} */
@@ -1987,9 +2073,19 @@ export interface components {
             updatedAt?: string;
             /** Format: date-time */
             closedAt?: string;
+            /** Format: date-time */
+            deadline?: string;
             fileIds?: number[];
             comments?: components["schemas"]["TaskCommentDTO"][];
             visibilityRoleIds?: number[];
+        };
+        TaskUserInfoDTO: {
+            /** Format: int64 */
+            userId?: number;
+            username?: string;
+            name?: string;
+            /** Format: int64 */
+            profileImageFileId?: number;
         };
         /** @description Новая видимость */
         TaskVisibilityUpdateRequestDTO: {
@@ -2033,8 +2129,7 @@ export interface components {
             videoUrl?: string;
             instrumentation?: components["schemas"]["SongInstrumentDTO"][];
             tags?: string[];
-            sheetFileIds?: number[];
-            audioFileIds?: number[];
+            fileIds?: number[];
         };
         SongDTO: {
             /**
@@ -2081,6 +2176,7 @@ export interface components {
             tags?: string[];
             sheetFileIds?: number[];
             audioFileIds?: number[];
+            fileIds?: number[];
         };
         EventUpdateRequestDTO: {
             title?: string;
@@ -2117,6 +2213,8 @@ export interface components {
             id?: number;
             /** Format: int64 */
             organizationId?: number;
+            /** Format: int64 */
+            createdByUserId?: number;
             title?: string;
             description?: string;
             /** @enum {string} */
@@ -2136,8 +2234,17 @@ export interface components {
             includeAllOrganizationMembers?: boolean;
             /** Format: int32 */
             remindBeforeMinutes?: number;
+            /**
+             * @description RSVP status of the currently authenticated user for this event. Null if user is not a participant.
+             * @enum {string}
+             */
+            myRsvpStatus?: "PENDING" | "ACCEPTED" | "DECLINED";
             fileIds?: number[];
             songIds?: number[];
+        };
+        EventRsvpUpdateRequestDTO: {
+            /** @enum {string} */
+            rsvpStatus: "PENDING" | "ACCEPTED" | "DECLINED";
         };
         EventDescriptionTemplateCreateRequestDTO: {
             /** @example Стандартное описание репетиции */
@@ -2187,6 +2294,8 @@ export interface components {
             /** Format: int64 */
             authorUserId?: number;
             authorName?: string;
+            /** Format: int64 */
+            authorProfileImageFileId?: number;
             text?: string;
             /** Format: date-time */
             createdAt?: string;
@@ -2239,6 +2348,8 @@ export interface components {
             /** @enum {string} */
             visibility: "ALL_MEMBERS" | "ROLE_RESTRICTED";
             visibilityRoleIds?: number[];
+            /** Format: date-time */
+            deadline?: string;
             files?: string[];
         };
         /** @description Файл для прикрепления */
@@ -2279,8 +2390,7 @@ export interface components {
             videoUrl?: string;
             instrumentation: components["schemas"]["SongInstrumentDTO"][];
             tags?: string[];
-            sheetFiles?: string[];
-            audioFiles?: string[];
+            files?: string[];
         };
         /** @description Файл для загрузки */
         SongFileUploadRequestDTO: {
@@ -2307,6 +2417,8 @@ export interface components {
             /** Format: int64 */
             performedByUserId?: number;
             performedByName?: string;
+            /** Format: int64 */
+            performedByProfileImageFileId?: number;
             /** Format: date-time */
             createdAt?: string;
         };
@@ -2380,6 +2492,8 @@ export interface components {
             /** Format: int64 */
             authorUserId?: number;
             authorName?: string;
+            /** Format: int64 */
+            authorProfileImageFileId?: number;
             text?: string;
             /** Format: int32 */
             rating?: number;
@@ -2604,11 +2718,11 @@ export interface components {
             title?: string;
             tags?: string[];
             scopeValid?: boolean;
-            sectionIdProvidedForSectionScope?: boolean;
-            sectionIdsProvidedForSectionsScope?: boolean;
             dateOrderValid?: boolean;
             dateRangeValid?: boolean;
             sectionIdsSizeValid?: boolean;
+            sectionIdProvidedForSectionScope?: boolean;
+            sectionIdsProvidedForSectionsScope?: boolean;
         };
         EventCalendarDTO: {
             /** Format: int64 */
@@ -2818,6 +2932,64 @@ export interface operations {
             };
         };
     };
+    getTaskById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description ID организации
+                 * @example 1
+                 */
+                organizationId: number;
+                /**
+                 * @description ID задачи
+                 * @example 1
+                 */
+                taskId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Задача найдена */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskDTO"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Нет доступа к задаче */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Задача не найдена */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
     updateTask: {
         parameters: {
             query?: never;
@@ -2889,6 +3061,62 @@ export interface operations {
             };
             /** @description Внутренняя ошибка сервера */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    deleteTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description ID организации
+                 * @example 1
+                 */
+                organizationId: number;
+                /**
+                 * @description ID задачи
+                 * @example 1
+                 */
+                taskId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Задача успешно удалена */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Нет прав для удаления задачи */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Задача не найдена */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3499,6 +3727,71 @@ export interface operations {
             };
             /** @description Внутренняя ошибка сервера */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    updateMyRsvp: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID организации */
+                organizationId: number;
+                /** @description ID события */
+                eventId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EventRsvpUpdateRequestDTO"];
+            };
+        };
+        responses: {
+            /** @description RSVP обновлён */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventDTO"];
+                };
+            };
+            /** @description Ошибка валидации */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Пользователь не является участником события */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Событие не найдено */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -8206,6 +8499,126 @@ export interface operations {
             };
         };
     };
+    getEventParticipants: {
+        parameters: {
+            query?: {
+                /** @description Поиск по имени участника */
+                name?: string;
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
+            header?: never;
+            path: {
+                /** @description ID организации */
+                organizationId: number;
+                /** @description ID события */
+                eventId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Список участников получен */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PagedModel"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Доступ запрещен */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Событие не найдено */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    getEventCommentsPage: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
+            header?: never;
+            path: {
+                /** @description ID организации */
+                organizationId: number;
+                /** @description ID мероприятия */
+                eventId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Комментарии получены */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedModel"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Доступ запрещен */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Событие не найдено */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
     getAttendanceMatrix: {
         parameters: {
             query?: never;
@@ -8369,6 +8782,60 @@ export interface operations {
             };
             /** @description Внутренняя ошибка сервера */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    getEventFeedback: {
+        parameters: {
+            query?: {
+                title?: string;
+                eventType?: "REHEARSAL" | "CONCERT" | "OTHER";
+                from?: string;
+                to?: string;
+                tags?: string[];
+                sortField?: string;
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
+            header?: never;
+            path: {
+                /** @description ID организации */
+                organizationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Список комментариев получен */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PagedModel"];
+                };
+            };
+            /** @description Не аутентифицирован */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Доступ запрещен */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };

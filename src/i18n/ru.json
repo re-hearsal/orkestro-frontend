@@ -86,6 +86,11 @@
     "email": "Email",
     "location": "Город",
     "birthDate": "Дата рождения",
+    "preferredLanguage": "Язык",
+    "language": {
+      "RU": "Русский",
+      "EN": "English"
+    },
     "empty": "—",
     "instruments": "Ваши инструменты",
     "noInstruments": "Выбранных инструментов нет",
@@ -117,7 +122,39 @@
       "remove": "Удалить фото",
       "uploadError": "Ошибка загрузки фото",
       "removeError": "Ошибка удаления фото"
+    },
+    "security": {
+      "title": "Безопасность",
+      "changePassword": "Изменить пароль",
+      "newPassword": "Новый пароль",
+      "confirmPassword": "Подтвердите пароль",
+      "passwordMismatch": "Пароли не совпадают",
+      "passwordChanged": "Пароль успешно изменён",
+      "passwordChangeError": "Не удалось изменить пароль",
+      "deleteAccount": "Удалить аккаунт",
+      "deleteAccountConfirm": "Вы уверены, что хотите удалить аккаунт?",
+      "deleteAccountWarning": "Это действие необратимо. Все данные будут удалены.",
+      "deleteAccountConfirmButton": "Удалить",
+      "deleteAccountError": "Не удалось удалить аккаунт"
     }
+  },
+  "schedule": {
+    "title": "Мое расписание",
+    "filters": "Фильтры",
+    "filterTags": "Теги",
+    "filterSections": "Область назначения",
+    "noTags": "Тегов нет",
+    "allEvents": "Вся организация",
+    "bySection": "По секциям",
+    "addSection": "Добавить секцию",
+    "export": "Экспорт",
+    "exportCsv": "Экспорт CSV",
+    "exportIcal": "Экспорт iCal",
+    "exportError": "Не удалось экспортировать расписание",
+    "viewMonth": "Месяц",
+    "viewWeek": "Неделя",
+    "createEvent": "Создать мероприятие",
+    "wholeOrganization": "Вся организация"
   },
   "nav": {
     "organizations": "Мои организации",
@@ -128,7 +165,8 @@
     "joinRequests": "Заявки",
     "fund": "Денежный фонд",
     "repertoire": "Репертуар",
-    "tasks": "Задачи"
+    "tasks": "Задачи",
+    "feedback": "Обратная связь"
   },
   "language": {
     "current": "РУС"
@@ -306,7 +344,56 @@
       "concert": "Концерт",
       "other": "Другое",
       "empty": "На выбранный период событий нет",
-      "loadError": "Не удалось загрузить мероприятия"
+      "loadError": "Не удалось загрузить мероприятия",
+      "create": {
+        "title": "Создать мероприятие",
+        "stepParticipants": "Участники",
+        "stepInfo": "Основная информация",
+        "stepDates": "Даты",
+        "stepFiles": "Файлы",
+        "eventType": "Тип мероприятия",
+        "participantsMode": "Участники",
+        "allOrganization": "Вся организация",
+        "bySection": "По секциям",
+        "addSection": "Добавить секцию",
+        "additionalParticipants": "Дополнительные участники",
+        "additionalParticipantsHint": "Выберите хотя бы одну секцию, чтобы добавить отдельных участников",
+        "searchParticipants": "Поиск участников...",
+        "songs": "Произведения из репертуара",
+        "addSong": "Добавить произведение",
+        "nameLabel": "Название",
+        "descriptionLabel": "Описание",
+        "locationLabel": "Место проведения",
+        "externalLinkLabel": "Внешняя ссылка",
+        "tagsLabel": "Теги",
+        "addTagPlaceholder": "Добавить тег и нажать Enter",
+        "startTime": "Дата и время начала",
+        "endTime": "Дата и время окончания",
+        "duplicateSwitch": "Дублировать",
+        "duplicateHint": "После создания мероприятия дубликаты будут добавлены автоматически.",
+        "addDate": "Добавить дату",
+        "sendRsvp": "Отправить опрос посещения участникам",
+        "reminderSwitch": "Напомнить о мероприятии",
+        "reminderMinutes": "За сколько минут",
+        "addFiles": "Добавить файлы",
+        "dragDrop": "Перетащите файлы сюда",
+        "back": "Назад",
+        "next": "Далее",
+        "create": "Создать",
+        "createSuccess": "Мероприятие успешно создано",
+        "tooManyTags": "Максимум 5 тегов",
+        "tooManyFiles": "Максимум 100 файлов",
+        "tooManySongs": "Максимум 50 произведений",
+        "startTimeInPast": "Дата начала должна быть текущей или будущей",
+        "endBeforeStart": "Дата окончания должна быть позже даты начала",
+        "duplicateDateLimit": "Максимум 10 дополнительных дат",
+        "nameRequired": "Название обязательно",
+        "nameMaxLength": "Название не может быть длиннее 30 символов",
+        "eventTypeRequired": "Тип мероприятия обязателен",
+        "startTimeRequired": "Дата начала обязательна",
+        "endTimeRequired": "Дата окончания обязательна",
+        "duplicateError": "Не удалось создать некоторые дубликаты"
+      }
     },
     "invite": {
       "label": "Пригласительная ссылка",
@@ -532,10 +619,104 @@
     "yourRole": "Ваша роль",
     "upcomingEvents": "Ближайшие мероприятия"
   },
+  "events": {
+    "notFound": "Мероприятие не найдено",
+    "participants": "Участники",
+    "changeRsvp": "Изменить ответ",
+    "rsvpAccepted": "Приду",
+    "rsvpDeclined": "Не приду",
+    "rsvpPending": "Не решил",
+    "rsvpUpdated": "Ответ обновлён",
+    "rsvpUpdateError": "Не удалось обновить ответ",
+    "reminder": "Напоминание за {{minutes}} мин",
+    "tagsLabel": "Теги",
+    "descriptionLabel": "Описание",
+    "noDescription": "Описание не указано",
+    "songsSection": "Произведения",
+    "noSongs": "Произведения не добавлены",
+    "filesSection": "Файлы",
+    "filesMaxReached": "Максимум 100 файлов",
+    "commentsSection": "Обратная связь",
+    "writeComment": "Оставить обратную связь",
+    "noComments": "Обратной связи пока нет",
+    "commentRating": "Оценка (0–10)",
+    "commentText": "Текст обратной связи",
+    "commentSubmit": "Отправить",
+    "commentCreated": "Обратная связь добавлена",
+    "commentCreateError": "Не удалось добавить обратную связь",
+    "deleteComment": "Удалить",
+    "commentDeleted": "Обратная связь удалена",
+    "commentDeleteError": "Не удалось удалить обратную связь",
+    "deleteEvent": "Удалить мероприятие",
+    "confirmDeleteEvent": "Вы уверены, что хотите удалить это мероприятие? Это действие необратимо.",
+    "eventDeleted": "Мероприятие удалено",
+    "nParticipants": "{{count}} уч.",
+    "myRsvpLabel": "Статус вашего посещения",
+    "editDialogTitle": "Редактировать мероприятие",
+    "editSaveSuccess": "Мероприятие обновлено",
+    "editSaveError": "Не удалось сохранить мероприятие",
+    "colRsvp": "RSVP",
+    "colAttendance": "Посещаемость",
+    "searchParticipants": "Поиск по имени",
+    "noParticipants": "Участников нет",
+    "exportCsv": "Экспорт CSV",
+    "exportCsvError": "Не удалось выгрузить CSV",
+    "markAttendance": "Отметить посещаемость",
+    "attendanceUpdated": "Посещаемость обновлена",
+    "attendanceUpdateError": "Не удалось обновить посещаемость",
+    "attendance": {
+      "ATTENDED": "Присутствовал",
+      "ABSENT": "Отсутствовал",
+      "EXCUSED": "Уважительная причина",
+      "UNKNOWN": "Неизвестно"
+    },
+    "templates": {
+      "pageTitle": "Шаблоны описаний событий",
+      "tab": {
+        "rehearsal": "Репетиция",
+        "concert": "Концерт",
+        "other": "Другое"
+      },
+      "empty": "Шаблон не создан",
+      "create": "Создать шаблон",
+      "edit": "Редактировать",
+      "delete": "Удалить",
+      "dialog": {
+        "titleField": "Заголовок",
+        "contentField": "Текст шаблона"
+      },
+      "createdAt": "Создан",
+      "createSuccess": "Шаблон создан",
+      "updateSuccess": "Шаблон обновлён",
+      "deleteSuccess": "Шаблон удалён",
+      "button": "Шаблоны событий"
+    }
+  },
+  "feedback": {
+    "empty": "Нет комментариев по событиям"
+  },
+  "eventType": {
+    "REHEARSAL": "Репетиция",
+    "CONCERT": "Концерт",
+    "OTHER": "Другое",
+    "all": "Все типы"
+  },
+  "searchByTitle": "Поиск по названию события",
+  "dateFrom": "Начало периода",
+  "dateTo": "Конец периода",
+  "resetFilters": "Сбросить",
+  "sortBy": "Сортировка",
+  "sort": {
+    "commentCreatedAt": "Дата комментария",
+    "eventStartTime": "Дата события",
+    "rating": "Оценка"
+  },
   "common": {
     "back": "Назад",
     "cancel": "Отмена",
-    "edit": "Редактировать"
+    "edit": "Редактировать",
+    "save": "Сохранить",
+    "send": "Отправить"
   },
   "notifications": {
     "title": "Уведомления",
@@ -559,9 +740,9 @@
     "REPERTOIRE_MANAGE_TAGS": "Управлять тегами репертуара",
     "REPERTOIRE_MANAGE_INSTRUMENTATION": "Управлять инструментовкой",
     "EVENT_MARK_ATTENDANCE": "Отмечать посещаемость",
-    "EVENT_DELETION": "Удалять мероприятия",
+    "EVENT_MANAGE": "Управлять мероприятиями",
     "EVENT_MANAGE_DESCRIPTIONS": "Управлять шаблонами описаний событий",
-    "EVENT_WRITE_COMMENT": "Писать комментарии к мероприятиям",
+    "EVENT_WRITE_COMMENT": "Оставлять обратную связь к мероприятиям",
     "TASK_MANAGE": "Управлять задачами",
     "SECTION_EDIT": "Редактировать секцию",
     "SECTION_DELETE": "Удалить секцию",
@@ -570,5 +751,23 @@
     "SECTION_MEMBER_REMOVE": "Удалять участников",
     "SECTION_ASSIGN_TECH_ROLE": "Назначать технические роли",
     "SECTION_TECH_ROLE_MANAGE": "Управлять техническими ролями"
+  },
+  "infoMessage": {
+    "newMessage": "Новое сообщение",
+    "textLabel": "Текст сообщения",
+    "sent": "Сообщение отправлено",
+    "error": "Ошибка при отправке сообщения",
+    "empty": "Информационных сообщений пока нет",
+    "sectionTitle": "Информационные сообщения",
+    "orgTarget": "Вся организация",
+    "sectionsTarget": "По секциям",
+    "addSection": "Добавить секцию",
+    "selectTargets": "Выберите получателей",
+    "charCount": "{{count}} / 5000"
+  },
+  "birthdays": {
+    "title": "Дни рождения",
+    "noBirthdays": "Дни рождения не найдены",
+    "tooltipButton": "Дни рождения"
   }
 }

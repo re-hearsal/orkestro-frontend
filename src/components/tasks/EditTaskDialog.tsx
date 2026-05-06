@@ -121,6 +121,21 @@ export default function EditTaskDialog({ open, onClose, task, organizationId, on
       const newDeadlineIso = deadline ? new Date(deadline).toISOString() : null;
       const clearDeadline = Boolean(originalDeadline && !deadline);
 
+      const origVisRoleIds = [...((task.visibilityRoleIds as number[] | undefined) ?? [])].sort((a, b) => a - b);
+      const curVisRoleIds = visibility === "ROLE_RESTRICTED" ? [...selectedRoles.map((r) => r.id!)].sort((a, b) => a - b) : [];
+      const hasChanges =
+        title.trim() !== (task.title ?? "") ||
+        description.trim() !== (task.description ?? "") ||
+        clearDeadline ||
+        (newDeadlineIso !== null && newDeadlineIso !== originalDeadline) ||
+        visibility !== ((task.visibility as "ALL_MEMBERS" | "ROLE_RESTRICTED" | undefined) ?? "ALL_MEMBERS") ||
+        JSON.stringify(origVisRoleIds) !== JSON.stringify(curVisRoleIds);
+
+      if (!hasChanges) {
+        onClose();
+        return;
+      }
+
       const body: {
         title: string;
         description?: string;
@@ -136,7 +151,7 @@ export default function EditTaskDialog({ open, onClose, task, organizationId, on
         clearDeadline: clearDeadline,
       };
 
-      if (description.trim()) {
+      if (description.trim() !== (task.description ?? "")) {
         body.description = description.trim();
       }
       if (newDeadlineIso) {
