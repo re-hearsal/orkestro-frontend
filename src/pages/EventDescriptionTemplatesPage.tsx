@@ -7,6 +7,7 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import client from "../api/client";
@@ -15,6 +16,7 @@ import { useAppAlert } from "../hooks/useAppAlert";
 import { useAuth } from "../hooks/useAuth";
 import { useOrgMemberContext } from "../hooks/useOrgMemberContext";
 import EventDescriptionTemplateDialog from "../components/events/EventDescriptionTemplateDialog";
+import { useMobileAction } from "../context/MobileActionContext";
 
 type EventDescriptionTemplateDTO = components["schemas"]["EventDescriptionTemplateDTO"];
 type EventType = "REHEARSAL" | "CONCERT" | "OTHER";
@@ -124,6 +126,14 @@ export default function EventDescriptionTemplatesPage() {
     }
   }, [user, organizationId, showAlert, t]);
 
+  const currentTemplate = templates[activeEventType];
+
+  useMobileAction(
+    canManage && !loading && !currentTemplate
+      ? { icon: <AddIcon />, onClick: () => { setEditingTemplate(undefined); setDialogOpen(true); }, ariaLabel: String(t("events.templates.create")) }
+      : null
+  );
+
   if (!canManage) {
     return (
       <Box sx={{ p: 4 }}>
@@ -131,8 +141,6 @@ export default function EventDescriptionTemplatesPage() {
       </Box>
     );
   }
-
-  const currentTemplate = templates[activeEventType];
 
   return (
     <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 800, mx: "auto" }}>
@@ -222,6 +230,7 @@ export default function EventDescriptionTemplatesPage() {
               setDialogOpen(true);
             }}
             sx={{
+              display: { xs: "none", md: "flex" },
               textTransform: "none",
               fontFamily: "Century Gothic, sans-serif",
               borderColor: "#0f3eb5",

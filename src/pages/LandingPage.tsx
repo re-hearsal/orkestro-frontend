@@ -27,7 +27,7 @@ export default function LandingPage() {
         sx={{
           bgcolor: 'transparent',
           color: '#0f3eb5',
-          px: 4,
+          px: { xs: 2, sm: 4 },
           py: 1.5,
           display: 'flex',
           justifyContent: 'space-between',
@@ -52,10 +52,10 @@ export default function LandingPage() {
         sx={{
           bgcolor: '#0f3eb5',
           color: 'white',
-          px: 8,
+          px: { xs: 2, sm: 4, md: 8 },
           pt: 4,
           pb: 6,
-          mx: 12,
+          mx: { xs: 1, sm: 4, md: 12 },
           mt: 4,
           borderRadius: 4,
         }}
@@ -67,9 +67,9 @@ export default function LandingPage() {
           <Typography
             sx={{
               fontFamily: 'cs-mollwish-2, sans-serif',
-              fontSize: '6rem',
+              fontSize: { xs: '3rem', sm: '4.5rem', md: '6rem' },
               color: 'white',
-              letterSpacing: 4,
+              letterSpacing: { xs: 2, md: 4 },
               mb: 4,
             }}
           >
@@ -83,9 +83,9 @@ export default function LandingPage() {
               bgcolor: 'white',
               color: '#0f3eb5',
               borderRadius: 8,
-              px: 8,
+              px: { xs: 4, sm: 8 },
               py: 2,
-              fontSize: '1.6rem',
+              fontSize: { xs: '1.1rem', sm: '1.6rem' },
               fontWeight: 'bold',
               '&:hover': { bgcolor: '#e8eeff' },
             }}
@@ -95,10 +95,10 @@ export default function LandingPage() {
         </Box>
       </Box>
 
-      <Divider sx={{ mx: 6, my: 4, borderBottomWidth: 5, borderRadius: 2, borderColor: '#333333' }} />
+      <Divider sx={{ mx: { xs: 2, sm: 6 }, my: 4, borderBottomWidth: 5, borderRadius: 2, borderColor: '#333333' }} />
 
       {/* Steps section */}
-      <Box sx={{ px: 4, py: 4, pb: 8, textAlign: 'center' }}>
+      <Box sx={{ px: { xs: 2, sm: 4 }, py: 4, pb: 8, textAlign: 'center' }}>
         <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 6, lineHeight: 1.0 }}>
           <span style={{ color: '#0f3eb5' }}>{t('landing.steps.heading1')}</span>
           <br />
@@ -120,7 +120,7 @@ export default function LandingPage() {
                 borderRadius: 3,
                 boxShadow: 3,
                 p: 4,
-                width: 220,
+                width: { xs: '100%', sm: 220 },
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',

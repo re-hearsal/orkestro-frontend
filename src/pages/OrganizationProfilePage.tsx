@@ -380,13 +380,15 @@ export default function OrganizationProfilePage() {
           gap: 2,
         }}
       >
-        <Box>
+        <Box sx={{ minWidth: 0 }}>
           <Typography
             variant="h4"
             sx={{
               fontFamily: "Century Gothic, sans-serif",
               fontWeight: 700,
               color: "#0f3eb5",
+              wordBreak: "break-word",
+              overflowWrap: "break-word",
             }}
           >
             {organization.name}

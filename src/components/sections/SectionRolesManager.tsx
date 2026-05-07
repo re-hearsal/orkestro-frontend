@@ -15,6 +15,8 @@ import {
   Popover,
   TextField,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import client from "../../api/client";
@@ -49,6 +51,8 @@ interface RoleDialogProps {
 function CreateSectionRoleDialog({ sectionId, open, onClose, onSaved, existingRole }: RoleDialogProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [name, setName] = useState("");
   const [nameError, setNameError] = useState<string | null>(null);
@@ -111,11 +115,11 @@ function CreateSectionRoleDialog({ sectionId, open, onClose, onSaved, existingRo
   const isEdit = existingRole != null;
 
   return (
-    <Dialog open={open} onClose={() => { if (!loading) onClose(); }} fullWidth maxWidth="sm" slotProps={{ paper: { sx: { borderRadius: "16px" } } }}>
+    <Dialog open={open} onClose={() => { if (!loading) onClose(); }} fullWidth maxWidth="sm" fullScreen={fullScreen} slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}>
       <DialogTitle sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700, color: "#0f3eb5" }}>
         {isEdit ? t("roles.editTitle") : t("roles.createTitle")}
       </DialogTitle>
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ overflowY: 'auto' }}>
         <TextField
           label={t("roles.form.name")}
           value={name}
@@ -154,7 +158,7 @@ function CreateSectionRoleDialog({ sectionId, open, onClose, onSaved, existingRo
         </FormGroup>
         {apiError && <FormHelperText error sx={{ mt: 1 }}>{apiError}</FormHelperText>}
       </DialogContent>
-      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, px: 3, py: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: { xs: 'column-reverse', sm: 'row' }, justifyContent: { sm: "flex-end" }, alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, px: 3, py: 2 }}>
         <Button onClick={onClose} disabled={loading} variant="outlined" sx={{ borderRadius: "8px", borderColor: "#7795de", color: "#7795de", fontFamily: "Century Gothic, sans-serif", textTransform: "none" }}>
           {t("common.cancel")}
         </Button>

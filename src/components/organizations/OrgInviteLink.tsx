@@ -9,6 +9,8 @@ import {
   IconButton,
   Tooltip,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -27,6 +29,8 @@ interface OrgInviteLinkProps {
 export default function OrgInviteLink({ organizationId, permissions }: OrgInviteLinkProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const [code, setCode] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
@@ -163,17 +167,18 @@ export default function OrgInviteLink({ organizationId, permissions }: OrgInvite
             setConfirmOpen(false);
           }
         }}
-        slotProps={{ paper: { sx: { borderRadius: "32px" } } }}
+        fullScreen={fullScreen}
+        slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "32px" } } }}
       >
         <DialogTitle sx={{ fontFamily: "Century Gothic, sans-serif", color: "#0f3eb5", fontWeight: 700 }}>
           {t("organizations.invite.regenerateButton")}
         </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ overflowY: 'auto' }}>
           <DialogContentText sx={{ fontFamily: "Century Gothic, sans-serif", color: "#7795de" }}>
             {t("organizations.invite.regenerateConfirm")}
           </DialogContentText>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
+        <DialogActions sx={{ px: 3, pb: 2, flexDirection: { xs: 'column-reverse', sm: 'row' }, alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, '& > *': { m: '0 !important' } }}>
           <Button
             onClick={() => setConfirmOpen(false)}
             disabled={regenerating}

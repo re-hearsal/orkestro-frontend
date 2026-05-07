@@ -11,7 +11,15 @@ import {
   MenuItem,
   TextField,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { ruRU, enUS } from "@mui/x-date-pickers/locales";
+import dayjs, { type Dayjs } from "dayjs";
+import "dayjs/locale/ru";
 import { useTranslation } from "react-i18next";
 import client from "../../api/client";
 import type { components } from "../../api/schema";
@@ -37,21 +45,24 @@ function getErrorMessage(error: unknown): string {
 }
 
 export default function EditTaskDialog({ open, onClose, task, organizationId, onUpdated }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
+  const dayjsLocale = i18n.language === "ru" ? "ru" : "en";
   const { showAlert } = useAppAlert();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [title, setTitle] = useState("");
   const [titleError, setTitleError] = useState("");
   const [description, setDescription] = useState("");
-  const [deadline, setDeadline] = useState("");
+  const [deadline, setDeadline] = useState<Dayjs | null>(null);
   const [visibility, setVisibility] = useState<"ALL_MEMBERS" | "ROLE_RESTRICTED">("ALL_MEMBERS");
   const [roles, setRoles] = useState<TechnicalRoleDTO[]>([]);
   const [selectedRoles, setSelectedRoles] = useState<TechnicalRoleDTO[]>([]);
   const [autocompleteKey, setAutocompleteKey] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
-  const isDeadlinePast = deadline !== "" && new Date(deadline) < new Date();
+  const isDeadlinePast = deadline !== null && deadline.isBefore(dayjs());
 
   // Reset + pre-fill form when dialog opens
   useEffect(() => {
@@ -59,13 +70,7 @@ export default function EditTaskDialog({ open, onClose, task, organizationId, on
       setTitle(task.title ?? "");
       setTitleError("");
       setDescription(task.description ?? "");
-      if (task.deadline) {
-        const d = new Date(task.deadline);
-        const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
-        setDeadline(local.toISOString().slice(0, 16));
-      } else {
-        setDeadline("");
-      }
+      setDeadline(task.deadline ? dayjs(task.deadline) : null);
       const vis = (task.visibility as "ALL_MEMBERS" | "ROLE_RESTRICTED" | undefined) ?? "ALL_MEMBERS";
       setVisibility(vis);
       setSelectedRoles([]);
@@ -118,7 +123,7 @@ export default function EditTaskDialog({ open, onClose, task, organizationId, on
     setSubmitting(true);
     try {
       const originalDeadline = task.deadline ?? null;
-      const newDeadlineIso = deadline ? new Date(deadline).toISOString() : null;
+      const newDeadlineIso = deadline ? deadline.toISOString() : null;
       const clearDeadline = Boolean(originalDeadline && !deadline);
 
       const origVisRoleIds = [...((task.visibilityRoleIds as number[] | undefined) ?? [])].sort((a, b) => a - b);
@@ -192,12 +197,17 @@ export default function EditTaskDialog({ open, onClose, task, organizationId, on
   const availableRoles = roles.filter((r) => !selectedRoles.some((s) => s.id === r.id));
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth scroll="paper">
+    <LocalizationProvider
+      dateAdapter={AdapterDayjs}
+      adapterLocale={dayjsLocale}
+      localeText={dayjsLocale === "ru" ? ruRU.components.MuiLocalizationProvider.defaultProps.localeText : enUS.components.MuiLocalizationProvider.defaultProps.localeText}
+    >
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={fullScreen} scroll="paper">
       <DialogTitle sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700 }}>
         {t("tasks.editButton")}
       </DialogTitle>
 
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ overflowY: 'auto' }}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 0.5 }}>
           {/* Title */}
           <TextField
@@ -228,15 +238,15 @@ export default function EditTaskDialog({ open, onClose, task, organizationId, on
 
           {/* Deadline */}
           <Box>
-            <TextField
+            <DateTimePicker
               label={t("tasks.form.deadline")}
-              type="datetime-local"
-              fullWidth
               value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
+              onChange={(val) => setDeadline(val)}
               slotProps={{
-                inputLabel: { shrink: true },
-                input: { sx: { fontFamily: "Century Gothic, sans-serif" } },
+                textField: {
+                  fullWidth: true,
+                  sx: { "& .MuiInputBase-root": { fontFamily: "Century Gothic, sans-serif" } },
+                },
               }}
             />
             {isDeadlinePast && (
@@ -296,7 +306,7 @@ export default function EditTaskDialog({ open, onClose, task, organizationId, on
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 2 }}>
+      <DialogActions sx={{ px: 3, pb: 2, flexDirection: { xs: 'column-reverse', sm: 'row' }, alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, '& > *': { m: '0 !important' } }}>
         <Button
           onClick={onClose}
           sx={{ textTransform: "none", fontFamily: "Century Gothic, sans-serif", color: "text.secondary" }}
@@ -313,5 +323,6 @@ export default function EditTaskDialog({ open, onClose, task, organizationId, on
         </Button>
       </DialogActions>
     </Dialog>
+    </LocalizationProvider>
   );
 }

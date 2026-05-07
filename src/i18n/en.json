@@ -154,6 +154,7 @@
     "viewMonth": "Month",
     "viewWeek": "Week",
     "createEvent": "Create event",
+    "noEvents": "No events this week",
     "wholeOrganization": "Whole organization"
   },
   "nav": {

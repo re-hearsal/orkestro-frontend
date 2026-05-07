@@ -1,7 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Box, Button, CircularProgress, Pagination, TextField, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Pagination, Typography } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { ruRU, enUS } from "@mui/x-date-pickers/locales";
+import dayjs, { type Dayjs } from "dayjs";
+import "dayjs/locale/ru";
 import { Navigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import AddCardIcon from "@mui/icons-material/AddCard";
 import client from "../api/client";
 import i18n from "../i18n";
 import type { components } from "../api/schema";
@@ -11,6 +18,7 @@ import { useOrgMemberContext } from "../hooks/useOrgMemberContext";
 import { useOrganization } from "../hooks/useOrganization";
 import { withFlatPagination } from "../utils/pagination";
 import { onFundRealtimeSnapshot } from "../utils/fundEvents";
+import { useMobileAction } from "../context/MobileActionContext";
 import FundTransactionRow from "../components/fund/FundTransactionRow";
 import CreateFundTransactionDialog from "../components/fund/CreateFundTransactionDialog";
 
@@ -91,8 +99,8 @@ export default function OrgFundPage() {
   const [totalPages, setTotalPages] = useState(0);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [exportingCsv, setExportingCsv] = useState(false);
-  const [exportDateFrom, setExportDateFrom] = useState("");
-  const [exportDateTo, setExportDateTo] = useState("");
+  const [exportDateFrom, setExportDateFrom] = useState<Dayjs | null>(null);
+  const [exportDateTo, setExportDateTo] = useState<Dayjs | null>(null);
 
   const loadBalance = useCallback(async () => {
     if (!user || !isValidOrganizationId) {
@@ -205,6 +213,14 @@ export default function OrgFundPage() {
     }
   }, [currentOrganization?.id, isValidOrganizationId, organizationId, organizations, setCurrentOrganization]);
 
+  const canCreateTransaction = permissions.has("ORG_FUND_MANIPULATION");
+
+  useMobileAction(
+    canCreateTransaction
+      ? { icon: <AddCardIcon />, onClick: () => setCreateDialogOpen(true), ariaLabel: String(t("fund.create.openButton")) }
+      : null
+  );
+
   useEffect(() => {
     const unsubscribe = onFundRealtimeSnapshot((snapshot) => {
       if (!isValidOrganizationId || snapshot.organizationId !== organizationId) {
@@ -246,7 +262,6 @@ export default function OrgFundPage() {
     );
   }
 
-  const canCreateTransaction = permissions.has("ORG_FUND_MANIPULATION");
   const formattedBalance =
     typeof balance === "number"
       ? new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(balance)
@@ -263,7 +278,10 @@ export default function OrgFundPage() {
       return;
     }
 
-    if (exportDateFrom && exportDateTo && exportDateFrom > exportDateTo) {
+    const dateFromStr = exportDateFrom?.isValid() ? exportDateFrom.format("YYYY-MM-DD") : null;
+    const dateToStr = exportDateTo?.isValid() ? exportDateTo.format("YYYY-MM-DD") : null;
+
+    if (dateFromStr && dateToStr && dateFromStr > dateToStr) {
       showAlert(String(t("fund.export.invalidRange")), "warning");
       return;
     }
@@ -271,12 +289,8 @@ export default function OrgFundPage() {
     setExportingCsv(true);
 
     try {
-      const dateFromIso = exportDateFrom
-        ? toUserTimezoneBoundaryIso(exportDateFrom, "start")
-        : undefined;
-      const dateToIso = exportDateTo
-        ? toUserTimezoneBoundaryIso(exportDateTo, "end")
-        : undefined;
+      const dateFromIso = dateFromStr ? toUserTimezoneBoundaryIso(dateFromStr, "start") : undefined;
+      const dateToIso = dateToStr ? toUserTimezoneBoundaryIso(dateToStr, "end") : undefined;
 
       const { data, error, response } = await client.GET(
         "/api/v1/organizations/{organizationId}/fund/transactions/export",
@@ -342,7 +356,7 @@ export default function OrgFundPage() {
           {t("fund.page.title")}
         </Typography>
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+        <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 1, flexWrap: "wrap" }}>
           {canCreateTransaction && (
             <Button
               onClick={() => setCreateDialogOpen(true)}
@@ -483,40 +497,49 @@ export default function OrgFundPage() {
           </Box>
         )}
 
-        <Box
-          sx={{
-            mt: 2.5,
-            pt: 2,
-            borderTop: "1px solid #e7effb",
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            gap: 1,
-          }}
+        <LocalizationProvider
+          dateAdapter={AdapterDayjs}
+          adapterLocale={i18n.language === "ru" ? "ru" : "en"}
+          localeText={
+            i18n.language === "ru"
+              ? ruRU.components.MuiLocalizationProvider.defaultProps.localeText
+              : enUS.components.MuiLocalizationProvider.defaultProps.localeText
+          }
         >
-          <TextField
-            type="date"
-            size="small"
-            label={t("fund.export.dateFrom")}
-            value={exportDateFrom}
-            onChange={(event) => setExportDateFrom(event.target.value)}
-            slotProps={{
-              inputLabel: { shrink: true, sx: { fontFamily: "Century Gothic, sans-serif" } },
-              input: { sx: { fontFamily: "Century Gothic, sans-serif" } },
+          <Box
+            sx={{
+              mt: 2.5,
+              pt: 2,
+              borderTop: "1px solid #e7effb",
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              gap: 1,
             }}
-          />
+          >
+            <DatePicker
+              label={t("fund.export.dateFrom")}
+              value={exportDateFrom}
+              onChange={(val) => setExportDateFrom(val)}
+              slotProps={{
+                textField: {
+                  size: "small",
+                  sx: { flex: { xs: "1 1 100%", sm: "0 0 auto" } },
+                },
+              }}
+            />
 
-          <TextField
-            type="date"
-            size="small"
-            label={t("fund.export.dateTo")}
-            value={exportDateTo}
-            onChange={(event) => setExportDateTo(event.target.value)}
-            slotProps={{
-              inputLabel: { shrink: true, sx: { fontFamily: "Century Gothic, sans-serif" } },
-              input: { sx: { fontFamily: "Century Gothic, sans-serif" } },
-            }}
-          />
+            <DatePicker
+              label={t("fund.export.dateTo")}
+              value={exportDateTo}
+              onChange={(val) => setExportDateTo(val)}
+              slotProps={{
+                textField: {
+                  size: "small",
+                  sx: { flex: { xs: "1 1 100%", sm: "0 0 auto" } },
+                },
+              }}
+            />
 
           <Button
             onClick={() => {
@@ -540,7 +563,8 @@ export default function OrgFundPage() {
           >
             {exportingCsv ? t("fund.export.loading") : t("fund.export.button")}
           </Button>
-        </Box>
+          </Box>
+        </LocalizationProvider>
       </Box>
 
       <CreateFundTransactionDialog

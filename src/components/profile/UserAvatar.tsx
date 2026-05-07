@@ -236,6 +236,11 @@ export default function UserAvatar({ profileImageFileId, userName, onAvatarUpdat
           opacity: updating ? 1 : 0,
           pointerEvents: updating ? "auto" : "none",
           transition: "opacity 0.2s",
+          "@media (hover: none)": {
+            opacity: 1,
+            pointerEvents: "auto",
+            backgroundColor: "transparent",
+          },
           zIndex: 3,
         }}
       >

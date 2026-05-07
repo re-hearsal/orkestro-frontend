@@ -14,8 +14,9 @@ export default function AuthBox() {
     <Paper
       elevation={4}
       sx={{
-        width: 420,
-        p: 4,
+        width: '100%',
+        maxWidth: 480,
+        p: { xs: 3, sm: 4 },
         borderRadius: 4,
         background: 'linear-gradient(135deg, #e8f0ff 0%, #ffffff 100%)',
       }}

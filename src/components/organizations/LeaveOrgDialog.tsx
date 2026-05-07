@@ -5,6 +5,8 @@ import {
   DialogContent,
   DialogTitle,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
@@ -22,6 +24,8 @@ export default function LeaveOrgDialog({
   isLeader,
 }: LeaveOrgDialogProps) {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
     <Dialog
@@ -29,13 +33,14 @@ export default function LeaveOrgDialog({
       onClose={onClose}
       maxWidth="sm"
       fullWidth
-      slotProps={{ paper: { sx: { borderRadius: "16px" } } }}
+      fullScreen={fullScreen}
+      slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}
     >
       <DialogTitle sx={{ fontFamily: "Century Gothic, sans-serif", color: "#0f3eb5", fontWeight: 700 }}>
         {t("organizations.leaveDialog.title")}
       </DialogTitle>
 
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ overflowY: 'auto' }}>
         <Typography sx={{ fontFamily: "Century Gothic, sans-serif", color: "#0f3eb5" }}>
           {isLeader
             ? t("organizations.leaveDialog.leaderWarning")
@@ -43,7 +48,7 @@ export default function LeaveOrgDialog({
         </Typography>
       </DialogContent>
 
-      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, px: 3, py: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: { xs: 'column-reverse', sm: 'row' }, justifyContent: { sm: "flex-end" }, alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, px: 3, py: 2 }}>
         <Button
           onClick={onClose}
           variant="outlined"

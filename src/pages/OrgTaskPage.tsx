@@ -352,10 +352,11 @@ export default function OrgTaskPage() {
             <Box
               sx={{
                 display: "flex",
-                alignItems: "center",
+                alignItems: { xs: "flex-start", sm: "center" },
                 justifyContent: "space-between",
                 gap: 2,
                 mb: 1,
+                flexWrap: "wrap",
               }}
             >
               <Typography

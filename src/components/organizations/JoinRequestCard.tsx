@@ -145,14 +145,16 @@ export default function JoinRequestCard({
   return (
     <Box
       sx={{
-        borderRadius: "50px",
+        borderRadius: { xs: "16px", sm: "50px" },
         border: "1px solid #7795de",
         backgroundColor: "#ffffff",
         px: { xs: 1.5, sm: 2.25 },
         py: 1.2,
         display: "flex",
-        alignItems: "center",
+        flexDirection: { xs: "column", sm: "row" },
+        alignItems: { xs: "flex-start", sm: "center" },
         gap: 1.5,
+        width: "100%",
       }}
     >
       <Box
@@ -227,7 +229,7 @@ export default function JoinRequestCard({
       </Box>
 
       {canManage && (
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={0.8}>
+        <Stack direction="row" spacing={0.8} sx={{ flexWrap: "wrap", alignSelf: { xs: "stretch", sm: "auto" } }}>
           <Button
             variant="outlined"
             size="small"
@@ -237,6 +239,7 @@ export default function JoinRequestCard({
             }}
             sx={{
               minWidth: 102,
+              flex: { xs: 1, sm: "none" },
               borderRadius: "999px",
               textTransform: "none",
               fontFamily: "Century Gothic, sans-serif",
@@ -256,6 +259,7 @@ export default function JoinRequestCard({
             }}
             sx={{
               minWidth: 102,
+              flex: { xs: 1, sm: "none" },
               borderRadius: "999px",
               textTransform: "none",
               fontFamily: "Century Gothic, sans-serif",

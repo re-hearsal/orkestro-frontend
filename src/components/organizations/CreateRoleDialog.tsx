@@ -12,6 +12,8 @@ import {
   FormHelperText,
   TextField,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import client from "../../api/client";
@@ -55,6 +57,8 @@ export default function CreateRoleDialog({
 }: CreateRoleDialogProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [name, setName] = useState("");
   const [nameError, setNameError] = useState<string | null>(null);
@@ -160,7 +164,8 @@ export default function CreateRoleDialog({
       }}
       fullWidth
       maxWidth="sm"
-      slotProps={{ paper: { sx: { borderRadius: "16px" } } }}
+      fullScreen={fullScreen}
+      slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}
     >
       <DialogTitle
         sx={{
@@ -172,7 +177,7 @@ export default function CreateRoleDialog({
         {isEdit ? t("roles.editTitle") : t("roles.createTitle")}
       </DialogTitle>
 
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ overflowY: 'auto' }}>
         <TextField
           label={t("roles.form.name")}
           value={name}
@@ -237,7 +242,7 @@ export default function CreateRoleDialog({
         )}
       </DialogContent>
 
-      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, px: 3, py: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: { xs: 'column-reverse', sm: 'row' }, justifyContent: { sm: "flex-end" }, alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, px: 3, py: 2 }}>
         <Button
           onClick={onClose}
           disabled={loading}

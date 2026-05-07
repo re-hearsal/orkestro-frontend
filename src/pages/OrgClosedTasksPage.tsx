@@ -171,7 +171,7 @@ export default function OrgClosedTasksPage() {
           {/* Two-column grid */}
           <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 3 }}>
             {/* DONE column */}
-            <Box>
+            <Box sx={{ minWidth: 0 }}>
               <Typography sx={columnHeaderSx}>{t("tasks.status.done")}</Typography>
               {doneTasks.length === 0 ? (
                 <Typography sx={{ fontFamily: "Century Gothic, sans-serif", color: "#7795de", fontSize: "0.9rem" }}>
@@ -202,7 +202,7 @@ export default function OrgClosedTasksPage() {
             </Box>
 
             {/* CANCELLED column */}
-            <Box>
+            <Box sx={{ minWidth: 0 }}>
               <Typography sx={columnHeaderSx}>{t("tasks.status.cancelled")}</Typography>
               {cancelledTasks.length === 0 ? (
                 <Typography sx={{ fontFamily: "Century Gothic, sans-serif", color: "#7795de", fontSize: "0.9rem" }}>

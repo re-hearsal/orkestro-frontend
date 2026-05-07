@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Menu, MenuItem, Typography } from "@mui/material";
+import { Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Menu, MenuItem, Typography, useMediaQuery, useTheme } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutlined";
 import PersonIcon from "@mui/icons-material/Person";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
@@ -48,6 +48,8 @@ export default function OrgMemberCard({
   const { user } = useAuth();
   const { showAlert } = useAppAlert();
   const navigate = useNavigate();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const objectUrlRef = useRef<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -406,7 +408,7 @@ export default function OrgMemberCard({
                 size="small"
                 onClick={handleMenuOpen}
                 title={String(t("organizations.members.assignRole"))}
-                sx={{ color: "#7795de", flexShrink: 0, p: 0.25 }}
+                sx={{ color: "#7795de", flexShrink: 0, minWidth: 44, minHeight: 44 }}
               >
                 <AddCircleOutlineIcon fontSize="small" />
               </IconButton>
@@ -485,17 +487,18 @@ export default function OrgMemberCard({
         onClose={() => setRemoveDialogOpen(false)}
         maxWidth="xs"
         fullWidth
-        PaperProps={{ sx: { borderRadius: "16px" } }}
+        fullScreen={fullScreen}
+        PaperProps={{ sx: { borderRadius: fullScreen ? 0 : "16px" } }}
       >
         <DialogTitle sx={{ color: "error.main", fontFamily: "Century Gothic, sans-serif" }}>
           {t("organizations.members.removeConfirmTitle")}
         </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ overflowY: 'auto' }}>
           <Typography sx={{ fontFamily: "Century Gothic, sans-serif" }}>
             {t("organizations.members.removeConfirmText", { name: member.name ?? "" })}
           </Typography>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ flexDirection: { xs: 'column-reverse', sm: 'row' }, alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, '& > *': { m: '0 !important' } }}>
           <Button
             onClick={() => setRemoveDialogOpen(false)}
             disabled={removing}

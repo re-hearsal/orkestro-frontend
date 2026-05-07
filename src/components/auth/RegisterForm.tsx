@@ -18,7 +18,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { ruRU, enUS } from '@mui/x-date-pickers/locales';
 import dayjs, { type Dayjs } from 'dayjs';
+import 'dayjs/locale/ru';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import client from '../../api/client';
@@ -43,7 +45,8 @@ interface Step2Errors {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function RegisterForm({ onBack }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dayjsLocale = i18n.language === "ru" ? "ru" : "en";
   const navigate = useNavigate();
   const { login } = useAuth();
   const { showAlert } = useAppAlert();
@@ -154,7 +157,11 @@ export default function RegisterForm({ onBack }: Props) {
     setStep1Errors((p) => ({ ...p, [field]: undefined }));
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider
+      dateAdapter={AdapterDayjs}
+      adapterLocale={dayjsLocale}
+      localeText={dayjsLocale === "ru" ? ruRU.components.MuiLocalizationProvider.defaultProps.localeText : enUS.components.MuiLocalizationProvider.defaultProps.localeText}
+    >
       <Stack spacing={2}>
         <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0f3eb5', textAlign: 'center' }}>
           {t('auth.register.title')}

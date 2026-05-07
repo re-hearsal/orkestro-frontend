@@ -10,6 +10,8 @@ import {
   Typography,
 } from "@mui/material";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import AddIcon from "@mui/icons-material/Add";
+import MusicNoteIcon from "@mui/icons-material/MusicNote";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import client from "../api/client";
@@ -22,6 +24,7 @@ import { useOrganization } from "../hooks/useOrganization";
 import { withFlatPagination } from "../utils/pagination";
 import { onSongDeleted } from "../utils/songEvents";
 import CreateSongDialog from "../components/repertoire/CreateSongDialog";
+import { useMobileAction } from "../context/MobileActionContext";
 
 type SongDTO = components["schemas"]["SongDTO"];
 
@@ -29,6 +32,22 @@ interface SongsPage {
   content?: SongDTO[];
 }
 
+
+function MusicNotePlusIcon() {
+  return (
+    <Box sx={{ position: "relative", width: 22, height: 22, display: "flex" }}>
+      <MusicNoteIcon sx={{ fontSize: 22 }} />
+      <AddIcon
+        sx={{
+          fontSize: 13,
+          position: "absolute",
+          bottom: -2,
+          right: -3,
+        }}
+      />
+    </Box>
+  );
+}
 
 const SERVER_PAGE_SIZE = 1000;
 const CLIENT_PAGE_SIZE = 20;
@@ -59,6 +78,12 @@ export default function OrgRepertoirePage() {
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const canCreateSong = permissions.has("REPERTOIRE_CREATE_SONG");
+
+  useMobileAction(
+    canCreateSong
+      ? { icon: <MusicNotePlusIcon />, onClick: () => setCreateDialogOpen(true), ariaLabel: String(t("repertoire.addSong")) }
+      : null
+  );
 
   // Derived: client-side tag filter + pagination
   const filteredSongs = useMemo(
@@ -187,6 +212,7 @@ export default function OrgRepertoirePage() {
             variant="outlined"
             onClick={() => setCreateDialogOpen(true)}
             sx={{
+              display: { xs: "none", md: "flex" },
               borderRadius: "8px",
               borderColor: "#0f3eb5",
               color: "#0f3eb5",
@@ -211,7 +237,8 @@ export default function OrgRepertoirePage() {
         placeholder={String(t("repertoire.searchPlaceholder"))}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        sx={{ width: 400, mb: tags.length > 0 ? 1.5 : 2 }}
+        fullWidth
+        sx={{ maxWidth: { xs: "100%", sm: 400 }, mb: tags.length > 0 ? 1.5 : 2 }}
         slotProps={{
           input: { sx: { fontFamily: "Century Gothic, sans-serif" } },
         }}

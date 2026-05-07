@@ -8,6 +8,8 @@ import {
   Typography,
   CircularProgress,
   IconButton,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from "react-i18next";
@@ -45,6 +47,8 @@ interface Props {
 export default function InstrumentPicker({ open, onClose, myInstrumentIds, onAdd }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [allInstruments, setAllInstruments] = useState<InstrumentDTO[]>([]);
   const [search, setSearch] = useState("");
@@ -98,7 +102,8 @@ export default function InstrumentPicker({ open, onClose, myInstrumentIds, onAdd
       onClose={onClose}
       maxWidth="sm"
       fullWidth
-      PaperProps={{ sx: { borderRadius: "16px" } }}
+      fullScreen={fullScreen}
+      PaperProps={{ sx: { borderRadius: fullScreen ? 0 : "16px" } }}
     >
       <DialogTitle
         sx={{
@@ -111,13 +116,13 @@ export default function InstrumentPicker({ open, onClose, myInstrumentIds, onAdd
         {t("profile.addInstrument")}
         <IconButton
           onClick={onClose}
-          sx={{ position: "absolute", right: 12, top: 12, color: "#9aa5c0" }}
+          sx={{ position: "absolute", right: 12, top: 12, color: "#9aa5c0", minWidth: 44, minHeight: 44 }}
         >
           <CloseIcon />
         </IconButton>
       </DialogTitle>
 
-      <DialogContent>
+      <DialogContent sx={{ overflowY: 'auto' }}>
         <TextField
           fullWidth
           size="small"

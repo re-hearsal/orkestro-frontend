@@ -11,6 +11,8 @@ import {
   IconButton,
   TextField,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -66,6 +68,8 @@ export default function CreateSongDialog({ open, onClose, organizationId, onCrea
   const { t } = useTranslation();
   const { user } = useAuth();
   const { showAlert } = useAppAlert();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const createSongMultipart = client.POST as unknown as (
     path: "/api/v1/organizations/{organizationId}/repertoire/songs",
@@ -290,12 +294,12 @@ export default function CreateSongDialog({ open, onClose, organizationId, onCrea
   );
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth scroll="paper">
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={fullScreen} scroll="paper">
       <DialogTitle sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700 }}>
         {step === 1 ? t("repertoire.createStep1") : t("repertoire.createStep2")}
       </DialogTitle>
 
-      <DialogContent dividers sx={{ overflow: step === 2 ? "visible" : "auto" }}>
+      <DialogContent dividers sx={{ overflow: step === 2 ? "visible" : "auto", overflowY: 'auto' }}>
         {step === 1 ? (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 0.5 }}>
             <TextField
@@ -516,7 +520,7 @@ export default function CreateSongDialog({ open, onClose, organizationId, onCrea
         )}
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 2 }}>
+      <DialogActions sx={{ px: 3, pb: 2, flexDirection: { xs: 'column-reverse', sm: 'row' }, alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, '& > *': { m: '0 !important' } }}>
         {step === 1 ? (
           <>
             <Button

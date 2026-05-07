@@ -31,13 +31,10 @@ export default function TaskCard({ task, isClosedList, currentUserId }: TaskCard
   const isDeadlinePast = task.deadline ? new Date(task.deadline) < new Date() : false;
   const showDeadline = !!task.deadline && !isClosed;
 
-  const dateRow = (() => {
-    const created = formatDate(task.createdAt);
-    if (isClosedList && task.closedAt) {
-      return `${t("tasks.createdAt")}: ${created} · ${t("tasks.closedAt")}: ${formatDate(task.closedAt)}`;
-    }
-    return `${t("tasks.createdAt")}: ${created} · ${t("tasks.updatedAt")}: ${formatDate(task.updatedAt)}`;
-  })();
+  const createdLine = `${t("tasks.createdAt")}: ${formatDate(task.createdAt)}`;
+  const secondLine = isClosedList && task.closedAt
+    ? `${t("tasks.closedAt")}: ${formatDate(task.closedAt)}`
+    : `${t("tasks.updatedAt")}: ${formatDate(task.updatedAt)}`;
 
   return (
     <Paper
@@ -56,7 +53,7 @@ export default function TaskCard({ task, isClosedList, currentUserId }: TaskCard
         "&:hover": { background: "#f0f4fd" },
       }}
     >
-      <Box sx={{ flex: 1, minWidth: 0 }}>
+      <Box sx={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
         <Typography
           sx={{
             fontWeight: 700,
@@ -98,9 +95,24 @@ export default function TaskCard({ task, isClosedList, currentUserId }: TaskCard
             color: "#7795de",
             fontFamily: "Century Gothic, sans-serif",
             mt: 0.25,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
           }}
         >
-          {dateRow}
+          {createdLine}
+        </Typography>
+        <Typography
+          sx={{
+            fontSize: "0.78rem",
+            color: "#7795de",
+            fontFamily: "Century Gothic, sans-serif",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {secondLine}
         </Typography>
 
         {showDeadline && (

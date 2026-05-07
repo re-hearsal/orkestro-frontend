@@ -4,6 +4,8 @@
   padding: 0;
   scrollbar-width: thin;
   scrollbar-color: #7795de #dce6f9;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 *::-webkit-scrollbar {
@@ -27,4 +29,16 @@
 
 html, body, #root {
   height: 100%;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+button, a {
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
 }

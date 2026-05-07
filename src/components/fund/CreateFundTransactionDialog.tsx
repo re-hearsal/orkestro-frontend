@@ -12,6 +12,8 @@ import {
   Select,
   TextField,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import client from "../../api/client";
@@ -58,6 +60,8 @@ export default function CreateFundTransactionDialog({
 }: CreateFundTransactionDialogProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [operationType, setOperationType] = useState<OperationType>("DEPOSIT");
   const [amountInput, setAmountInput] = useState("");
@@ -137,7 +141,8 @@ export default function CreateFundTransactionDialog({
       onClose={handleClose}
       fullWidth
       maxWidth="sm"
-      slotProps={{ paper: { sx: { borderRadius: "16px" } } }}
+      fullScreen={fullScreen}
+      slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}
     >
       <DialogTitle
         sx={{
@@ -149,7 +154,7 @@ export default function CreateFundTransactionDialog({
         {t("fund.create.title")}
       </DialogTitle>
 
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ overflowY: 'auto' }}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 0.5 }}>
           <FormControl size="small" fullWidth>
             <InputLabel sx={{ fontFamily: "Century Gothic, sans-serif" }}>
@@ -214,7 +219,7 @@ export default function CreateFundTransactionDialog({
         </Box>
       </DialogContent>
 
-      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, px: 3, py: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: { xs: 'column-reverse', sm: 'row' }, justifyContent: { sm: "flex-end" }, alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, px: 3, py: 2 }}>
         <Button
           onClick={handleClose}
           disabled={submitting}

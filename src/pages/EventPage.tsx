@@ -346,7 +346,7 @@ export default function EventPage() {
     <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1040, mx: "auto" }}>
 
       {/* Top action bar */}
-      <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 1, mb: 2 }}>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", flexWrap: "wrap", gap: 1, mb: 2 }}>
         <Button
           variant="outlined"
           startIcon={<PeopleIcon />}
@@ -387,9 +387,9 @@ export default function EventPage() {
       {/* Main info block */}
       <Box sx={{ border: "1px solid #dce6f9", borderRadius: "12px", backgroundColor: "#ffffff", p: { xs: 2, sm: 3 }, mb: 2 }}>
         {/* Title row */}
-        <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1, mb: 0.75 }}>
+        <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1, mb: 0.75, minWidth: 0 }}>
           <Typography
-            sx={{ fontWeight: 700, fontFamily: "Century Gothic, sans-serif", color: "#0f3eb5", overflowWrap: "break-word", wordBreak: "normal", fontSize: { xs: "1.6rem", sm: "2rem" }, lineHeight: 1.2, flex: "1 1 200px", minWidth: 0 }}
+            sx={{ fontWeight: 700, fontFamily: "Century Gothic, sans-serif", color: "#0f3eb5", fontSize: { xs: "1.2rem", sm: "2rem" }, lineHeight: 1.2, flex: "1 1 0", minWidth: 0, wordBreak: "break-word", overflowWrap: "break-word", whiteSpace: { xs: "normal", sm: "nowrap" }, overflow: { xs: "visible", sm: "hidden" }, textOverflow: { xs: "unset", sm: "ellipsis" } }}
           >
             {event.title}
             {externalUrl && (
@@ -409,8 +409,8 @@ export default function EventPage() {
           </Typography>
 
           {event.myRsvpStatus != null && (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexShrink: 0 }}>
-              <Typography sx={{ fontFamily: "Century Gothic, sans-serif", fontSize: "0.9rem", color: "#7795de" }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 0.5, sm: 1 }, flexShrink: 0 }}>
+              <Typography sx={{ fontFamily: "Century Gothic, sans-serif", fontSize: "0.9rem", color: "#7795de", whiteSpace: "nowrap", display: { xs: "none", sm: "block" } }}>
                 {t("events.myRsvpLabel")}
               </Typography>
               <EventRsvpButton organizationId={organizationId} eventId={eventId} initialStatus={event.myRsvpStatus} />
@@ -588,6 +588,7 @@ export default function EventPage() {
             fontFamily: "Century Gothic, sans-serif",
             whiteSpace: "pre-wrap",
             wordBreak: "break-word",
+            overflowWrap: "break-word",
             color: event.description ? "#1a2f63" : "#7795de",
             fontSize: "0.96rem",
             lineHeight: 1.45,
@@ -781,7 +782,7 @@ export default function EventPage() {
             {t("events.confirmDeleteEvent")}
           </Typography>
         </DialogContent>
-        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, px: 3, py: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", flexWrap: "wrap", gap: 1.5, px: 3, py: 2 }}>
           <Button
             variant="outlined"
             onClick={() => setDeleteOpen(false)}

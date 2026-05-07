@@ -200,7 +200,7 @@ export default function UserProfilePage() {
       </Box>
 
       {/* Avatar + name */}
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 4, gap: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, alignItems: "center", mb: 4, gap: 2 }}>
         <UserAvatar
           profileImageFileId={fullProfile?.profileImageFileId}
           userName={fullProfile?.name ?? profile?.name ?? ""}
@@ -208,7 +208,7 @@ export default function UserProfilePage() {
         />
         <Typography
           variant="h5"
-          sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700, color: "#0f3eb5" }}
+          sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700, color: "#0f3eb5", textAlign: { xs: "center", sm: "left" } }}
         >
           {fullProfile?.name ?? profile?.name ?? profile?.username ?? ""}
         </Typography>

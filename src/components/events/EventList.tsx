@@ -247,16 +247,30 @@ export default function EventList({ organizationId, from, to, scope, tags }: Eve
               <Box
                 key={`${event.id ?? index}-${event.startTime ?? ""}`}
                 sx={{
+                  position: "relative",
                   display: "flex",
                   alignItems: "stretch",
-                  background: isBlueRow
-                    ? "linear-gradient(to right, #0f3eb5, #ffffff)"
-                    : "#ffffff",
+                  background: "#ffffff",
                   ...(index < events.length - 1 ? { borderBottom: "1px solid #dce6f9" } : {}),
                 }}
               >
+                {isBlueRow && (
+                  <Box
+                    aria-hidden
+                    sx={{
+                      display: { xs: "none", sm: "block" },
+                      position: "absolute",
+                      inset: 0,
+                      zIndex: 0,
+                      background: "linear-gradient(to right, #0f3eb5, #ffffff)",
+                    }}
+                  />
+                )}
+
                 <Box
                   sx={{
+                    position: "relative",
+                    zIndex: 1,
                     width: { xs: 72, sm: 88 },
                     display: "flex",
                     flexDirection: "column",
@@ -272,7 +286,7 @@ export default function EventList({ organizationId, from, to, scope, tags }: Eve
                       fontFamily: "Century Gothic, sans-serif",
                       fontWeight: 700,
                       fontSize: { xs: "1.5rem", sm: "2rem" },
-                      color: dateColor,
+                      color: { xs: "#0f3eb5", sm: dateColor },
                       lineHeight: 1,
                     }}
                   >
@@ -285,7 +299,7 @@ export default function EventList({ organizationId, from, to, scope, tags }: Eve
                       fontWeight: 700,
                       fontSize: "0.72rem",
                       letterSpacing: "0.06em",
-                      color: dateColor,
+                      color: { xs: "#0f3eb5", sm: dateColor },
                       lineHeight: 1,
                     }}
                   >
@@ -293,17 +307,18 @@ export default function EventList({ organizationId, from, to, scope, tags }: Eve
                   </Typography>
                 </Box>
 
-                <Box sx={{ flex: 1, p: 1.25 }}>
+                <Box sx={{ position: "relative", zIndex: 1, flex: 1, p: 1.25 }}>
                   <Box sx={{ borderRadius: "12px", boxShadow: 1, bgcolor: "#fff", p: 2 }}>
                     <Box
                       sx={{
                         display: "flex",
-                        alignItems: "flex-start",
+                        flexDirection: { xs: "column", sm: "row" },
+                        alignItems: { xs: "flex-start", sm: "flex-start" },
                         justifyContent: "space-between",
-                        gap: 2,
+                        gap: 1.5,
                       }}
                     >
-                      <Box sx={{ minWidth: 0, flex: 1 }}>
+                      <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                         <Typography
                           sx={{
                             fontFamily: "Century Gothic, sans-serif",
@@ -342,9 +357,9 @@ export default function EventList({ organizationId, from, to, scope, tags }: Eve
                         sx={{
                           display: "flex",
                           flexDirection: "column",
-                          alignItems: "flex-end",
+                          alignItems: "flex-start",
                           gap: 0.75,
-                          minWidth: { xs: 96, sm: 140 },
+                          minWidth: { sm: 140 },
                         }}
                       >
                         <Chip
@@ -363,7 +378,6 @@ export default function EventList({ organizationId, from, to, scope, tags }: Eve
                             sx={{
                               display: "flex",
                               flexWrap: "wrap",
-                              justifyContent: "flex-end",
                               gap: 0.75,
                             }}
                           >

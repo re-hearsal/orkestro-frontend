@@ -12,6 +12,9 @@ const theme = createTheme({
   },
   typography: {
     fontFamily: 'Century Gothic, sans-serif',
+    h4: { fontSize: 'clamp(1.25rem, 4vw, 1.75rem)' },
+    h6: { fontSize: 'clamp(1rem, 3.5vw, 1.15rem)' },
+    body1: { fontSize: 'clamp(0.85rem, 2.5vw, 0.92rem)' },
   },
   shape: {
     borderRadius: 12,

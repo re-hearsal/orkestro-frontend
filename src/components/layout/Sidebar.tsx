@@ -1,13 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Badge, Box, List, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
-import GroupsIcon from "@mui/icons-material/Groups";
-import DateRangeIcon from "@mui/icons-material/DateRange";
-import GroupAddIcon from "@mui/icons-material/GroupAdd";
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
-import AssignmentIcon from "@mui/icons-material/Assignment";
-import FeedbackOutlinedIcon from "@mui/icons-material/FeedbackOutlined";
-import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import LanguageIcon from "@mui/icons-material/Language";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -21,6 +13,7 @@ import {
   JOIN_REQUESTS_UPDATED_EVENT,
   type JoinRequestsUpdatedDetail,
 } from "../../utils/joinRequestsEvents";
+import { NAV_ITEMS, type NavItemDef } from "./navItems";
 
 type SectionDTO = components["schemas"]["SectionDTO"];
 
@@ -226,10 +219,6 @@ export default function Sidebar() {
     };
   }, [activeOrganizationId, canViewJoinRequests, loadPendingJoinRequestsCount]);
 
-  const joinRequestsPath = activeOrganizationId
-    ? `/organizations/${activeOrganizationId}/join-requests`
-    : "/organizations";
-
   const isJoinRequestsRoute = useMemo(
     () => location.pathname.includes("/join-requests"),
     [location.pathname]
@@ -265,34 +254,34 @@ export default function Sidebar() {
     [location.pathname]
   );
 
-  const fundPath = activeOrganizationId
-    ? `/organizations/${activeOrganizationId}/fund`
-    : "/organizations";
-
-  const repertoirePath = activeOrganizationId
-    ? `/organizations/${activeOrganizationId}/repertoire`
-    : "/organizations";
-
-  const tasksPath = activeOrganizationId
-    ? `/organizations/${activeOrganizationId}/tasks`
-    : "/organizations";
-
-  const sectionsPath = activeOrganizationId
-    ? `/organizations/${activeOrganizationId}/sections`
-    : "/organizations";
-
-  const feedbackPath = activeOrganizationId
-    ? `/organizations/${activeOrganizationId}/feedback`
-    : "/organizations";
-
-  const schedulePath = activeOrganizationId
-    ? `/organizations/${activeOrganizationId}/schedule`
-    : "/organizations";
-
   const visibleSections = sectionsExpanded ? mySections : mySections.slice(0, 3);
   const hiddenSectionsCount = Math.max(0, mySections.length - 3);
 
-  const isActive = (path: string) => location.pathname.startsWith(path);
+  const activeForKey: Record<string, boolean> = {
+    organizations:
+      location.pathname.startsWith("/organizations") &&
+      !isJoinRequestsRoute &&
+      !isFundRoute &&
+      !isRepertoireRoute &&
+      !isSectionsRoute &&
+      !isScheduleRoute &&
+      !isFeedbackRoute,
+    schedule: isScheduleRoute,
+    feedback: isFeedbackRoute,
+    fund: isFundRoute,
+    repertoire: isRepertoireRoute,
+    tasks: isTasksRoute,
+    sections: isSectionsRoute,
+    joinRequests: isJoinRequestsRoute,
+  };
+
+  const isVisible = (item: NavItemDef): boolean => {
+    if (item.requiresOrg && (!hasOrganizations || activeOrganizationId === null))
+      return false;
+    if (item.requiresFund && !canViewFund) return false;
+    if (item.requiresJoinRequestView && !canViewJoinRequests) return false;
+    return true;
+  };
 
   const topItemSx = (active: boolean) => ({
     borderRadius: "8px",
@@ -335,7 +324,7 @@ export default function Sidebar() {
         left: 0,
         top: 0,
         background: "#0f3eb5",
-        display: "flex",
+        display: { xs: "none", md: "flex" },
         flexDirection: "column",
         pt: 2,
         pb: 0.6,
@@ -358,169 +347,122 @@ export default function Sidebar() {
         </Box>
       </Box>
 
-      {/* All nav items in one list */}
       <List disablePadding sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
         <Box sx={{ height: "50%", display: "flex", flexDirection: "column", justifyContent: "space-evenly" }}>
-            <ListItemButton
-              component={Link}
-              to="/organizations"
-              sx={topItemSx(
-                isActive("/organizations") &&
-                  !isJoinRequestsRoute &&
-                  !isFundRoute &&
-                  !isRepertoireRoute &&
-                  !isSectionsRoute &&
-                  !isScheduleRoute &&
-                  !isFeedbackRoute
-              )}
-            >
-            <ListItemIcon sx={itemIconSx}>
-              <GroupsIcon />
-            </ListItemIcon>
-            <ListItemText sx={{ my: 0 }} primary={t("nav.organizations")} slotProps={{ primary: { sx: textSx } }} />
-          </ListItemButton>
+          {NAV_ITEMS.filter((item) => !item.isBottom).map((item) => {
+            if (!isVisible(item)) return null;
+            const path = item.getPath(activeOrganizationId);
+            const active = activeForKey[item.key] ?? false;
 
-          {hasOrganizations && activeOrganizationId !== null && (
-            <ListItemButton component={Link} to={schedulePath} sx={topItemSx(isScheduleRoute)}>
-              <ListItemIcon sx={itemIconSx}>
-                <DateRangeIcon />
-              </ListItemIcon>
-              <ListItemText sx={{ my: 0 }} primary={t("schedule.title")} slotProps={{ primary: { sx: textSx } }} />
-            </ListItemButton>
-          )}
-
-          {hasOrganizations && activeOrganizationId !== null && (
-            <ListItemButton component={Link} to={feedbackPath} sx={topItemSx(isFeedbackRoute)}>
-              <ListItemIcon sx={itemIconSx}>
-                <FeedbackOutlinedIcon />
-              </ListItemIcon>
-              <ListItemText sx={{ my: 0 }} primary={t("sidebar.feedback")} slotProps={{ primary: { sx: textSx } }} />
-            </ListItemButton>
-          )}
-
-          {hasOrganizations && canViewFund && (
-            <ListItemButton component={Link} to={fundPath} sx={topItemSx(isFundRoute)}>
-              <ListItemIcon sx={itemIconSx}>
-                <AccountBalanceWalletIcon />
-              </ListItemIcon>
-              <ListItemText sx={{ my: 0 }} primary={t("sidebar.fund")} slotProps={{ primary: { sx: textSx } }} />
-            </ListItemButton>
-          )}
-
-          {hasOrganizations && activeOrganizationId !== null && (
-            <ListItemButton component={Link} to={repertoirePath} sx={topItemSx(isRepertoireRoute)}>
-              <ListItemIcon sx={itemIconSx}>
-                <LibraryMusicIcon />
-              </ListItemIcon>
-              <ListItemText sx={{ my: 0 }} primary={t("sidebar.repertoire")} slotProps={{ primary: { sx: textSx } }} />
-            </ListItemButton>
-          )}
-
-          {hasOrganizations && activeOrganizationId !== null && (
-            <ListItemButton component={Link} to={tasksPath} sx={topItemSx(isTasksRoute)}>
-              <ListItemIcon sx={itemIconSx}>
-                <AssignmentIcon />
-              </ListItemIcon>
-              <ListItemText sx={{ my: 0 }} primary={t("sidebar.tasks")} slotProps={{ primary: { sx: textSx } }} />
-            </ListItemButton>
-          )}
-
-          {hasOrganizations && activeOrganizationId !== null && (
-            <>
-              <ListItemButton component={Link} to={sectionsPath} sx={topItemSx(isSectionsRoute)}>
-                <ListItemIcon sx={itemIconSx}>
-                  <FolderOutlinedIcon />
-                </ListItemIcon>
-                <ListItemText sx={{ my: 0 }} primary={t("sections.sections")} slotProps={{ primary: { sx: textSx } }} />
-              </ListItemButton>
-
-              {visibleSections.map((section) => {
-                if (section.id == null) {
-                  return null;
-                }
-
-                const sectionPath = `/organizations/${activeOrganizationId}/sections/${section.id}`;
-                const sectionActive = location.pathname.startsWith(sectionPath);
-
-                return (
-                  <ListItemButton key={section.id} component={Link} to={sectionPath} sx={nestedItemSx(sectionActive)}>
-                    <ListItemText
-                      sx={{ my: 0 }}
-                      primary={section.name ?? `#${section.id}`}
-                      slotProps={{
-                        primary: {
-                          sx: {
-                            ...textSx,
-                            fontSize: "0.82rem",
-                            fontWeight: 500,
-                          },
-                        },
-                      }}
-                    />
-                  </ListItemButton>
-                );
-              })}
-
-              {hiddenSectionsCount > 0 && !sectionsExpanded && (
-                <ListItemButton sx={nestedItemSx(false)} onClick={() => setSectionsExpanded(true)}>
+            return (
+              <Fragment key={item.key}>
+                <ListItemButton component={Link} to={path} sx={topItemSx(active)}>
+                  <ListItemIcon sx={itemIconSx}>
+                    <item.icon />
+                  </ListItemIcon>
                   <ListItemText
                     sx={{ my: 0 }}
-                    primary={t("sections.showMore", { count: hiddenSectionsCount })}
-                    slotProps={{
-                      primary: {
-                        sx: {
-                          ...textSx,
-                          fontSize: "0.8rem",
-                          fontWeight: 500,
-                          color: "#7795de",
-                        },
-                      },
-                    }}
+                    primary={t(item.labelKey)}
+                    slotProps={{ primary: { sx: textSx } }}
                   />
                 </ListItemButton>
-              )}
 
-              {mySections.length > 3 && sectionsExpanded && (
-                <ListItemButton sx={nestedItemSx(false)} onClick={() => setSectionsExpanded(false)}>
-                  <ListItemText
-                    sx={{ my: 0 }}
-                    primary={t("sections.collapse")}
-                    slotProps={{
-                      primary: {
-                        sx: {
-                          ...textSx,
-                          fontSize: "0.8rem",
-                          fontWeight: 500,
-                          color: "#7795de",
-                        },
-                      },
-                    }}
-                  />
-                </ListItemButton>
-              )}
-            </>
-          )}
+                {item.key === "sections" && (
+                  <>
+                    {visibleSections.map((section) => {
+                      if (section.id == null) return null;
+                      const sectionPath = `/organizations/${activeOrganizationId}/sections/${section.id}`;
+                      const sectionActive = location.pathname.startsWith(sectionPath);
+                      return (
+                        <ListItemButton
+                          key={section.id}
+                          component={Link}
+                          to={sectionPath}
+                          sx={nestedItemSx(sectionActive)}
+                        >
+                          <ListItemText
+                            sx={{ my: 0 }}
+                            primary={section.name ?? `#${section.id}`}
+                            slotProps={{
+                              primary: {
+                                sx: { ...textSx, fontSize: "0.82rem", fontWeight: 500 },
+                              },
+                            }}
+                          />
+                        </ListItemButton>
+                      );
+                    })}
 
+                    {hiddenSectionsCount > 0 && !sectionsExpanded && (
+                      <ListItemButton
+                        sx={nestedItemSx(false)}
+                        onClick={() => setSectionsExpanded(true)}
+                      >
+                        <ListItemText
+                          sx={{ my: 0 }}
+                          primary={t("sections.showMore", { count: hiddenSectionsCount })}
+                          slotProps={{
+                            primary: {
+                              sx: { ...textSx, fontSize: "0.8rem", fontWeight: 500, color: "#7795de" },
+                            },
+                          }}
+                        />
+                      </ListItemButton>
+                    )}
 
+                    {mySections.length > 3 && sectionsExpanded && (
+                      <ListItemButton
+                        sx={nestedItemSx(false)}
+                        onClick={() => setSectionsExpanded(false)}
+                      >
+                        <ListItemText
+                          sx={{ my: 0 }}
+                          primary={t("sections.collapse")}
+                          slotProps={{
+                            primary: {
+                              sx: { ...textSx, fontSize: "0.8rem", fontWeight: 500, color: "#7795de" },
+                            },
+                          }}
+                        />
+                      </ListItemButton>
+                    )}
+                  </>
+                )}
+              </Fragment>
+            );
+          })}
         </Box>
 
         {hasOrganizations && (
           <Box sx={{ mt: "auto" }}>
-            {canViewJoinRequests && (
-              <ListItemButton component={Link} to={joinRequestsPath} sx={bottomItemSx(isJoinRequestsRoute)}>
-                <ListItemIcon sx={itemIconSx}>
+            {NAV_ITEMS.filter((item) => item.isBottom && isVisible(item)).map((item) => {
+              const path = item.getPath(activeOrganizationId);
+              const active = activeForKey[item.key] ?? false;
+              const iconEl =
+                item.key === "joinRequests" ? (
                   <Badge
                     badgeContent={pendingJoinRequestsCount}
                     color="error"
                     overlap="circular"
                     showZero={false}
                   >
-                    <GroupAddIcon />
+                    <item.icon />
                   </Badge>
-                </ListItemIcon>
-                <ListItemText sx={{ my: 0 }} primary={t("sidebar.joinRequests")} slotProps={{ primary: { sx: textSx } }} />
-              </ListItemButton>
-            )}
+                ) : (
+                  <item.icon />
+                );
+
+              return (
+                <ListItemButton key={item.key} component={Link} to={path} sx={bottomItemSx(active)}>
+                  <ListItemIcon sx={itemIconSx}>{iconEl}</ListItemIcon>
+                  <ListItemText
+                    sx={{ my: 0 }}
+                    primary={t(item.labelKey)}
+                    slotProps={{ primary: { sx: textSx } }}
+                  />
+                </ListItemButton>
+              );
+            })}
 
             <ListItemButton
               onClick={() => i18n.changeLanguage(i18n.language === "ru" ? "en" : "ru")}
@@ -529,7 +471,11 @@ export default function Sidebar() {
               <ListItemIcon sx={itemIconSx}>
                 <LanguageIcon />
               </ListItemIcon>
-              <ListItemText sx={{ my: 0 }} primary={t("language.current")} slotProps={{ primary: { sx: textSx } }} />
+              <ListItemText
+                sx={{ my: 0 }}
+                primary={t("language.current")}
+                slotProps={{ primary: { sx: textSx } }}
+              />
             </ListItemButton>
           </Box>
         )}

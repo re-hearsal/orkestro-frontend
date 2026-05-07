@@ -2,12 +2,24 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import AddIcon from "@mui/icons-material/Add";
+import GroupsIcon from "@mui/icons-material/Groups";
 import client from "../api/client";
 import type { components } from "../api/schema";
 import { useAuth } from "../hooks/useAuth";
 import { useAppAlert } from "../hooks/useAppAlert";
 import SectionCard from "../components/sections/SectionCard";
 import CreateSectionDialog from "../components/sections/CreateSectionDialog";
+import { useMobileAction } from "../context/MobileActionContext";
+
+function GroupsPlusIcon() {
+  return (
+    <Box sx={{ position: "relative", width: 22, height: 22, display: "flex" }}>
+      <GroupsIcon sx={{ fontSize: 22 }} />
+      <AddIcon sx={{ fontSize: 13, position: "absolute", bottom: -2, right: -3 }} />
+    </Box>
+  );
+}
 
 type SectionDTO = components["schemas"]["SectionDTO"];
 
@@ -25,6 +37,12 @@ export default function OrgSectionsPage() {
   const [loading, setLoading] = useState(true);
   const [loaded, setLoaded] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+
+  useMobileAction(
+    loaded
+      ? { icon: <GroupsPlusIcon />, onClick: () => setCreateDialogOpen(true), ariaLabel: String(t("sections.createSection")) }
+      : null
+  );
 
   useEffect(() => {
     if (!user || !isValid) { setLoading(false); return; }
@@ -86,7 +104,7 @@ export default function OrgSectionsPage() {
           <Button
             variant="outlined"
             onClick={() => setCreateDialogOpen(true)}
-            sx={{ borderRadius: "8px", borderColor: "#0f3eb5", color: "#0f3eb5", fontFamily: "Century Gothic, sans-serif", fontWeight: 700, textTransform: "none", "&:hover": { borderColor: "#0f3eb5", backgroundColor: "rgba(15,62,181,0.08)" } }}
+            sx={{ display: { xs: "none", md: "flex" }, borderRadius: "8px", borderColor: "#0f3eb5", color: "#0f3eb5", fontFamily: "Century Gothic, sans-serif", fontWeight: 700, textTransform: "none", "&:hover": { borderColor: "#0f3eb5", backgroundColor: "rgba(15,62,181,0.08)" } }}
           >
             {t("sections.createSection")}
           </Button>

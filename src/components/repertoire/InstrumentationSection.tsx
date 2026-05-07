@@ -224,6 +224,7 @@ export default function InstrumentationSection({
                             sx={{
                               display: "flex",
                               alignItems: "center",
+                              flexWrap: "wrap",
                               gap: 1,
                               p: 1,
                               border: "1px solid #e7effb",
@@ -231,11 +232,11 @@ export default function InstrumentationSection({
                               background: "#fafcff",
                             }}
                           >
-                            <Box {...provided.dragHandleProps} sx={{ display: "flex", cursor: "grab" }}>
+                            <Box {...provided.dragHandleProps} sx={{ display: "flex", cursor: "grab", minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center" }}>
                               <DragIndicatorIcon sx={{ color: "text.secondary" }} />
                             </Box>
 
-                            <Typography sx={{ flex: 1, fontFamily: "Century Gothic, sans-serif", color: "#1a2f63" }}>
+                            <Typography sx={{ flex: 1, minWidth: 80, fontFamily: "Century Gothic, sans-serif", color: "#1a2f63" }}>
                               {resolveInstrumentName(item.instrumentId)}
                             </Typography>
 
@@ -257,6 +258,7 @@ export default function InstrumentationSection({
                               size="small"
                               onClick={() => handleRemove(item.instrumentId)}
                               color="error"
+                              sx={{ minWidth: 44, minHeight: 44 }}
                             >
                               <DeleteIcon fontSize="small" />
                             </IconButton>
@@ -300,11 +302,12 @@ export default function InstrumentationSection({
               columnGap: 1.5,
               rowGap: 0.5,
               alignItems: "center",
+              minWidth: 0,
             }}
           >
             {displayList.map((item) => (
               <Fragment key={item.instrumentId}>
-                <Typography sx={{ fontFamily: "Century Gothic, sans-serif" }}>
+                <Typography sx={{ fontFamily: "Century Gothic, sans-serif", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {resolveInstrumentName(item.instrumentId)}
                 </Typography>
 

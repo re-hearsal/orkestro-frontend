@@ -154,6 +154,7 @@
     "viewMonth": "Месяц",
     "viewWeek": "Неделя",
     "createEvent": "Создать мероприятие",
+    "noEvents": "На этой неделе событий нет",
     "wholeOrganization": "Вся организация"
   },
   "nav": {

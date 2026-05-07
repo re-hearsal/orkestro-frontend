@@ -8,6 +8,8 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import client from "../../api/client";
@@ -45,6 +47,8 @@ export default function EventDescriptionTemplateDialog({
   const { t } = useTranslation();
   const { user } = useAuth();
   const { showAlert } = useAppAlert();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const isEdit = Boolean(template);
 
@@ -130,12 +134,12 @@ export default function EventDescriptionTemplateDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth scroll="paper">
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth fullScreen={fullScreen} scroll="paper">
       <DialogTitle sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700 }}>
         {isEdit ? t("events.templates.edit") : t("events.templates.create")}
       </DialogTitle>
 
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ overflowY: 'auto' }}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 0.5 }}>
           <TextField
             label={t("events.templates.dialog.titleField")}
@@ -169,7 +173,7 @@ export default function EventDescriptionTemplateDialog({
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 2 }}>
+      <DialogActions sx={{ px: 3, pb: 2, flexDirection: { xs: 'column-reverse', sm: 'row' }, alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, '& > *': { m: '0 !important' } }}>
         <Button
           onClick={onClose}
           disabled={submitting}

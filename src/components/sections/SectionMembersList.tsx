@@ -9,6 +9,8 @@ import {
   DialogTitle,
   TextField,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import client from "../../api/client";
@@ -169,6 +171,8 @@ export default function SectionMembersList({
   const { t } = useTranslation();
   const { user } = useAuth();
   const { showAlert } = useAppAlert();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [query, setQuery] = useState("");
   const [roleIds, setRoleIds] = useState<number[]>([]);
@@ -471,12 +475,13 @@ export default function SectionMembersList({
         onClose={() => setAddDialogOpen(false)}
         maxWidth="sm"
         fullWidth
-        PaperProps={{ sx: { borderRadius: "16px" } }}
+        fullScreen={fullScreen}
+        PaperProps={{ sx: { borderRadius: fullScreen ? 0 : "16px" } }}
       >
         <DialogTitle sx={{ fontFamily: "Century Gothic, sans-serif", color: "#0f3eb5", fontWeight: 700 }}>
           {t("sections.addMember")}
         </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ overflowY: 'auto' }}>
           <TextField
             value={orgMemberQuery}
             onChange={(e) => setOrgMemberQuery(e.target.value)}

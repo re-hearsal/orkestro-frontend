@@ -15,6 +15,8 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
@@ -45,6 +47,8 @@ export default function WriteInfoMessageDialog({ open, onClose, organizationId }
   const { user } = useAuth();
   const { showAlert } = useAppAlert();
   const { permissions: orgPermissions } = useOrgMemberContext(organizationId);
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const canWriteOrg = orgPermissions.has("ORG_WRITE_INFO");
 
@@ -182,7 +186,8 @@ export default function WriteInfoMessageDialog({ open, onClose, organizationId }
       onClose={sending ? undefined : onClose}
       maxWidth="sm"
       fullWidth
-      slotProps={{ paper: { sx: { borderRadius: "16px" } } }}
+      fullScreen={fullScreen}
+      slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}
     >
       <DialogTitle
         sx={{
@@ -196,13 +201,13 @@ export default function WriteInfoMessageDialog({ open, onClose, organizationId }
         <IconButton
           onClick={onClose}
           disabled={sending}
-          sx={{ position: "absolute", right: 12, top: 12, color: "#7795de" }}
+          sx={{ position: "absolute", right: 12, top: 12, color: "#7795de", minWidth: 44, minHeight: 44 }}
         >
           <CloseIcon />
         </IconButton>
       </DialogTitle>
 
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ overflowY: 'auto' }}>
         <Stack spacing={2.5} sx={{ pt: 0.5 }}>
           <Box>
             <Typography
@@ -360,7 +365,7 @@ export default function WriteInfoMessageDialog({ open, onClose, organizationId }
         </Stack>
       </DialogContent>
 
-      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, px: 3, py: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: { xs: 'column-reverse', sm: 'row' }, justifyContent: { sm: "flex-end" }, alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, px: 3, py: 2 }}>
         <Button
           variant="outlined"
           onClick={onClose}

@@ -10,6 +10,8 @@ import {
   InputAdornment,
   Stack,
   TextField,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -29,6 +31,8 @@ export default function ChangePasswordDialog({ open, onClose, username }: Change
   const { t } = useTranslation();
   const { user } = useAuth();
   const { showAlert } = useAppAlert();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -72,20 +76,21 @@ export default function ChangePasswordDialog({ open, onClose, username }: Change
       onClose={handleClose}
       maxWidth="xs"
       fullWidth
-      slotProps={{ paper: { sx: { borderRadius: "16px" } } }}
+      fullScreen={fullScreen}
+      slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}
     >
       <DialogTitle sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700, color: "#0f3eb5", pr: 6 }}>
         {t("profile.security.changePassword")}
         <IconButton
           onClick={handleClose}
           disabled={saving}
-          sx={{ position: "absolute", right: 12, top: 12, color: "#7795de" }}
+          sx={{ position: "absolute", right: 12, top: 12, color: "#7795de", minWidth: 44, minHeight: 44 }}
         >
           <CloseIcon />
         </IconButton>
       </DialogTitle>
 
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ overflowY: 'auto' }}>
         <Stack spacing={2.5} sx={{ pt: 0.5 }}>
           <TextField
             label={t("profile.security.newPassword")}
@@ -132,7 +137,7 @@ export default function ChangePasswordDialog({ open, onClose, username }: Change
         </Stack>
       </DialogContent>
 
-      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, px: 3, py: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: { xs: 'column-reverse', sm: 'row' }, justifyContent: { sm: "flex-end" }, alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, px: 3, py: 2 }}>
         <Button
           variant="outlined"
           onClick={handleClose}

@@ -12,9 +12,14 @@ export default function AuthPage() {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        background:
-          'radial-gradient(circle 500px at 0% 75%, rgba(15,62,181,0.86) 0%, transparent 100%),' +
-          'radial-gradient(circle 500px at 100% 75%, rgba(15,62,181,0.86) 0%, transparent 100%)',
+        background: {
+          xs:
+            'radial-gradient(circle 280px at 0% 68%, rgba(15,62,181,0.86) 0%, rgba(15,62,181,0.78) 10%, rgba(15,62,181,0.62) 22%, rgba(15,62,181,0.42) 36%, rgba(15,62,181,0.22) 52%, rgba(15,62,181,0.08) 68%, transparent 100%),' +
+            'radial-gradient(circle 280px at 100% 68%, rgba(15,62,181,0.86) 0%, rgba(15,62,181,0.78) 10%, rgba(15,62,181,0.62) 22%, rgba(15,62,181,0.42) 36%, rgba(15,62,181,0.22) 52%, rgba(15,62,181,0.08) 68%, transparent 100%)',
+          sm:
+            'radial-gradient(circle 500px at 0% 75%, rgba(15,62,181,0.86) 0%, transparent 100%),' +
+            'radial-gradient(circle 500px at 100% 75%, rgba(15,62,181,0.86) 0%, transparent 100%)',
+        },
         backgroundColor: 'white',
         px: 2,
         py: 4,
@@ -35,7 +40,8 @@ export default function AuthPage() {
         <img src="/img/logo_blue.svg" alt="logo" style={{
           width: 128,
           height: 128,
-          marginBlock: -20
+          marginBlock: -20,
+          marginInline: 'auto',
         }} />
 
         <Typography

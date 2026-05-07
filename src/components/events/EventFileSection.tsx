@@ -11,6 +11,8 @@ import {
   MenuItem,
   Tooltip,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
@@ -73,6 +75,8 @@ export default function EventFileSection({ organizationId, eventId, fileIds, can
   const { t } = useTranslation();
   const { user } = useAuth();
   const { showAlert } = useAppAlert();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const uploadEventFile = client.POST as unknown as (
     path: "/api/v1/organizations/{organizationId}/events/{eventId}/files",
@@ -370,11 +374,11 @@ export default function EventFileSection({ organizationId, eventId, fileIds, can
         )}
       </Menu>
 
-      <Dialog open={infoOpen} onClose={() => setInfoOpen(false)} maxWidth="xs" fullWidth slotProps={{ paper: { sx: { borderRadius: "16px" } } }}>
+      <Dialog open={infoOpen} onClose={() => setInfoOpen(false)} maxWidth="xs" fullWidth fullScreen={fullScreen} slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}>
         <DialogTitle sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700, color: "#0f3eb5" }}>
           {t("repertoire.fileInfo")}
         </DialogTitle>
-        <DialogContent dividers>
+        <DialogContent dividers sx={{ overflowY: 'auto' }}>
           {infoLoading ? (
             <Typography sx={{ fontFamily: "Century Gothic, sans-serif", color: "text.secondary" }}>...</Typography>
           ) : (
@@ -391,11 +395,11 @@ export default function EventFileSection({ organizationId, eventId, fileIds, can
             </Box>
           )}
         </DialogContent>
-        <Box sx={{ display: "flex", justifyContent: "flex-end", px: 3, py: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: { sm: "flex-end" }, px: 3, py: 2 }}>
           <Button
             variant="outlined"
             onClick={() => setInfoOpen(false)}
-            sx={{ borderRadius: "8px", borderColor: "#7795de", color: "#7795de", fontFamily: "Century Gothic, sans-serif", textTransform: "none" }}
+            sx={{ borderRadius: "8px", borderColor: "#7795de", color: "#7795de", fontFamily: "Century Gothic, sans-serif", textTransform: "none", width: { xs: '100%', sm: 'auto' } }}
           >
             {t("common.cancel")}
           </Button>
@@ -407,17 +411,18 @@ export default function EventFileSection({ organizationId, eventId, fileIds, can
         onClose={() => { if (!deleting) { setDeleteOpen(false); setDeleteTarget(null); } }}
         maxWidth="xs"
         fullWidth
-        slotProps={{ paper: { sx: { borderRadius: "16px" } } }}
+        fullScreen={fullScreen}
+        slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}
       >
         <DialogTitle sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700, color: "error.main" }}>
           {t("repertoire.deleteFile")}
         </DialogTitle>
-        <DialogContent dividers>
+        <DialogContent dividers sx={{ overflowY: 'auto' }}>
           <Typography sx={{ fontFamily: "Century Gothic, sans-serif" }}>
             {t("repertoire.confirmDeleteFile")}
           </Typography>
         </DialogContent>
-        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, px: 3, py: 2 }}>
+        <Box sx={{ display: "flex", flexDirection: { xs: 'column-reverse', sm: 'row' }, justifyContent: { sm: "flex-end" }, alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, px: 3, py: 2 }}>
           <Button
             variant="outlined"
             onClick={() => { setDeleteOpen(false); setDeleteTarget(null); }}

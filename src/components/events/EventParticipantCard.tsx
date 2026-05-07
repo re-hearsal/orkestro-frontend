@@ -132,6 +132,7 @@ export default function EventParticipantCard({
       sx={{
         display: "flex",
         alignItems: "center",
+        flexWrap: "wrap",
         gap: 1.5,
         px: 2,
         py: 1,
@@ -175,53 +176,55 @@ export default function EventParticipantCard({
         {participant.name}
       </Typography>
 
-
-      {/* RSVP status chip */}
-      <Chip
-        size="small"
-        label={
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, width: "100%" }}>
-            <Box sx={{ width: 7, height: 7, borderRadius: "50%", bgcolor: rsvpSt.dot, flexShrink: 0 }} />
-            {rsvpLabel}
-          </Box>
-        }
-        sx={{
-          ...chipSx,
-          width: RSVP_CHIP_WIDTH,
-          bgcolor: rsvpSt.bg,
-          color: rsvpSt.color,
-        }}
-      />
-
-      {/* Divider between RSVP and Attendance */}
-      <Box sx={{ width: "1px", alignSelf: "stretch", bgcolor: "#dce6f9", flexShrink: 0 }} />
-
-      {/* Attendance status chip — clickable for authorized users */}
-      <Chip
-        size="small"
-        onClick={canMarkAttendance ? handleAttendanceClick : undefined}
-        label={
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, width: "100%", justifyContent: "space-between" }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <Box sx={{ width: 7, height: 7, borderRadius: "50%", bgcolor: attendSt.dot, flexShrink: 0 }} />
-              {attendanceLabel}
+      {/* Chips grouped so they wrap together to the next line on mobile */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexShrink: 0 }}>
+        {/* RSVP status chip */}
+        <Chip
+          size="small"
+          label={
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, width: "100%" }}>
+              <Box sx={{ width: 7, height: 7, borderRadius: "50%", bgcolor: rsvpSt.dot, flexShrink: 0 }} />
+              {rsvpLabel}
             </Box>
-            {canMarkAttendance && (
-              <ExpandMoreIcon sx={{ fontSize: "0.9rem", color: attendSt.color, flexShrink: 0 }} />
-            )}
-          </Box>
-        }
-        sx={{
-          ...chipSx,
-          width: ATTEND_CHIP_WIDTH,
-          bgcolor: attendSt.bg,
-          color: attendSt.color,
-          cursor: canMarkAttendance ? "pointer" : "default",
-          ...(canMarkAttendance && {
-            "&:hover": { filter: "brightness(0.95)" },
-          }),
-        }}
-      />
+          }
+          sx={{
+            ...chipSx,
+            width: RSVP_CHIP_WIDTH,
+            bgcolor: rsvpSt.bg,
+            color: rsvpSt.color,
+          }}
+        />
+
+        {/* Divider between RSVP and Attendance */}
+        <Box sx={{ width: "1px", alignSelf: "stretch", bgcolor: "#dce6f9", flexShrink: 0 }} />
+
+        {/* Attendance status chip — clickable for authorized users */}
+        <Chip
+          size="small"
+          onClick={canMarkAttendance ? handleAttendanceClick : undefined}
+          label={
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, width: "100%", justifyContent: "space-between" }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <Box sx={{ width: 7, height: 7, borderRadius: "50%", bgcolor: attendSt.dot, flexShrink: 0 }} />
+                {attendanceLabel}
+              </Box>
+              {canMarkAttendance && (
+                <ExpandMoreIcon sx={{ fontSize: "0.9rem", color: attendSt.color, flexShrink: 0 }} />
+              )}
+            </Box>
+          }
+          sx={{
+            ...chipSx,
+            width: ATTEND_CHIP_WIDTH,
+            bgcolor: attendSt.bg,
+            color: attendSt.color,
+            cursor: canMarkAttendance ? "pointer" : "default",
+            ...(canMarkAttendance && {
+              "&:hover": { filter: "brightness(0.95)" },
+            }),
+          }}
+        />
+      </Box>
 
       <Menu
         anchorEl={anchorEl}

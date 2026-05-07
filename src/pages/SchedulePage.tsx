@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Box, Button, GlobalStyles, IconButton, Typography } from "@mui/material";
+import { Box, Button, Chip, Divider, GlobalStyles, IconButton, Typography, useMediaQuery, useTheme } from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
@@ -20,6 +20,7 @@ import EventHoverPopup from "../components/schedule/EventHoverPopup";
 import WeekEventCard from "../components/schedule/WeekEventCard";
 import MonthEventCell from "../components/schedule/MonthEventCell";
 import type { CalendarEvent, SectionDTO } from "../components/schedule/types";
+import { useMobileAction } from "../context/MobileActionContext";
 
 type EventCalendarGroupedResponseDTO = components["schemas"]["EventCalendarGroupedResponseDTO"];
 type EventCalendarDTO = components["schemas"]["EventCalendarDTO"];
@@ -202,6 +203,108 @@ const rbcGlobalStyles = {
   },
 };
 
+interface AgendaViewProps {
+  events: CalendarEvent[];
+  lang: string;
+  noEventsLabel: string;
+  onEventClick: (event: CalendarEvent, target: HTMLElement) => void;
+}
+
+function AgendaView({ events, lang, noEventsLabel, onEventClick }: AgendaViewProps) {
+  const locale = lang === "ru" ? "ru-RU" : "en-US";
+
+  const grouped = useMemo(() => {
+    const sorted = [...events].sort((a, b) => a.start.getTime() - b.start.getTime());
+    const map = new Map<string, CalendarEvent[]>();
+    for (const ev of sorted) {
+      const key = ev.start.toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" });
+      const existing = map.get(key) ?? [];
+      existing.push(ev);
+      map.set(key, existing);
+    }
+    return map;
+  }, [events, locale]);
+
+  if (grouped.size === 0) {
+    return (
+      <Box sx={{ textAlign: "center", py: 6, color: "#7795de" }}>
+        <Typography sx={{ fontFamily: "Century Gothic, sans-serif", fontSize: "0.95rem" }}>
+          {noEventsLabel}
+        </Typography>
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      {Array.from(grouped.entries()).map(([dateLabel, dayEvents]) => (
+        <Box key={dateLabel}>
+          <Typography
+            sx={{
+              fontFamily: "Century Gothic, sans-serif",
+              fontSize: "0.8rem",
+              fontWeight: 700,
+              color: "#7795de",
+              textTransform: "capitalize",
+              mb: 0.75,
+            }}
+          >
+            {dateLabel}
+          </Typography>
+          <Divider sx={{ borderColor: "#dce6f9", mb: 1 }} />
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
+            {dayEvents.map((ev) => {
+              const timeStr = ev.start.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
+              return (
+                <Box
+                  key={ev.id}
+                  onClick={(e) => onEventClick(ev, e.currentTarget as HTMLElement)}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1.5,
+                    p: 1,
+                    borderRadius: "8px",
+                    background: "rgba(15,62,181,0.06)",
+                    cursor: "pointer",
+                    "&:active": { background: "rgba(15,62,181,0.12)" },
+                  }}
+                >
+                  <Chip
+                    label={timeStr}
+                    size="small"
+                    sx={{
+                      fontFamily: "Century Gothic, sans-serif",
+                      fontSize: "0.72rem",
+                      fontWeight: 700,
+                      background: "#0f3eb5",
+                      color: "#fff",
+                      flexShrink: 0,
+                    }}
+                  />
+                  <Typography
+                    sx={{
+                      fontFamily: "Century Gothic, sans-serif",
+                      fontSize: "0.88rem",
+                      fontWeight: 600,
+                      color: "#0f3eb5",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {ev.title}
+                  </Typography>
+                </Box>
+              );
+            })}
+          </Box>
+        </Box>
+      ))}
+    </Box>
+  );
+}
+
 export default function SchedulePage() {
   const { t, i18n } = useTranslation();
   const { organizationId: rawOrgId } = useParams<{ organizationId: string }>();
@@ -209,6 +312,8 @@ export default function SchedulePage() {
   const { user } = useAuth();
   const { showAlert } = useAppAlert();
   const { organizations, setCurrentOrganization } = useOrganization();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const organizationId = useMemo(() => Number(rawOrgId), [rawOrgId]);
 
@@ -286,7 +391,7 @@ export default function SchedulePage() {
   const loadEvents = useCallback(async () => {
     if (!user || !Number.isFinite(organizationId) || organizationId <= 0) return;
 
-    const range = view === "month" ? getMonthRange(currentDate) : getWeekRange(currentDate);
+    const range = isMobile ? getWeekRange(currentDate) : view === "month" ? getMonthRange(currentDate) : getWeekRange(currentDate);
 
     try {
       const query = withFlatPagination(
@@ -313,7 +418,7 @@ export default function SchedulePage() {
     } catch {
       showAlert(t("organizations.events.loadError"), "error");
     }
-  }, [currentDate, organizationId, selectedTags, showAlert, t, user, view]);
+  }, [currentDate, isMobile, organizationId, selectedTags, showAlert, t, user, view]);
 
   useEffect(() => {
     void loadEvents();
@@ -329,7 +434,7 @@ export default function SchedulePage() {
 
   const navigate_period = (direction: -1 | 1) => {
     const next = new Date(currentDate);
-    if (view === "month") {
+    if (!isMobile && view === "month") {
       next.setMonth(next.getMonth() + direction);
     } else {
       next.setDate(next.getDate() + direction * 7);
@@ -352,7 +457,9 @@ export default function SchedulePage() {
     if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
   };
 
-  const rangeLabel = formatRangeLabel(view, currentDate, i18n.language);
+  const rangeLabel = formatRangeLabel(isMobile ? "week" : view, currentDate, i18n.language);
+
+  useMobileAction(null);
 
   const calendarFormats = useMemo(() => {
     if (i18n.language !== "ru") return {};
@@ -369,8 +476,8 @@ export default function SchedulePage() {
       <GlobalStyles styles={rbcGlobalStyles} />
 
       <Box sx={{ display: "flex", gap: 3, alignItems: "flex-start" }}>
-        {/* Left panel */}
-        <Box sx={{ width: "15%", flexShrink: 0 }}>
+        {/* Left panel — hidden on mobile */}
+        <Box sx={{ width: "15%", flexShrink: 0, display: { xs: "none", md: "block" } }}>
           <ScheduleFilters
             allTags={allTags}
             selectedTags={selectedTags}
@@ -390,7 +497,7 @@ export default function SchedulePage() {
             sx={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "space-between",
+              justifyContent: { xs: "center", md: "space-between" },
               flexWrap: "wrap",
               mb: 1.5,
               gap: 1,
@@ -419,8 +526,8 @@ export default function SchedulePage() {
             </Box>
 
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              {/* View toggle */}
-              <Box sx={{ display: "flex", gap: 0.5 }}>
+              {/* View toggle — hidden on mobile (agenda is shown instead) */}
+              <Box sx={{ display: { xs: "none", md: "flex" }, gap: 0.5 }}>
                 <Button
                   variant={view === "month" ? "contained" : "outlined"}
                   size="small"
@@ -450,34 +557,47 @@ export default function SchedulePage() {
             </Box>
           </Box>
 
-          <Box className="rbc-calendar-wrapper" sx={{ height: view === "month" ? 600 : 700 }}>
-            <Calendar<CalendarEvent>
-              localizer={localizer}
+          {/* Calendar — desktop only */}
+          {!isMobile && (
+            <Box className="rbc-calendar-wrapper" sx={{ height: view === "month" ? 600 : 700 }}>
+              <Calendar<CalendarEvent>
+                localizer={localizer}
+                events={filteredEvents}
+                popup
+                view={view}
+                onView={() => { }}
+                date={currentDate}
+                onNavigate={() => { }}
+                toolbar={false}
+                step={60}
+                timeslots={1}
+                style={{ height: "100%" }}
+                culture={i18n.language === "ru" ? "ru" : "en"}
+                formats={calendarFormats}
+                components={{
+                  event: view === "week" ? WeekEventCard : MonthEventCell,
+                }}
+                onSelectEvent={(event, e) => {
+                  openPopup(event, e.currentTarget as HTMLElement);
+                }}
+                eventPropGetter={() =>
+                  view === "week"
+                    ? { style: { background: "transparent", border: "none", padding: 0 } }
+                    : {}
+                }
+              />
+            </Box>
+          )}
+
+          {/* Agenda list — mobile only */}
+          {isMobile && (
+            <AgendaView
               events={filteredEvents}
-              popup
-              view={view}
-              onView={() => {}}
-              date={currentDate}
-              onNavigate={() => {}}
-              toolbar={false}
-              step={60}
-              timeslots={1}
-              style={{ height: "100%" }}
-              culture={i18n.language === "ru" ? "ru" : "en"}
-              formats={calendarFormats}
-              components={{
-                event: view === "week" ? WeekEventCard : MonthEventCell,
-              }}
-              onSelectEvent={(event, e) => {
-                openPopup(event, e.currentTarget as HTMLElement);
-              }}
-              eventPropGetter={() =>
-                view === "week"
-                  ? { style: { background: "transparent", border: "none", padding: 0 } }
-                  : {}
-              }
+              lang={i18n.language}
+              noEventsLabel={t("schedule.noEvents")}
+              onEventClick={openPopup}
             />
-          </Box>
+          )}
         </Box>
       </Box>
 

@@ -10,6 +10,8 @@ import {
   TextField,
   Tooltip,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import CakeIcon from "@mui/icons-material/Cake";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -32,6 +34,8 @@ type SectionDTO = components["schemas"]["SectionDTO"];
 
 export default function SectionProfilePage() {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const { organizationId: rawOrgId, sectionId: rawSectionId } = useParams();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
@@ -541,12 +545,13 @@ export default function SectionProfilePage() {
         onClose={() => { if (!editLoading) setEditDialogOpen(false); }}
         maxWidth="sm"
         fullWidth
-        slotProps={{ paper: { sx: { borderRadius: "16px" } } }}
+        fullScreen={fullScreen}
+        slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}
       >
         <DialogTitle sx={{ fontFamily: "Century Gothic, sans-serif", color: "#0f3eb5", fontWeight: 700 }}>
           {t("sections.editSection")}
         </DialogTitle>
-        <DialogContent dividers>
+        <DialogContent dividers sx={{ overflowY: "auto" }}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 0.5 }}>
             <TextField
               label={t("sections.sectionName")}
@@ -570,11 +575,12 @@ export default function SectionProfilePage() {
             />
           </Box>
         </DialogContent>
-        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, px: 3, py: 2 }}>
+        <Box sx={{ display: "flex", flexDirection: { xs: "column-reverse", sm: "row" }, justifyContent: "flex-end", gap: 1.5, px: 3, py: 2 }}>
           <Button
             onClick={() => setEditDialogOpen(false)}
             disabled={editLoading}
             variant="outlined"
+            fullWidth={fullScreen}
             sx={{ borderRadius: "8px", borderColor: "#7795de", color: "#7795de", fontFamily: "Century Gothic, sans-serif", textTransform: "none" }}
           >
             {t("common.cancel")}
@@ -583,6 +589,7 @@ export default function SectionProfilePage() {
             onClick={() => void handleSaveEdit()}
             disabled={editLoading || !editName.trim()}
             variant="contained"
+            fullWidth={fullScreen}
             sx={{ borderRadius: "8px", backgroundColor: "#0f3eb5", fontFamily: "Century Gothic, sans-serif", fontWeight: 700, textTransform: "none", "&:hover": { backgroundColor: "#0d35a0" } }}
           >
             {editLoading ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : t("common.edit")}

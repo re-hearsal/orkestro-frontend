@@ -135,7 +135,7 @@ export default function OrganizationsPage() {
   );
 
   return (
-    <Box sx={{ p: 3, maxWidth: 900, mx: "auto" }}>
+    <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 900, mx: "auto" }}>
       <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 3 }}>
         <Button
           variant="outlined"

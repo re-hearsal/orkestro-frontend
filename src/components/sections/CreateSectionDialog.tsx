@@ -6,6 +6,8 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import type { components } from "../../api/schema";
@@ -26,6 +28,8 @@ export default function CreateSectionDialog({
   onCreated,
 }: CreateSectionDialogProps) {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
@@ -67,7 +71,8 @@ export default function CreateSectionDialog({
       onClose={handleClose}
       maxWidth="sm"
       fullWidth
-      slotProps={{ paper: { sx: { borderRadius: "16px" } } }}
+      fullScreen={fullScreen}
+      slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}
     >
       <DialogTitle
         sx={{
@@ -79,7 +84,7 @@ export default function CreateSectionDialog({
         {t("sections.createSection")}
       </DialogTitle>
 
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ overflowY: 'auto' }}>
         <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 0.5 }}>
           <TextField
             label={t("sections.sectionName")}
@@ -110,7 +115,7 @@ export default function CreateSectionDialog({
         </Box>
       </DialogContent>
 
-      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, px: 3, py: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: { xs: 'column-reverse', sm: 'row' }, justifyContent: { sm: "flex-end" }, alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, px: 3, py: 2 }}>
         <Button
           onClick={handleClose}
           variant="outlined"

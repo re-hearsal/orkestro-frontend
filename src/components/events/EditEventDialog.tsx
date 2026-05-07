@@ -20,10 +20,13 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { ruRU, enUS } from "@mui/x-date-pickers/locales";
 import dayjs, { type Dayjs } from "dayjs";
 import "dayjs/locale/ru";
 import AddIcon from "@mui/icons-material/Add";
@@ -72,6 +75,8 @@ export default function EditEventDialog({ open, onClose, event, organizationId, 
   const { t, i18n } = useTranslation();
   const { user, profile } = useAuth();
   const { showAlert } = useAppAlert();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const dayjsLocale = i18n.language === "ru" ? "ru" : "en";
 
@@ -443,24 +448,29 @@ export default function EditEventDialog({ open, onClose, event, organizationId, 
   const availableSongsToAdd = allSongs.filter((s) => s.id != null && !songIds.includes(s.id!));
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={dayjsLocale}>
+    <LocalizationProvider
+      dateAdapter={AdapterDayjs}
+      adapterLocale={dayjsLocale}
+      localeText={dayjsLocale === "ru" ? ruRU.components.MuiLocalizationProvider.defaultProps.localeText : enUS.components.MuiLocalizationProvider.defaultProps.localeText}
+    >
       <Dialog
         open={open}
         onClose={saving ? undefined : onClose}
         maxWidth="md"
         fullWidth
-        slotProps={{ paper: { sx: { borderRadius: "16px" } } }}
+        fullScreen={fullScreen}
+        slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}
       >
         <DialogTitle sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700, color: "#0f3eb5", pb: 1 }}>
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             {t("events.editDialogTitle")}
-            <IconButton size="small" onClick={onClose} disabled={saving}>
+            <IconButton size="small" onClick={onClose} disabled={saving} sx={{ minWidth: 44, minHeight: 44 }}>
               <CloseIcon fontSize="small" />
             </IconButton>
           </Box>
         </DialogTitle>
 
-        <DialogContent dividers sx={{ p: { xs: 2, sm: 3 } }}>
+        <DialogContent dividers sx={{ p: { xs: 2, sm: 3 }, overflowY: 'auto' }}>
           <Stepper
             activeStep={step}
             sx={{
@@ -799,7 +809,7 @@ export default function EditEventDialog({ open, onClose, event, organizationId, 
           )}
 
           {/* Navigation buttons */}
-          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
+          <Box sx={{ display: "flex", flexDirection: { xs: 'column-reverse', sm: 'row' }, justifyContent: { sm: "space-between" }, alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, mt: 2 }}>
             <Button
               variant="outlined"
               onClick={step === 0 ? onClose : handleBack}

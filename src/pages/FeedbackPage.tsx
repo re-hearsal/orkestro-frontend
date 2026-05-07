@@ -9,6 +9,12 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { ruRU, enUS } from "@mui/x-date-pickers/locales";
+import dayjs, { type Dayjs } from "dayjs";
+import "dayjs/locale/ru";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import client from "../api/client";
@@ -35,7 +41,11 @@ interface FeedbackPage {
 }
 
 export default function FeedbackPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const dayjsLocale = i18n.language === "ru" ? "ru" : "en";
+  const localeText = dayjsLocale === "ru"
+    ? ruRU.components.MuiLocalizationProvider.defaultProps.localeText
+    : enUS.components.MuiLocalizationProvider.defaultProps.localeText;
   const { organizationId: rawOrgId } = useParams();
   const { user } = useAuth();
   const { organizations, currentOrganization, setCurrentOrganization } = useOrganization();
@@ -54,8 +64,8 @@ export default function FeedbackPage() {
   // Filter state
   const [title, setTitle] = useState("");
   const [eventType, setEventType] = useState<EventType | "all">("all");
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
+  const [dateFrom, setDateFrom] = useState<Dayjs | null>(null);
+  const [dateTo, setDateTo] = useState<Dayjs | null>(null);
   const [tags, setTags] = useState<string[]>([]);
   const [sortField, setSortField] = useState<string>("commentCreatedAt");
   const [page, setPage] = useState(0);
@@ -68,8 +78,8 @@ export default function FeedbackPage() {
   const resetFilters = () => {
     setTitle("");
     setEventType("all");
-    setDateFrom("");
-    setDateTo("");
+    setDateFrom(null);
+    setDateTo(null);
     setTags([]);
     setSortField("commentCreatedAt");
     setPage(0);
@@ -106,8 +116,8 @@ export default function FeedbackPage() {
       const query: Record<string, unknown> = {};
       if (title.trim()) query.title = title.trim();
       if (eventType !== "all") query.eventType = eventType;
-      if (dateFrom) query.from = new Date(dateFrom).toISOString();
-      if (dateTo) query.to = new Date(dateTo + "T23:59:59").toISOString();
+      if (dateFrom?.isValid()) query.from = dateFrom.startOf("day").toISOString();
+      if (dateTo?.isValid()) query.to = dateTo.endOf("day").toISOString();
       if (tags.length > 0) query.tags = tags;
       if (sortField) query.sortField = sortField;
 
@@ -165,7 +175,7 @@ export default function FeedbackPage() {
           label={t("searchByTitle")}
           value={title}
           onChange={(e) => handleFilterChange(() => setTitle(e.target.value))}
-          sx={{ minWidth: 200, flex: "1 1 200px" }}
+          sx={{ minWidth: 0, flex: { xs: "1 1 100%", sm: "1 1 200px" } }}
           slotProps={{ input: { sx: { fontFamily: "Century Gothic, sans-serif" } } }}
         />
 
@@ -175,7 +185,7 @@ export default function FeedbackPage() {
           label={t("organizations.events.create.eventType")}
           value={eventType}
           onChange={(e) => handleFilterChange(() => setEventType(e.target.value as EventType | "all"))}
-          sx={{ minWidth: 150, flex: "1 1 150px" }}
+          sx={{ minWidth: 0, flex: { xs: "1 1 100%", sm: "1 1 150px" } }}
           slotProps={{ input: { sx: { fontFamily: "Century Gothic, sans-serif" } } }}
         >
           {EVENT_TYPE_OPTIONS.map((opt) => (
@@ -185,26 +195,22 @@ export default function FeedbackPage() {
           ))}
         </TextField>
 
-        <Box sx={{ display: "flex", gap: 1, flex: "1 1 260px", flexWrap: "wrap" }}>
-          <TextField
-            size="small"
-            label={t("dateFrom")}
-            type="date"
-            value={dateFrom}
-            onChange={(e) => handleFilterChange(() => setDateFrom(e.target.value))}
-            slotProps={{ inputLabel: { shrink: true }, input: { sx: { fontFamily: "Century Gothic, sans-serif" } } }}
-            sx={{ flex: 1, minWidth: 130 }}
-          />
-          <TextField
-            size="small"
-            label={t("dateTo")}
-            type="date"
-            value={dateTo}
-            onChange={(e) => handleFilterChange(() => setDateTo(e.target.value))}
-            slotProps={{ inputLabel: { shrink: true }, input: { sx: { fontFamily: "Century Gothic, sans-serif" } } }}
-            sx={{ flex: 1, minWidth: 130 }}
-          />
-        </Box>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={dayjsLocale} localeText={localeText}>
+          <Box sx={{ display: "flex", gap: 1, flex: { xs: "1 1 100%", sm: "1 1 260px" }, flexWrap: "wrap" }}>
+            <DatePicker
+              label={t("dateFrom")}
+              value={dateFrom}
+              onChange={(val) => handleFilterChange(() => setDateFrom(val))}
+              slotProps={{ textField: { size: "small", sx: { flex: 1, minWidth: 130 } } }}
+            />
+            <DatePicker
+              label={t("dateTo")}
+              value={dateTo}
+              onChange={(val) => handleFilterChange(() => setDateTo(val))}
+              slotProps={{ textField: { size: "small", sx: { flex: 1, minWidth: 130 } } }}
+            />
+          </Box>
+        </LocalizationProvider>
 
         <Autocomplete
           multiple
@@ -219,7 +225,7 @@ export default function FeedbackPage() {
               sx={{ "& .MuiInputBase-root": { fontFamily: "Century Gothic, sans-serif" } }}
             />
           )}
-          sx={{ minWidth: 180, flex: "1 1 180px" }}
+          sx={{ minWidth: 0, flex: { xs: "1 1 100%", sm: "1 1 180px" } }}
         />
 
         <TextField
@@ -228,7 +234,7 @@ export default function FeedbackPage() {
           label={t("sortBy")}
           value={sortField}
           onChange={(e) => handleFilterChange(() => setSortField(e.target.value))}
-          sx={{ minWidth: 160, flex: "1 1 160px" }}
+          sx={{ minWidth: 0, flex: { xs: "1 1 100%", sm: "1 1 160px" } }}
           slotProps={{ input: { sx: { fontFamily: "Century Gothic, sans-serif" } } }}
         >
           {SORT_OPTIONS.map((opt) => (

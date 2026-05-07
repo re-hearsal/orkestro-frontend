@@ -218,7 +218,7 @@ export default function UserPublicProfilePage() {
       </Box>
 
       {/* Avatar + name */}
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 4, gap: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, alignItems: "center", mb: 4, gap: 2 }}>
         <Box
           sx={{
             width: 120,
@@ -230,6 +230,7 @@ export default function UserPublicProfilePage() {
             alignItems: "center",
             justifyContent: "center",
             overflow: "hidden",
+            flexShrink: 0,
           }}
         >
           {avatarUrl ? (
@@ -247,7 +248,7 @@ export default function UserPublicProfilePage() {
 
         <Typography
           variant="h5"
-          sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700, color: "#0f3eb5" }}
+          sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700, color: "#0f3eb5", textAlign: { xs: "center", sm: "left" } }}
         >
           {userData?.name ?? userData?.username ?? ""}
         </Typography>

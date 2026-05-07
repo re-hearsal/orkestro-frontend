@@ -10,7 +10,15 @@ import {
   MenuItem,
   Stack,
   TextField,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { ruRU, enUS } from "@mui/x-date-pickers/locales";
+import dayjs, { type Dayjs } from "dayjs";
+import "dayjs/locale/ru";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from "react-i18next";
 import client from "../../api/client";
@@ -35,13 +43,16 @@ export default function EditProfileDialog({
   onSaved,
 }: EditProfileDialogProps) {
   const { t, i18n } = useTranslation();
+  const dayjsLocale = i18n.language === "ru" ? "ru" : "en";
   const { user } = useAuth();
   const { showAlert } = useAppAlert();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [location, setLocation] = useState("");
-  const [birthDate, setBirthDate] = useState("");
+  const [birthDate, setBirthDate] = useState<Dayjs | null>(null);
   const [preferredLanguage, setPreferredLanguage] = useState<"RU" | "EN">("RU");
   const [saving, setSaving] = useState(false);
 
@@ -50,7 +61,7 @@ export default function EditProfileDialog({
       setName(profile.name ?? "");
       setEmail(profile.email ?? "");
       setLocation(profile.location ?? "");
-      setBirthDate(profile.birthDate ?? "");
+      setBirthDate(profile.birthDate ? dayjs(profile.birthDate) : null);
       setPreferredLanguage((profile.preferredLanguage as "RU" | "EN") ?? "RU");
     }
   }, [open, profile]);
@@ -60,10 +71,11 @@ export default function EditProfileDialog({
     setSaving(true);
     try {
       const body: UserProfileUpdateRequestDTO = {};
+      const birthDateStr = birthDate?.isValid() ? birthDate.format("YYYY-MM-DD") : "";
       if (name.trim() !== (profile.name ?? "")) body.name = name.trim() || undefined;
       if (email.trim() !== (profile.email ?? "")) body.email = email.trim() || undefined;
       if (location.trim() !== (profile.location ?? "")) body.location = location.trim() || undefined;
-      if (birthDate !== (profile.birthDate ?? "")) body.birthDate = birthDate || undefined;
+      if (birthDateStr !== (profile.birthDate ?? "")) body.birthDate = birthDateStr || undefined;
       if (preferredLanguage !== ((profile.preferredLanguage as "RU" | "EN") ?? "RU")) {
         body.preferredLanguage = preferredLanguage;
       }
@@ -98,108 +110,115 @@ export default function EditProfileDialog({
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={saving ? undefined : onClose}
-      maxWidth="sm"
-      fullWidth
-      slotProps={{ paper: { sx: { borderRadius: "16px" } } }}
+    <LocalizationProvider
+      dateAdapter={AdapterDayjs}
+      adapterLocale={dayjsLocale}
+      localeText={dayjsLocale === "ru" ? ruRU.components.MuiLocalizationProvider.defaultProps.localeText : enUS.components.MuiLocalizationProvider.defaultProps.localeText}
     >
-      <DialogTitle
-        sx={{
-          fontFamily: "Century Gothic, sans-serif",
-          fontWeight: 700,
-          color: "#0f3eb5",
-          pr: 6,
-        }}
+      <Dialog
+        open={open}
+        onClose={saving ? undefined : onClose}
+        maxWidth="sm"
+        fullWidth
+        fullScreen={fullScreen}
+        slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}
       >
-        {t("profile.editButton")}
-        <IconButton
-          onClick={onClose}
-          disabled={saving}
-          sx={{ position: "absolute", right: 12, top: 12, color: "#7795de" }}
+        <DialogTitle
+          sx={{
+            fontFamily: "Century Gothic, sans-serif",
+            fontWeight: 700,
+            color: "#0f3eb5",
+            pr: 6,
+          }}
         >
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
-
-      <DialogContent dividers>
-        <Stack spacing={2.5} sx={{ pt: 0.5 }}>
-          <TextField
-            label={t("profile.name")}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            fullWidth
-            size="small"
-          />
-          <TextField
-            label={t("profile.email")}
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            fullWidth
-            size="small"
-          />
-          <TextField
-            label={t("profile.location")}
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            fullWidth
-            size="small"
-          />
-          <TextField
-            label={t("profile.birthDate")}
-            type="date"
-            value={birthDate}
-            onChange={(e) => setBirthDate(e.target.value)}
-            fullWidth
-            size="small"
-            slotProps={{ inputLabel: { shrink: true }, htmlInput: { max: new Date().toISOString().split("T")[0] } }}
-          />
-          <TextField
-            select
-            label={t("profile.preferredLanguage")}
-            value={preferredLanguage}
-            onChange={(e) => setPreferredLanguage(e.target.value as "RU" | "EN")}
-            fullWidth
-            size="small"
+          {t("profile.editButton")}
+          <IconButton
+            onClick={onClose}
+            disabled={saving}
+            sx={{ position: "absolute", right: 12, top: 12, color: "#7795de", minWidth: 44, minHeight: 44 }}
           >
-            <MenuItem value="RU">{t("profile.language.RU")}</MenuItem>
-            <MenuItem value="EN">{t("profile.language.EN")}</MenuItem>
-          </TextField>
-        </Stack>
-      </DialogContent>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
 
-      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, px: 3, py: 2 }}>
-        <Button
-          variant="outlined"
-          onClick={onClose}
-          disabled={saving}
-          sx={{
-            borderRadius: "8px",
-            borderColor: "#7795de",
-            color: "#7795de",
-            fontFamily: "Century Gothic, sans-serif",
-            textTransform: "none",
-          }}
-        >
-          {t("profile.cancel")}
-        </Button>
-        <Button
-          variant="contained"
-          onClick={() => void handleSave()}
-          disabled={saving}
-          sx={{
-            borderRadius: "8px",
-            backgroundColor: "#0f3eb5",
-            fontFamily: "Century Gothic, sans-serif",
-            textTransform: "none",
-            "&:hover": { backgroundColor: "#0c32a0" },
-          }}
-        >
-          {saving ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : t("profile.save")}
-        </Button>
-      </Box>
-    </Dialog>
+        <DialogContent dividers sx={{ overflowY: 'auto' }}>
+          <Stack spacing={2.5} sx={{ pt: 0.5 }}>
+            <TextField
+              label={t("profile.name")}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              fullWidth
+              size="small"
+            />
+            <TextField
+              label={t("profile.email")}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              fullWidth
+              size="small"
+            />
+            <TextField
+              label={t("profile.location")}
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              fullWidth
+              size="small"
+            />
+            <DatePicker
+              label={t("profile.birthDate")}
+              value={birthDate}
+              onChange={(val) => setBirthDate(val)}
+              maxDate={dayjs()}
+              slotProps={{
+                textField: { fullWidth: true, size: "small" },
+              }}
+            />
+            <TextField
+              select
+              label={t("profile.preferredLanguage")}
+              value={preferredLanguage}
+              onChange={(e) => setPreferredLanguage(e.target.value as "RU" | "EN")}
+              fullWidth
+              size="small"
+            >
+              <MenuItem value="RU">{t("profile.language.RU")}</MenuItem>
+              <MenuItem value="EN">{t("profile.language.EN")}</MenuItem>
+            </TextField>
+          </Stack>
+        </DialogContent>
+
+        <Box sx={{ display: "flex", flexDirection: { xs: 'column-reverse', sm: 'row' }, justifyContent: { sm: "flex-end" }, alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, px: 3, py: 2 }}>
+          <Button
+            variant="outlined"
+            onClick={onClose}
+            disabled={saving}
+            sx={{
+              borderRadius: "8px",
+              borderColor: "#7795de",
+              color: "#7795de",
+              fontFamily: "Century Gothic, sans-serif",
+              textTransform: "none",
+            }}
+          >
+            {t("profile.cancel")}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => void handleSave()}
+            disabled={saving}
+            sx={{
+              borderRadius: "8px",
+              backgroundColor: "#0f3eb5",
+              fontFamily: "Century Gothic, sans-serif",
+              textTransform: "none",
+              "&:hover": { backgroundColor: "#0c32a0" },
+            }}
+          >
+            {saving ? <CircularProgress size={18} sx={{ color: "#fff" }} /> : t("profile.save")}
+          </Button>
+        </Box>
+      </Dialog>
+    </LocalizationProvider>
   );
 }

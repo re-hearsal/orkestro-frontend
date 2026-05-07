@@ -11,6 +11,8 @@ import {
   Stack,
   TextField,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from "react-i18next";
@@ -55,6 +57,8 @@ export default function EditOrgDialog({
   const { t } = useTranslation();
   const { user } = useAuth();
   const { showAlert } = useAppAlert();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
@@ -184,7 +188,8 @@ export default function EditOrgDialog({
       onClose={saving ? undefined : onClose}
       maxWidth="sm"
       fullWidth
-      slotProps={{ paper: { sx: { borderRadius: "16px" } } }}
+      fullScreen={fullScreen}
+      slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}
     >
       <DialogTitle
         sx={{
@@ -198,13 +203,13 @@ export default function EditOrgDialog({
         <IconButton
           onClick={onClose}
           disabled={saving}
-          sx={{ position: "absolute", right: 12, top: 12, color: "#7795de" }}
+          sx={{ position: "absolute", right: 12, top: 12, color: "#7795de", minWidth: 44, minHeight: 44 }}
         >
           <CloseIcon />
         </IconButton>
       </DialogTitle>
 
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ overflowY: 'auto' }}>
         <Stack spacing={2.5} sx={{ pt: 0.5 }}>
           <TextField
             label={t("organizations.createForm.name")}
@@ -327,7 +332,7 @@ export default function EditOrgDialog({
         </Stack>
       </DialogContent>
 
-      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, px: 3, py: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: { xs: 'column-reverse', sm: 'row' }, justifyContent: { sm: "flex-end" }, alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, px: 3, py: 2 }}>
         <Button
           variant="outlined"
           onClick={onClose}

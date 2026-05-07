@@ -8,6 +8,8 @@ import {
   DialogTitle,
   IconButton,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
@@ -25,6 +27,8 @@ export default function DeleteAccountDialog({ open, onClose }: DeleteAccountDial
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const { showAlert } = useAppAlert();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [deleting, setDeleting] = useState(false);
 
@@ -54,20 +58,21 @@ export default function DeleteAccountDialog({ open, onClose }: DeleteAccountDial
       onClose={handleClose}
       maxWidth="xs"
       fullWidth
-      slotProps={{ paper: { sx: { borderRadius: "16px" } } }}
+      fullScreen={fullScreen}
+      slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}
     >
       <DialogTitle sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700, color: "#c0392b", pr: 6 }}>
         {t("profile.security.deleteAccount")}
         <IconButton
           onClick={handleClose}
           disabled={deleting}
-          sx={{ position: "absolute", right: 12, top: 12, color: "#7795de" }}
+          sx={{ position: "absolute", right: 12, top: 12, color: "#7795de", minWidth: 44, minHeight: 44 }}
         >
           <CloseIcon />
         </IconButton>
       </DialogTitle>
 
-      <DialogContent>
+      <DialogContent sx={{ overflowY: 'auto' }}>
         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, py: 1 }}>
           <WarningAmberIcon sx={{ color: "#e67e22", fontSize: 48 }} />
           <Typography
@@ -94,7 +99,7 @@ export default function DeleteAccountDialog({ open, onClose }: DeleteAccountDial
         </Box>
       </DialogContent>
 
-      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, px: 3, py: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: { xs: 'column-reverse', sm: 'row' }, justifyContent: { sm: "flex-end" }, alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, px: 3, py: 2 }}>
         <Button
           variant="outlined"
           onClick={handleClose}

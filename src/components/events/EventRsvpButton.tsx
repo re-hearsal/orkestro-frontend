@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Button, CircularProgress, Menu, MenuItem, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Menu, MenuItem, Typography, useMediaQuery, useTheme } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircle";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import HelpOutlineIcon from "@mui/icons-material/Help";
@@ -22,10 +22,11 @@ function getStatusColor(status?: RsvpStatus): string {
   return "#9e9e9e";
 }
 
-function StatusIcon({ status }: { status?: RsvpStatus }) {
-  if (status === "ACCEPTED") return <CheckCircleOutlineIcon sx={{ fontSize: 28 }} />;
-  if (status === "DECLINED") return <CancelOutlinedIcon sx={{ fontSize: 28 }} />;
-  return <HelpOutlineIcon sx={{ fontSize: 28 }} />;
+function StatusIcon({ status, compact }: { status?: RsvpStatus; compact: boolean }) {
+  const sz = compact ? 20 : 28;
+  if (status === "ACCEPTED") return <CheckCircleOutlineIcon sx={{ fontSize: sz }} />;
+  if (status === "DECLINED") return <CancelOutlinedIcon sx={{ fontSize: sz }} />;
+  return <HelpOutlineIcon sx={{ fontSize: sz }} />;
 }
 
 function getStatusLabel(status: RsvpStatus | undefined, t: (k: string) => string): string {
@@ -38,6 +39,8 @@ export default function EventRsvpButton({ organizationId, eventId, initialStatus
   const { t } = useTranslation();
   const { user } = useAuth();
   const { showAlert } = useAppAlert();
+  const theme = useTheme();
+  const compact = useMediaQuery(theme.breakpoints.down("sm"));
   const [status, setStatus] = useState<RsvpStatus | undefined>(initialStatus);
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const [saving, setSaving] = useState(false);
@@ -76,26 +79,27 @@ export default function EventRsvpButton({ organizationId, eventId, initialStatus
           display: "flex",
           alignItems: "center",
           gap: 0.75,
-          px: 1.5,
-          py: 0.75,
+          px: compact ? 1 : 1.5,
+          py: compact ? 0.5 : 0.75,
           borderRadius: "8px",
           border: `1.5px solid ${color}`,
           color,
           textTransform: "none",
           fontFamily: "Century Gothic, sans-serif",
           fontWeight: 600,
-          fontSize: "0.85rem",
+          fontSize: compact ? "0.75rem" : "0.85rem",
           backgroundColor: "transparent",
           flexShrink: 0,
+          minWidth: 0,
           "&:hover": { backgroundColor: `${color}14` },
         }}
       >
         {saving ? (
-          <CircularProgress size={20} sx={{ color }} />
+          <CircularProgress size={compact ? 16 : 20} sx={{ color }} />
         ) : (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
-            <StatusIcon status={status} />
-            <Typography sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 600, fontSize: "0.85rem", color, lineHeight: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+            <StatusIcon status={status} compact={compact} />
+            <Typography sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 600, fontSize: compact ? "0.75rem" : "0.85rem", color, lineHeight: 1 }}>
               {getStatusLabel(status, (k) => String(t(k)))}
             </Typography>
           </Box>

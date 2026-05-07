@@ -21,6 +21,7 @@ import {
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { ruRU, enUS } from "@mui/x-date-pickers/locales";
 import dayjs, { type Dayjs } from "dayjs";
 import "dayjs/locale/ru";
 import AddIcon from "@mui/icons-material/Add";
@@ -422,7 +423,11 @@ export default function CreateEventPage() {
   const availableSongsToAdd = allSongs.filter((s) => s.id != null && !songIds.includes(s.id!));
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={dayjsLocale}>
+    <LocalizationProvider
+      dateAdapter={AdapterDayjs}
+      adapterLocale={dayjsLocale}
+      localeText={dayjsLocale === "ru" ? ruRU.components.MuiLocalizationProvider.defaultProps.localeText : enUS.components.MuiLocalizationProvider.defaultProps.localeText}
+    >
       <Box sx={{ maxWidth: 720, mx: "auto", p: { xs: 2, sm: 3 } }}>
         <Typography
           variant="h4"
@@ -438,11 +443,13 @@ export default function CreateEventPage() {
 
         <Stepper
           activeStep={step}
+          alternativeLabel
           sx={{
             mb: 4,
             "& .MuiStepLabel-label": {
               fontFamily: "Century Gothic, sans-serif",
               fontSize: "0.82rem",
+              display: { xs: "none", sm: "block" },
             },
           }}
         >
@@ -752,7 +759,7 @@ export default function CreateEventPage() {
                     {t("organizations.events.create.duplicateHint")}
                   </Typography>
                   {duplicateDates.map((range, index) => (
-                    <Box key={index} sx={{ display: "flex", gap: 1, mb: 1.5, alignItems: "flex-start" }}>
+                    <Box key={index} sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 1.5, alignItems: "flex-start" }}>
                       <DateTimePicker
                         label={t("organizations.events.create.startTime")}
                         value={range.start}
@@ -760,7 +767,7 @@ export default function CreateEventPage() {
                         slotProps={{
                           textField: {
                             size: "small",
-                            sx: { flex: 1, "& .MuiInputBase-root": { fontFamily: "Century Gothic, sans-serif" } },
+                            sx: { flex: "1 1 200px", minWidth: 0, "& .MuiInputBase-root": { fontFamily: "Century Gothic, sans-serif" } },
                           },
                         }}
                       />
@@ -771,7 +778,7 @@ export default function CreateEventPage() {
                         slotProps={{
                           textField: {
                             size: "small",
-                            sx: { flex: 1, "& .MuiInputBase-root": { fontFamily: "Century Gothic, sans-serif" } },
+                            sx: { flex: "1 1 200px", minWidth: 0, "& .MuiInputBase-root": { fontFamily: "Century Gothic, sans-serif" } },
                           },
                         }}
                       />
@@ -805,7 +812,7 @@ export default function CreateEventPage() {
             </Box>
 
             <Box sx={blockSx}>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 2 }}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -831,7 +838,7 @@ export default function CreateEventPage() {
                       setRemindBeforeMinutes(v);
                     }}
                     slotProps={{ htmlInput: { min: 0, max: 1440 } }}
-                    sx={{ width: 200, "& .MuiInputBase-root": { fontFamily: "Century Gothic, sans-serif" } }}
+                    sx={{ width: { xs: "100%", sm: 200 }, "& .MuiInputBase-root": { fontFamily: "Century Gothic, sans-serif" } }}
                   />
                 )}
               </Box>

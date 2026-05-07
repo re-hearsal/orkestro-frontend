@@ -142,7 +142,7 @@ export default function OrgTasksPage() {
   return (
     <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1100, mx: "auto" }}>
       {/* Header */}
-      <Box sx={{ mb: 3, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
+      <Box sx={{ mb: 3, display: "flex", alignItems: { xs: "flex-start", sm: "center" }, justifyContent: "space-between", gap: 1, flexWrap: "wrap" }}>
         <Typography
           variant="h5"
           sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700, color: "#0f3eb5" }}
@@ -150,7 +150,7 @@ export default function OrgTasksPage() {
           {t("tasks.title")}
         </Typography>
 
-        <Box sx={{ display: "flex", gap: 1 }}>
+        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
           <Button
             variant="outlined"
             onClick={() => navigate(`/organizations/${organizationId}/tasks/closed`)}
@@ -198,7 +198,7 @@ export default function OrgTasksPage() {
           {/* Two-column grid */}
           <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 3 }}>
             {/* OPEN column */}
-            <Box>
+            <Box sx={{ minWidth: 0 }}>
               <Typography sx={columnHeaderSx}>{t("tasks.status.open")}</Typography>
               {openTasks.length === 0 ? (
                 <Typography sx={{ fontFamily: "Century Gothic, sans-serif", color: "#7795de", fontSize: "0.9rem" }}>
@@ -229,7 +229,7 @@ export default function OrgTasksPage() {
             </Box>
 
             {/* IN_PROGRESS column */}
-            <Box>
+            <Box sx={{ minWidth: 0 }}>
               <Typography sx={columnHeaderSx}>{t("tasks.status.inProgress")}</Typography>
               {inProgressTasks.length === 0 ? (
                 <Typography sx={{ fontFamily: "Century Gothic, sans-serif", color: "#7795de", fontSize: "0.9rem" }}>

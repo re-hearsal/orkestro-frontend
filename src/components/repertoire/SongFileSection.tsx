@@ -11,6 +11,8 @@ import {
   MenuItem,
   Tooltip,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
@@ -109,6 +111,8 @@ export default function SongFileSection({
   const { t } = useTranslation();
   const { user } = useAuth();
   const { showAlert } = useAppAlert();
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const uploadSongFile = client.POST as unknown as (
     path: "/api/v1/organizations/{organizationId}/repertoire/songs/{songId}/files",
@@ -522,11 +526,11 @@ export default function SongFileSection({
         )}
       </Menu>
 
-      <Dialog open={infoOpen} onClose={() => setInfoOpen(false)} maxWidth="xs" fullWidth slotProps={{ paper: { sx: { borderRadius: "16px" } } }}>
+      <Dialog open={infoOpen} onClose={() => setInfoOpen(false)} maxWidth="xs" fullWidth fullScreen={fullScreen} slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}>
         <DialogTitle sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700, color: "#0f3eb5" }}>
           {t("repertoire.fileInfo")}
         </DialogTitle>
-        <DialogContent dividers>
+        <DialogContent dividers sx={{ overflowY: 'auto' }}>
           {infoLoading ? (
             <Typography sx={{ fontFamily: "Century Gothic, sans-serif", color: "text.secondary" }}>
               ...
@@ -545,7 +549,7 @@ export default function SongFileSection({
             </Box>
           )}
         </DialogContent>
-        <Box sx={{ display: "flex", justifyContent: "flex-end", px: 3, py: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: { sm: "flex-end" }, px: 3, py: 2 }}>
           <Button
             variant="outlined"
             onClick={() => setInfoOpen(false)}
@@ -555,6 +559,7 @@ export default function SongFileSection({
               color: "#7795de",
               fontFamily: "Century Gothic, sans-serif",
               textTransform: "none",
+              width: { xs: '100%', sm: 'auto' },
             }}
           >
             {t("common.cancel")}
@@ -572,16 +577,17 @@ export default function SongFileSection({
         }}
         maxWidth="xs"
         fullWidth
+        fullScreen={fullScreen}
       >
         <DialogTitle sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700, color: "error.main" }}>
           {t("repertoire.deleteFile")}
         </DialogTitle>
-        <DialogContent dividers>
+        <DialogContent dividers sx={{ overflowY: 'auto' }}>
           <Typography sx={{ fontFamily: "Century Gothic, sans-serif" }}>
             {t("repertoire.confirmDeleteFile")}
           </Typography>
         </DialogContent>
-        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, px: 3, py: 2 }}>
+        <Box sx={{ display: "flex", flexDirection: { xs: 'column-reverse', sm: 'row' }, justifyContent: { sm: "flex-end" }, alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, px: 3, py: 2 }}>
           <Button
             variant="outlined"
             onClick={() => {

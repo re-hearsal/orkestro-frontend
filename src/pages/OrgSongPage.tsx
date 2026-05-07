@@ -13,6 +13,8 @@ import {
   TextField,
   Tooltip,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import SmartDisplayIcon from "@mui/icons-material/SmartDisplay";
 import AddIcon from "@mui/icons-material/Add";
@@ -64,6 +66,9 @@ export default function OrgSongPage() {
   const organizationId = useMemo(() => Number(rawOrgId), [rawOrgId]);
   const songId = useMemo(() => Number(rawSongId), [rawSongId]);
   const isValid = Number.isFinite(organizationId) && organizationId > 0 && Number.isFinite(songId) && songId > 0;
+
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const { permissions } = useOrgMemberContext(isValid ? organizationId : 0);
   const canEditSong = permissions.has("REPERTOIRE_EDIT_SONG");
@@ -593,7 +598,7 @@ export default function OrgSongPage() {
       )}
 
       {/* Edit song dialog */}
-      <Dialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="sm" fullWidth slotProps={{ paper: { sx: { borderRadius: "16px" } } }}>
+      <Dialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="sm" fullWidth fullScreen={fullScreen} slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}>
         <DialogTitle sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700, color: "#0f3eb5" }}>
           {t("repertoire.editSong")}
         </DialogTitle>
@@ -649,7 +654,7 @@ export default function OrgSongPage() {
             />
           </Box>
         </DialogContent>
-        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, px: 3, py: 2 }}>
+        <Box sx={{ display: "flex", flexDirection: { xs: 'column-reverse', sm: 'row' }, justifyContent: { sm: "flex-end" }, alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, px: 3, py: 2 }}>
           <Button
             variant="outlined"
             onClick={() => setEditOpen(false)}
@@ -689,7 +694,8 @@ export default function OrgSongPage() {
         }}
         maxWidth="xs"
         fullWidth
-        slotProps={{ paper: { sx: { borderRadius: "16px" } } }}
+        fullScreen={fullScreen}
+        slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}
       >
         <DialogTitle sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700, color: "error.main" }}>
           {t("repertoire.deleteSong")}
@@ -699,7 +705,7 @@ export default function OrgSongPage() {
             {t("repertoire.confirmDeleteSong")}
           </Typography>
         </DialogContent>
-        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, px: 3, py: 2 }}>
+        <Box sx={{ display: "flex", flexDirection: { xs: 'column-reverse', sm: 'row' }, justifyContent: { sm: "flex-end" }, alignItems: { xs: 'stretch', sm: 'center' }, gap: 1.5, px: 3, py: 2 }}>
           <Button
             variant="outlined"
             onClick={() => setDeleteOpen(false)}

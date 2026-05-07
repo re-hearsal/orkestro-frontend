@@ -252,8 +252,8 @@ export default function EventParticipantsPage() {
         </Typography>
       ) : (
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-          {/* Column headers — widths mirror EventParticipantCard chip widths */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, px: 2, pb: 0.5 }}>
+          {/* Column headers — widths mirror EventParticipantCard chip widths; hidden on mobile since chips wrap */}
+          <Box sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center", gap: 1.5, px: 2, pb: 0.5 }}>
             <Box sx={{ width: 32, flexShrink: 0 }} />
             <Box sx={{ flex: 1 }} />
             <Box sx={{ width: "1px", bgcolor: "transparent", flexShrink: 0, mx: 0.5 }} />

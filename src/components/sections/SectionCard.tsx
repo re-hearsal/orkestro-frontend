@@ -23,13 +23,15 @@ export default function SectionCard({ section, onClick, showAvatar = true }: Sec
         px: 1.5,
         py: 0.85,
         cursor: "pointer",
+        overflow: "hidden",
+        minWidth: 0,
         "&:hover": {
           backgroundColor: "rgba(119,149,222,0.08)",
         },
       }}
     >
       {showAvatar && (
-        <Avatar sx={{ width: 32, height: 32, bgcolor: "#0f3eb5", fontSize: "0.85rem" }}>
+        <Avatar sx={{ width: 32, height: 32, bgcolor: "#0f3eb5", fontSize: "0.85rem", flexShrink: 0 }}>
           {section.name?.[0]?.toUpperCase() ?? "S"}
         </Avatar>
       )}
@@ -42,6 +44,8 @@ export default function SectionCard({ section, onClick, showAvatar = true }: Sec
           whiteSpace: "nowrap",
           overflow: "hidden",
           textOverflow: "ellipsis",
+          minWidth: 0,
+          flex: 1,
         }}
       >
         {section.name}
