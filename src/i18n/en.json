@@ -318,6 +318,7 @@
       "drums": "Drums",
       "percussion": "Percussion",
       "vocal": "Vocal",
+      "backingVocal": "Backing vocal",
       "choir": "Choir",
       "choirSoprano": "Choir soprano",
       "choirAlto": "Choir alto",
@@ -325,7 +326,8 @@
       "choirBass": "Choir bass",
       "accordion": "Accordion",
       "harp": "Harp",
-      "ukulele": "Ukulele"
+      "ukulele": "Ukulele",
+      "other": "Other"
     },
     "roleNames": {
       "leader": "Leader",

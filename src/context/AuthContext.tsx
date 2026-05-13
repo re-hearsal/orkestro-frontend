@@ -155,7 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
               stomp.subscribe(`/topic/organizations/${org.id}/fund`, (msg) => {
                 try {
-                  const snapshot = JSON.parse(msg.body) as components['schemas']['OrgFundRealtimeSnapshotDTO'];
+                  const snapshot = JSON.parse(msg.body) as import("../utils/fundEvents").FundRealtimeSnapshot;
                   emitFundRealtimeSnapshot(snapshot);
                 } catch {
                   // ignore malformed messages

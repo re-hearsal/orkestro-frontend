@@ -348,7 +348,7 @@ export default function WriteInfoMessageDialog({ open, onClose, organizationId }
               fullWidth
               size="small"
               disabled={sending}
-              inputProps={{ maxLength: 5000 }}
+              slotProps={{ htmlInput: { maxLength: 5000 } }}
             />
             <Box
               sx={{

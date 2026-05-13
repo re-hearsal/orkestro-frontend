@@ -145,7 +145,7 @@ export default function TaskAssigneesSection({
       const { data } = await client.GET(
         "/api/v1/organizations/{organizationId}/members/page",
         {
-          params: { path: { organizationId }, query: { size: 100 } },
+          params: { path: { organizationId }, query: { pageable: { size: 100 } } as never },
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );

@@ -183,7 +183,7 @@ export default function EventParticipantsPage() {
           fontSize: "0.9rem",
         }}
       >
-        {event?.name ?? String(t("common.back"))}
+        {event?.title ?? String(t("common.back"))}
       </Button>
 
       {/* Header */}

@@ -103,7 +103,7 @@ export default function InstrumentPicker({ open, onClose, myInstrumentIds, onAdd
       maxWidth="sm"
       fullWidth
       fullScreen={fullScreen}
-      PaperProps={{ sx: { borderRadius: fullScreen ? 0 : "16px" } }}
+      slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}
     >
       <DialogTitle
         sx={{
@@ -130,7 +130,7 @@ export default function InstrumentPicker({ open, onClose, myInstrumentIds, onAdd
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           sx={{ mb: 2, mt: 0.5 }}
-          inputProps={{ style: { fontFamily: "Century Gothic, sans-serif" } }}
+          slotProps={{ htmlInput: { style: { fontFamily: "Century Gothic, sans-serif" } } }}
         />
 
         {loading ? (

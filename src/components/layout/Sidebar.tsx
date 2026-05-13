@@ -341,6 +341,7 @@ export default function Sidebar() {
             color: "#fff",
             fontSize: "1.6rem",
             letterSpacing: 2,
+            whiteSpace: "nowrap",
           }}
         >
           ORKESTRO

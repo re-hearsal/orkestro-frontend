@@ -488,7 +488,7 @@ export default function OrgMemberCard({
         maxWidth="xs"
         fullWidth
         fullScreen={fullScreen}
-        PaperProps={{ sx: { borderRadius: fullScreen ? 0 : "16px" } }}
+        slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}
       >
         <DialogTitle sx={{ color: "error.main", fontFamily: "Century Gothic, sans-serif" }}>
           {t("organizations.members.removeConfirmTitle")}

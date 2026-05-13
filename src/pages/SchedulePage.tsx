@@ -6,7 +6,7 @@ import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import { format, getDay, parse, startOfWeek } from "date-fns";
 import { ru, enUS } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import client from "../api/client";
 import type { components } from "../api/schema";
@@ -26,8 +26,6 @@ type EventCalendarGroupedResponseDTO = components["schemas"]["EventCalendarGroup
 type EventCalendarDTO = components["schemas"]["EventCalendarDTO"];
 
 type CalendarView = "month" | "week";
-
-const locales = { ru, en: enUS };
 
 function buildLocalizer(lang: string) {
   const locale = lang === "ru" ? ru : enUS;
@@ -308,7 +306,7 @@ function AgendaView({ events, lang, noEventsLabel, onEventClick }: AgendaViewPro
 export default function SchedulePage() {
   const { t, i18n } = useTranslation();
   const { organizationId: rawOrgId } = useParams<{ organizationId: string }>();
-  const navigate = useNavigate();
+
   const { user } = useAuth();
   const { showAlert } = useAppAlert();
   const { organizations, setCurrentOrganization } = useOrganization();

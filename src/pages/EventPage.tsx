@@ -158,7 +158,7 @@ export default function EventPage() {
           {
             params: {
               path: { organizationId },
-              query: withFlatPagination({}, { page: 0, size: 100 }),
+              query: withFlatPagination({}, { page: 0, size: 100 }) as never,
             },
             headers: { Authorization: `Bearer ${user.token}` },
           }

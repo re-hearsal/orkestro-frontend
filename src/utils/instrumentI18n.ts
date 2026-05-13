@@ -106,11 +106,19 @@ const INSTRUMENT_NAME_ALIASES: Record<string, string> = {
   drums: "drums",
   drum: "drums",
   "барабаны": "drums",
+  "ударные": "drums",
   percussion: "percussion",
   "перкуссия": "percussion",
   vocal: "vocal",
   voice: "vocal",
   "вокал": "vocal",
+  "backing vocal": "backingVocal",
+  "backing-vocal": "backingVocal",
+  "бэк-вокал": "backingVocal",
+  "бэк вокал": "backingVocal",
+  other: "other",
+  "другие": "other",
+  "другое": "other",
   "choir soprano": "choirSoprano",
   "choir-soprano": "choirSoprano",
   "хор сопрано": "choirSoprano",
@@ -152,8 +160,9 @@ export function resolveInstrumentTranslationKey(name: string): string | null {
     return normalized.includes("synth") ? "synthesizer" : "keyboard";
   }
   if (normalized.includes("фортеп") || normalized.includes("пиано") || normalized.includes("piano")) return "piano";
-  if (normalized.includes("барабан") || normalized.includes("drum")) return "drums";
+  if (normalized.includes("барабан") || normalized.includes("drum") || normalized.includes("ударн")) return "drums";
   if (normalized.includes("перкус") || normalized.includes("percussion")) return "percussion";
+  if (normalized.includes("бэк") || normalized.includes("backing")) return "backingVocal";
   if (normalized.includes("вокал") || normalized.includes("vocal") || normalized.includes("voice")) return "vocal";
   if (normalized.includes("хор") || normalized.includes("choir") || normalized.includes("chorus")) return "choir";
   if (normalized.includes("валтор") || normalized.includes("french horn") || normalized.includes("horn")) return "frenchHorn";

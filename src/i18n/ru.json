@@ -315,9 +315,10 @@
       "guitar": "Гитара",
       "electricGuitar": "Электрогитара",
       "bassGuitar": "Бас-гитара",
-      "drums": "Барабаны",
+      "drums": "Ударные",
       "percussion": "Перкуссия",
       "vocal": "Вокал",
+      "backingVocal": "Бэк-вокал",
       "choir": "Хор",
       "choirSoprano": "Хор сопрано",
       "choirAlto": "Хор альт",
@@ -325,7 +326,8 @@
       "choirBass": "Хор бас",
       "accordion": "Аккордеон",
       "harp": "Арфа",
-      "ukulele": "Укулеле"
+      "ukulele": "Укулеле",
+      "other": "Другие"
     },
     "roleNames": {
       "leader": "Руководитель",

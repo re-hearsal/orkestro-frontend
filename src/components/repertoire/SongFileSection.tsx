@@ -287,9 +287,9 @@ export default function SongFileSection({
     setDeleting(true);
     try {
       const { error } = await client.DELETE(
-        "/api/v1/organizations/{organizationId}/repertoire/songs/{songId}/files/{fileId}",
+        "/api/v1/files/{fileId}",
         {
-          params: { path: { organizationId, songId, fileId: deleteTarget.id } },
+          params: { path: { fileId: deleteTarget.id } },
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );

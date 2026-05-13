@@ -425,7 +425,7 @@ export default function UserProfilePage() {
               {t("profile.channel.title")}:
             </Typography>
             <Typography
-              sx={{ fontFamily: "Century Gothic, sans-serif", color: "#0f3eb5", fontSize: "0.95rem" }}
+              sx={{ fontFamily: "Century Gothic, sans-serif", color: "#0f3eb5", fontSize: "0.95rem", whiteSpace: "nowrap" }}
             >
               {t(`profile.channel.${fullProfile.notificationChannel}`)}
             </Typography>

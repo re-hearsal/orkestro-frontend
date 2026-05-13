@@ -41,7 +41,7 @@ export default function OrgInfoMessageSection({ organizationId, sectionId }: Pro
           const { data, error } = await client.GET(
             "/api/v1/sections/{sectionId}/info-messages",
             {
-              params: { path: { sectionId }, query },
+              params: { path: { sectionId }, query: query as never },
               headers: { Authorization: `Bearer ${user.token}` },
             }
           );
@@ -53,7 +53,7 @@ export default function OrgInfoMessageSection({ organizationId, sectionId }: Pro
           const { data, error } = await client.GET(
             "/api/v1/organizations/{organizationId}/info-messages",
             {
-              params: { path: { organizationId }, query },
+              params: { path: { organizationId }, query: query as never },
               headers: { Authorization: `Bearer ${user.token}` },
             }
           );

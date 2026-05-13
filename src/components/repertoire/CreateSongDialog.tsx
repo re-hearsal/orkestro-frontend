@@ -30,7 +30,7 @@ import { useAppAlert } from "../../hooks/useAppAlert";
 import { useAuth } from "../../hooks/useAuth";
 import { instrumentI18nKey } from "../profile/InstrumentPicker";
 
-type InstrumentDTO = components["schemas"]["InstrumentDTO"];
+type InstrumentDTO = { id?: number; name?: string };
 type SongDTO = components["schemas"]["SongDTO"];
 
 interface InstrumentationItem {

@@ -79,10 +79,6 @@ export default function OrgClosedTasksPage() {
     void loadPage(0, true);
   }, [loadPage]);
 
-  const reload = useCallback(() => {
-    void loadPage(0, true);
-  }, [loadPage]);
-
   // Silent reload for WS events — fetches in background without showing spinner
   const silentReload = useCallback(async () => {
     if (!user || !isValidOrganizationId) return;

@@ -2,11 +2,18 @@ import type { components } from "../api/schema";
 
 export const FUND_REALTIME_SNAPSHOT_EVENT = "orkestro:fund-realtime-snapshot";
 
-export interface FundRealtimeSnapshotDetail {
-  snapshot: components["schemas"]["OrgFundRealtimeSnapshotDTO"];
+export interface FundRealtimeSnapshot {
+  organizationId?: number;
+  balance?: number;
+  transactions?: components["schemas"]["OrgFundTransactionDTO"][];
+  totalTransactions?: number;
 }
 
-export function emitFundRealtimeSnapshot(snapshot: components["schemas"]["OrgFundRealtimeSnapshotDTO"]): void {
+export interface FundRealtimeSnapshotDetail {
+  snapshot: FundRealtimeSnapshot;
+}
+
+export function emitFundRealtimeSnapshot(snapshot: FundRealtimeSnapshot): void {
   if (typeof window === "undefined") {
     return;
   }
@@ -19,7 +26,7 @@ export function emitFundRealtimeSnapshot(snapshot: components["schemas"]["OrgFun
 }
 
 export function onFundRealtimeSnapshot(
-  handler: (snapshot: components["schemas"]["OrgFundRealtimeSnapshotDTO"]) => void
+  handler: (snapshot: FundRealtimeSnapshot) => void
 ): () => void {
   if (typeof window === "undefined") {
     return () => {};
