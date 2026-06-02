@@ -28,7 +28,7 @@
     },
     "login": {
       "title": "Вход",
-      "username": "Имя пользователя",
+      "login": "Имя пользователя или Email",
       "password": "Пароль",
       "submit": "Войти",
       "back": "Назад"
@@ -39,6 +39,7 @@
       "usernameNoSpaces": "Не должно содержать пробелов",
       "usernameLatinOnly": "Только латинские буквы, цифры и _",
       "nameRequired": "Введите имя",
+      "loginRequired": "Введите имя пользователя или email",
       "emailRequired": "Введите email",
       "emailInvalid": "Некорректный email",
       "passwordRequired": "Введите пароль",
