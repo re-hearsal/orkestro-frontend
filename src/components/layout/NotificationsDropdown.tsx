@@ -17,9 +17,9 @@ interface NotificationsDropdownProps {
 }
 
 function formatDate(iso?: string): string {
-  if (!iso) return '-';
+  if (!iso) {return '-';}
   const parsed = new Date(iso);
-  if (Number.isNaN(parsed.getTime())) return '-';
+  if (Number.isNaN(parsed.getTime())) {return '-';}
   const datePart = parsed.toLocaleDateString('ru-RU');
   const timePart = parsed.toLocaleString('ru-RU', { hour: '2-digit', minute: '2-digit' });
   return `${datePart} ${timePart}`;
@@ -38,7 +38,7 @@ export default function NotificationsDropdown({ anchorEl, onClose }: Notificatio
 
   const fetchPage = (pageNum: number, append: boolean, token: string, cancelled: { value: boolean }) => {
     const isFirst = !append;
-    if (isFirst) setLoading(true); else setLoadingMore(true);
+    if (isFirst) {setLoading(true);} else {setLoadingMore(true);}
 
     client
       .GET('/api/v1/notifications', {
@@ -48,7 +48,7 @@ export default function NotificationsDropdown({ anchorEl, onClose }: Notificatio
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(({ data }) => {
-        if (cancelled.value) return;
+        if (cancelled.value) {return;}
         const items = data?.content ?? [];
         const tp = (data?.page?.totalPages as number) ?? 0;
         setTotalPages(tp);
@@ -58,39 +58,39 @@ export default function NotificationsDropdown({ anchorEl, onClose }: Notificatio
       .catch(() => {})
       .finally(() => {
         if (!cancelled.value) {
-          if (isFirst) setLoading(false); else setLoadingMore(false);
+          if (isFirst) {setLoading(false);} else {setLoadingMore(false);}
         }
       });
   };
 
   useEffect(() => {
-    if (!Boolean(anchorEl)) {
+    if (!anchorEl) {return;}
+
+    const token = user?.token ?? localStorage.getItem('orkestro_token');
+    if (!token) {return;}
+
+    const cancelled = { value: false };
+    void Promise.resolve().then(() => fetchPage(0, false, token, cancelled));
+    return () => {
+      cancelled.value = true;
       setNotifications([]);
       setPage(0);
       setTotalPages(0);
-      return;
-    }
-
-    const token = user?.token ?? localStorage.getItem('orkestro_token');
-    if (!token) return;
-
-    const cancelled = { value: false };
-    fetchPage(0, false, token, cancelled);
-    return () => { cancelled.value = true; };
+    };
   }, [anchorEl, user?.token]);
 
   const handleLoadMore = () => {
     const token = user?.token ?? localStorage.getItem('orkestro_token');
-    if (!token) return;
+    if (!token) {return;}
     const cancelled = { value: false };
     fetchPage(page + 1, true, token, cancelled);
   };
 
   const handleMouseEnter = (notification: InAppNotificationDTO) => {
-    if (notification.isRead || notification.id == null) return;
+    if (notification.isRead || notification.id == null) {return;}
     const id = notification.id;
     const token = user?.token ?? localStorage.getItem('orkestro_token');
-    if (!token) return;
+    if (!token) {return;}
 
     const timer = setTimeout(() => {
       client
@@ -113,7 +113,7 @@ export default function NotificationsDropdown({ anchorEl, onClose }: Notificatio
   };
 
   const handleMouseLeave = (id?: number) => {
-    if (id == null) return;
+    if (id == null) {return;}
     const timer = hoverTimers.current.get(id);
     if (timer != null) {
       clearTimeout(timer);
@@ -122,10 +122,10 @@ export default function NotificationsDropdown({ anchorEl, onClose }: Notificatio
   };
 
   const markRead = (notification: InAppNotificationDTO) => {
-    if (notification.isRead || notification.id == null) return;
+    if (notification.isRead || notification.id == null) {return;}
     const id = notification.id;
     const token = user?.token ?? localStorage.getItem('orkestro_token');
-    if (!token) return;
+    if (!token) {return;}
     client
       .PATCH('/api/v1/notifications/{id}/read', {
         params: { path: { id } },

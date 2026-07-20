@@ -48,7 +48,7 @@ function MemberAvatar({ fileId, name }: { fileId?: number; name?: string }) {
       objectUrlRef.current = null;
     };
 
-    if (!user || fileId == null) { revoke(); setAvatarUrl(null); return; }
+    if (!user || fileId == null) { revoke(); return; }
 
     let cancelled = false;
     const load = async () => {
@@ -58,18 +58,18 @@ function MemberAvatar({ fileId, name }: { fileId?: number; name?: string }) {
           headers: { Authorization: `Bearer ${user.token}` },
           parseAs: "blob",
         });
-        if (cancelled || !data) return;
+        if (cancelled || !data) {return;}
         revoke();
         const url = await toRenderableImageSource(data as unknown as Blob);
         objectUrlRef.current = url;
-        if (!cancelled) setAvatarUrl(url);
+        if (!cancelled) {setAvatarUrl(url);}
       } catch {
         if (!cancelled) { revoke(); setAvatarUrl(null); }
       }
     };
 
     void load();
-    return () => { cancelled = true; revoke(); };
+    return () => { cancelled = true; revoke(); setAvatarUrl(null); };
   }, [fileId, user]);
 
   if (avatarUrl) {
@@ -105,16 +105,16 @@ export default function BirthdaysPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user || !Number.isFinite(organizationId) || organizationId <= 0) {
-      setLoading(false);
-      return;
-    }
-
     let cancelled = false;
     const PAGE_SIZE = 100;
     const PROFILE_BATCH = 10;
 
     const fetchAll = async () => {
+      if (!user || !Number.isFinite(organizationId) || organizationId <= 0) {
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
 
       // Step 1: collect all member IDs
@@ -137,14 +137,14 @@ export default function BirthdaysPage() {
                   headers: { Authorization: `Bearer ${user.token}` },
                 });
 
-          if (cancelled) return;
+          if (cancelled) {return;}
 
           const paged = (data as unknown as PagedLike) ?? {};
           const content = paged.content ?? [];
 
           for (const raw of content) {
             const id = extractMemberId(raw);
-            if (id != null) ids.push(id);
+            if (id != null) {ids.push(id);}
           }
 
           const totalPages = paged.page?.totalPages;
@@ -155,13 +155,13 @@ export default function BirthdaysPage() {
         }
       }
 
-      if (cancelled) return;
+      if (cancelled) {return;}
 
       // Step 2: fetch public profiles in batches to get birthDate
       const result: BirthdayMember[] = [];
 
       for (let i = 0; i < ids.length; i += PROFILE_BATCH) {
-        if (cancelled) return;
+        if (cancelled) {return;}
         const batch = ids.slice(i, i + PROFILE_BATCH);
 
         const profiles = await Promise.allSettled(
@@ -174,21 +174,21 @@ export default function BirthdaysPage() {
         );
 
         for (const outcome of profiles) {
-          if (outcome.status !== "fulfilled") continue;
+          if (outcome.status !== "fulfilled") {continue;}
           const profile = asRecord(outcome.value.data);
-          if (!profile) continue;
+          if (!profile) {continue;}
 
           const birthDate = typeof profile.birthDate === "string" ? profile.birthDate : null;
-          if (!birthDate) continue;
+          if (!birthDate) {continue;}
 
           const parts = birthDate.split("-");
-          if (parts.length < 3) continue;
+          if (parts.length < 3) {continue;}
           const month = parseInt(parts[1], 10);
           const day = parseInt(parts[2], 10);
-          if (!month || !day) continue;
+          if (!month || !day) {continue;}
 
           const id = typeof profile.id === "number" ? profile.id : null;
-          if (id == null) continue;
+          if (id == null) {continue;}
 
           const name = typeof profile.name === "string" ? profile.name : undefined;
           const profileImageFileId =
@@ -210,7 +210,7 @@ export default function BirthdaysPage() {
 
   const grouped = useMemo(() => {
     const sorted = [...members].sort((a, b) => {
-      if (a.month !== b.month) return a.month - b.month;
+      if (a.month !== b.month) {return a.month - b.month;}
       return a.day - b.day;
     });
 

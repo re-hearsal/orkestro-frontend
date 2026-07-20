@@ -10,7 +10,7 @@ import { useAuth } from "../hooks/useAuth";
 import { useAppAlert } from "../hooks/useAppAlert";
 import SectionCard from "../components/sections/SectionCard";
 import CreateSectionDialog from "../components/sections/CreateSectionDialog";
-import { useMobileAction } from "../context/MobileActionContext";
+import { useMobileAction } from "../hooks/useMobileAction";
 
 function GroupsPlusIcon() {
   return (
@@ -61,7 +61,7 @@ export default function OrgSectionsPage() {
       } catch {
         if (!cancelled) { setLoaded(true); showAlert(String(t("organizations.profile.loadError")), "error"); }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {setLoading(false);}
       }
     };
     void load();
@@ -78,13 +78,13 @@ export default function OrgSectionsPage() {
           body: data,
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       return newSection as SectionDTO;
     },
     [organizationId, user]
   );
 
-  if (!isValid) return <Navigate to="/organizations" replace />;
+  if (!isValid) {return <Navigate to="/organizations" replace />;}
 
   if (loading) {
     return (

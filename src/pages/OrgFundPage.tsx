@@ -18,7 +18,7 @@ import { useOrgMemberContext } from "../hooks/useOrgMemberContext";
 import { useOrganization } from "../hooks/useOrganization";
 import { withFlatPagination } from "../utils/pagination";
 import { onFundRealtimeSnapshot } from "../utils/fundEvents";
-import { useMobileAction } from "../context/MobileActionContext";
+import { useMobileAction } from "../hooks/useMobileAction";
 import FundTransactionRow from "../components/fund/FundTransactionRow";
 import CreateFundTransactionDialog from "../components/fund/CreateFundTransactionDialog";
 

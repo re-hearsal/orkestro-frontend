@@ -24,7 +24,7 @@ export default defineConfig([
       reportUnusedDisableDirectives: 'error',
     },
     rules: {
-      eqeqeq: ['error', 'always'],
+      eqeqeq: ['error', 'smart'],
       curly: ['error', 'all'],
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-debugger': 'error',

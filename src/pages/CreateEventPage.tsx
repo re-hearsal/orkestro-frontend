@@ -28,7 +28,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import client from "../api/client";
+import client, { type UnsafeApiMethod } from "../api/client";
 import type { components } from "../api/schema";
 import { useAuth } from "../hooks/useAuth";
 import { useAppAlert } from "../hooks/useAppAlert";
@@ -78,9 +78,9 @@ export default function CreateEventPage() {
   const dayjsLocale = i18n.language === "ru" ? "ru" : "en";
 
   useEffect(() => {
-    if (!user || !organizationId) return;
+    if (!user || !organizationId) {return;}
     const org = organizations.find((o) => o.id === organizationId);
-    if (org) setCurrentOrganization(org);
+    if (org) {setCurrentOrganization(org);}
   }, [organizationId, organizations, setCurrentOrganization, user]);
 
   const [step, setStep] = useState(0);
@@ -130,7 +130,7 @@ export default function CreateEventPage() {
 
   // Load sections and songs once
   useEffect(() => {
-    if (!user || !organizationId) return;
+    if (!user || !organizationId) {return;}
     let cancelled = false;
 
     const loadSections = async () => {
@@ -138,7 +138,7 @@ export default function CreateEventPage() {
         params: { path: { organizationId } },
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      if (!cancelled && Array.isArray(data)) setAllSections(data as SectionDTO[]);
+      if (!cancelled && Array.isArray(data)) {setAllSections(data as SectionDTO[]);}
     };
 
     const loadSongs = async () => {
@@ -167,12 +167,12 @@ export default function CreateEventPage() {
       return;
     }
 
-    if (memberSearchTimerRef.current) clearTimeout(memberSearchTimerRef.current);
+    if (memberSearchTimerRef.current) {clearTimeout(memberSearchTimerRef.current);}
     memberSearchTimerRef.current = setTimeout(async () => {
       setMemberSearchLoading(true);
       try {
         const query = withFlatPagination({ query: memberSearchQuery }, { page: 0, size: 10 });
-        const { data } = await (client.GET as Function)(
+        const { data } = await (client.GET as UnsafeApiMethod)(
           "/api/v1/organizations/{organizationId}/members/page",
           {
             params: { path: { organizationId }, query },
@@ -193,13 +193,13 @@ export default function CreateEventPage() {
         setMemberSearchLoading(false);
       }
     }, 300);
-  }, [memberSearchQuery, organizationId, user]);
+  }, [memberSearchQuery, organizationId, user, profile?.id]);
 
   // Load template when entering step 2
   const loadTemplate = useCallback(async () => {
-    if (!user || !organizationId || !eventType) return;
+    if (!user || !organizationId || !eventType) {return;}
     try {
-      const { data } = await (client.GET as Function)(
+      const { data } = await (client.GET as UnsafeApiMethod)(
         "/api/v1/organizations/{organizationId}/event-templates",
         {
           params: { path: { organizationId }, query: { eventType } },
@@ -213,8 +213,8 @@ export default function CreateEventPage() {
         : [];
       if (items.length > 0) {
         const tpl = items[0] as EventDescriptionTemplateDTO;
-        if (tpl.content) setDescription(tpl.content);
-        if (tpl.id) setDescriptionTemplateId(tpl.id);
+        if (tpl.content) {setDescription(tpl.content);}
+        if (tpl.id) {setDescriptionTemplateId(tpl.id);}
       }
     } catch {
       // silently ignore template load failure
@@ -232,11 +232,11 @@ export default function CreateEventPage() {
     const newErrors: Record<string, string> = {};
 
     if (s === 0) {
-      if (!eventType) newErrors.eventType = t("organizations.events.create.eventTypeRequired");
+      if (!eventType) {newErrors.eventType = t("organizations.events.create.eventTypeRequired");}
     }
     if (s === 1) {
-      if (!title.trim()) newErrors.title = t("organizations.events.create.nameRequired");
-      if (title.trim().length > 30) newErrors.title = t("organizations.events.create.nameMaxLength");
+      if (!title.trim()) {newErrors.title = t("organizations.events.create.nameRequired");}
+      if (title.trim().length > 30) {newErrors.title = t("organizations.events.create.nameMaxLength");}
     }
     if (s === 2) {
       if (!startTime) {
@@ -256,7 +256,7 @@ export default function CreateEventPage() {
   };
 
   const handleNext = async () => {
-    if (!validateStep(step)) return;
+    if (!validateStep(step)) {return;}
     if (step === 0 && description === "") {
       await loadTemplate();
     }
@@ -269,8 +269,8 @@ export default function CreateEventPage() {
   };
 
   const handleCreate = async () => {
-    if (!validateStep(step)) return;
-    if (!user || !eventType || !startTime || !endTime) return;
+    if (!validateStep(step)) {return;}
+    if (!user || !eventType || !startTime || !endTime) {return;}
 
     setSaving(true);
     try {
@@ -279,9 +279,9 @@ export default function CreateEventPage() {
       formData.append("eventType", eventType);
       formData.append("startTime", startTime.toISOString());
       formData.append("endTime", endTime!.toISOString());
-      if (description.trim()) formData.append("description", description.trim());
-      if (location.trim()) formData.append("location", location.trim());
-      if (externalLink.trim()) formData.append("externalLink", externalLink.trim());
+      if (description.trim()) {formData.append("description", description.trim());}
+      if (location.trim()) {formData.append("location", location.trim());}
+      if (externalLink.trim()) {formData.append("externalLink", externalLink.trim());}
       tags.forEach((tag) => formData.append("tags", tag));
       formData.append("includeAllOrganizationMembers", String(participantMode === "all"));
       if (participantMode === "bySection") {
@@ -290,11 +290,11 @@ export default function CreateEventPage() {
       }
       songIds.forEach((id) => formData.append("songIds", String(id)));
       formData.append("sendRsvp", String(sendRsvp));
-      if (reminderEnabled) formData.append("remindBeforeMinutes", String(remindBeforeMinutes));
-      if (descriptionTemplateId) formData.append("descriptionTemplateId", String(descriptionTemplateId));
+      if (reminderEnabled) {formData.append("remindBeforeMinutes", String(remindBeforeMinutes));}
+      if (descriptionTemplateId) {formData.append("descriptionTemplateId", String(descriptionTemplateId));}
       files.forEach((file) => formData.append("files", file));
 
-      const { data, error } = await (client.POST as Function)(
+      const { data, error } = await (client.POST as UnsafeApiMethod)(
         "/api/v1/organizations/{organizationId}/events",
         {
           params: { path: { organizationId } },
@@ -304,7 +304,7 @@ export default function CreateEventPage() {
         }
       );
 
-      if (error) throw error;
+      if (error) {throw error;}
 
       const newEventId = (data as { id?: number })?.id;
 
@@ -315,7 +315,7 @@ export default function CreateEventPage() {
 
         if (startTimes.length > 0) {
           try {
-            await (client.POST as Function)(
+            await (client.POST as UnsafeApiMethod)(
               "/api/v1/organizations/{organizationId}/events/{eventId}/duplicates",
               {
                 params: { path: { organizationId, eventId: newEventId } },
@@ -357,7 +357,7 @@ export default function CreateEventPage() {
   };
 
   const addParticipantUser = (member: MemberSearchResult) => {
-    if (!member.userId || participantUserIds.includes(member.userId)) return;
+    if (!member.userId || participantUserIds.includes(member.userId)) {return;}
     setParticipantUserIds([...participantUserIds, member.userId]);
     setParticipantUsers([...participantUsers, member]);
     setMemberSearchQuery("");
@@ -370,7 +370,7 @@ export default function CreateEventPage() {
   };
 
   const addSong = (song: SongDTO) => {
-    if (!song.id || songIds.includes(song.id)) return;
+    if (!song.id || songIds.includes(song.id)) {return;}
     if (songIds.length >= 50) {
       showAlert(t("organizations.events.create.tooManySongs"), "error");
       return;
@@ -487,7 +487,7 @@ export default function CreateEventPage() {
                 value={participantMode}
                 exclusive
                 size="small"
-                onChange={(_, val) => { if (val) setParticipantMode(val); }}
+                onChange={(_, val) => { if (val) {setParticipantMode(val);} }}
                 sx={{ mb: 1.5 }}
               >
                 <ToggleButton value="all" sx={{ fontFamily: "Century Gothic, sans-serif", fontSize: "0.78rem", textTransform: "none" }}>
@@ -599,7 +599,7 @@ export default function CreateEventPage() {
                 value={null}
                 inputValue={songSearchInput}
                 onInputChange={(_, newValue, reason) => {
-                  if (reason !== "reset") setSongSearchInput(newValue);
+                  if (reason !== "reset") {setSongSearchInput(newValue);}
                 }}
                 onChange={(_, value) => {
                   if (value) {
@@ -707,7 +707,7 @@ export default function CreateEventPage() {
                 value={startTime}
                 onChange={(val) => {
                   setStartTime(val);
-                  if (val) setEndTime(val.add(3, "hour"));
+                  if (val) {setEndTime(val.add(3, "hour"));}
                 }}
                 slotProps={{
                   textField: {

@@ -31,7 +31,7 @@ export default function OrgInfoMessageSection({ organizationId, sectionId }: Pro
 
   const load = useCallback(
     async (p: number) => {
-      if (!user) return;
+      if (!user) {return;}
 
       const query = withFlatPagination({}, { page: p, size: 10, sort: ["createdAt,desc"] });
 
@@ -45,7 +45,7 @@ export default function OrgInfoMessageSection({ organizationId, sectionId }: Pro
               headers: { Authorization: `Bearer ${user.token}` },
             }
           );
-          if (error) throw error;
+          if (error) {throw error;}
           const payload = data as unknown as PagePayload;
           setMessages(payload.content ?? []);
           setTotalPages(payload.page?.totalPages ?? 0);
@@ -57,7 +57,7 @@ export default function OrgInfoMessageSection({ organizationId, sectionId }: Pro
               headers: { Authorization: `Bearer ${user.token}` },
             }
           );
-          if (error) throw error;
+          if (error) {throw error;}
           const payload = data as unknown as PagePayload;
           setMessages(payload.content ?? []);
           setTotalPages(payload.page?.totalPages ?? 0);

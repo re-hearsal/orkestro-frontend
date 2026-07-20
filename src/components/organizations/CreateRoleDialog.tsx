@@ -105,7 +105,7 @@ export default function CreateRoleDialog({
   };
 
   const handleSubmit = async () => {
-    if (!validate() || !user) return;
+    if (!validate() || !user) {return;}
 
     setLoading(true);
     setApiError(null);
@@ -160,7 +160,7 @@ export default function CreateRoleDialog({
     <Dialog
       open={open}
       onClose={() => {
-        if (!loading) onClose();
+        if (!loading) {onClose();}
       }}
       fullWidth
       maxWidth="sm"
@@ -183,7 +183,7 @@ export default function CreateRoleDialog({
           value={name}
           onChange={(e) => {
             setName(e.target.value);
-            if (nameError) setNameError(null);
+            if (nameError) {setNameError(null);}
           }}
           error={nameError != null}
           helperText={nameError}

@@ -14,7 +14,7 @@ import { useOrgMemberContext } from "../../hooks/useOrgMemberContext";
 import OrgSwitcherDropdown from "./OrgSwitcherDropdown";
 import NotificationsDropdown from "./NotificationsDropdown";
 import WriteInfoMessageDialog from "../organizations/WriteInfoMessageDialog";
-import { useMobileActionValue } from "../../context/MobileActionContext";
+import { useMobileActionValue } from "../../hooks/useMobileAction";
 
 interface TopBarProps {
   unreadCount: number;
@@ -44,7 +44,7 @@ function CalendarPlusIcon({ fontSize = 22 }: { fontSize?: number }) {
 
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/);
-  if (parts.length === 1) return parts[0][0]?.toUpperCase() ?? "";
+  if (parts.length === 1) {return parts[0][0]?.toUpperCase() ?? "";}
   return (parts[0][0] + parts[1][0]).toUpperCase();
 }
 

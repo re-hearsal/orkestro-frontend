@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useRef, type ReactNode } from 'react';
+import { useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import client from '../api/client';
@@ -13,6 +13,7 @@ import { emitEventCommentCreated } from '../utils/eventCommentEvents';
 import { emitEventDeleted } from '../utils/eventDeletedEvents';
 import { emitInfoMessageCreated } from '../utils/infoMessageEvents';
 import { isBlobUrl, toRenderableImageSource } from '../utils/imageSource';
+import { AuthContext } from './AuthContext.context';
 
 export interface AuthUser {
   token: string;
@@ -32,19 +33,6 @@ export interface UserProfile {
   notificationChannel?: 'TELEGRAM' | 'EMAIL' | 'VK';
 }
 
-interface AuthContextValue {
-  user: AuthUser | null;
-  profile: UserProfile | null;
-  avatarUrl: string | null;
-  initialized: boolean;
-  login: (token: string, username: string) => Promise<void>;
-  logout: () => void;
-  refreshProfile: () => Promise<void>;
-  subscribeToEventWebSocket: (organizationId: number, eventId: number) => () => void;
-}
-
-export const AuthContext = createContext<AuthContextValue | null>(null);
-
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? (import.meta.env.DEV ? '' : 'http://localhost:8080');
 
 type OrganizationListItem = Pick<components['schemas']['OrganizationDTO'], 'id'>;
@@ -57,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const avatarUrlRef = useRef<string | null>(null);
   const stompRef = useRef<Client | null>(null);
 
-  const fetchAvatar = async (token: string, fileId: number) => {
+  const fetchAvatar = useCallback(async (token: string, fileId: number) => {
     try {
       const { data } = await client.GET('/api/v1/files/{fileId}', {
         params: { path: { fileId } },
@@ -65,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         parseAs: 'blob',
       });
       if (data) {
-        if (avatarUrlRef.current && isBlobUrl(avatarUrlRef.current)) URL.revokeObjectURL(avatarUrlRef.current);
+        if (avatarUrlRef.current && isBlobUrl(avatarUrlRef.current)) {URL.revokeObjectURL(avatarUrlRef.current);}
         const renderable = await toRenderableImageSource(data as unknown as Blob);
         avatarUrlRef.current = renderable;
         setAvatarUrl(renderable);
@@ -73,9 +61,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (e) {
       console.error('[avatar] fetch error:', e);
     }
-  };
+  }, []);
 
-  const fetchProfile = async (token: string): Promise<boolean> => {
+  const fetchProfile = useCallback(async (token: string): Promise<boolean> => {
     try {
       const { data, error } = await client.GET('/api/v1/users/me', {
         headers: { Authorization: `Bearer ${token}` },
@@ -94,10 +82,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       return false;
     }
-  };
+  }, [fetchAvatar]);
 
-  const connectWebSocket = (token: string, userId: number) => {
-    if (stompRef.current?.active) return;
+  const connectWebSocket = useCallback((token: string, userId: number) => {
+    if (stompRef.current?.active) {return;}
 
     const stomp = new Client({
       webSocketFactory: () => new SockJS(`${BASE_URL}/ws`),
@@ -219,7 +207,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     stomp.activate();
     stompRef.current = stomp;
-  };
+  }, [fetchAvatar]);
 
   const disconnectWebSocket = () => {
     stompRef.current?.deactivate();
@@ -230,9 +218,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const token = localStorage.getItem('orkestro_token');
     const username = localStorage.getItem('orkestro_username');
     if (token && username) {
-      setUser({ token, username });
-
-      fetchProfile(token)
+      void Promise.resolve()
+        .then(() => {
+          setUser({ token, username });
+          return fetchProfile(token);
+        })
         .then((ok) => {
           if (!ok) {
             localStorage.removeItem('orkestro_token');
@@ -250,15 +240,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         })
         .finally(() => setInitialized(true));
     } else {
-      setInitialized(true);
+      void Promise.resolve().then(() => setInitialized(true));
     }
-  }, []);
+  }, [fetchProfile]);
 
   useEffect(() => {
     if (user && profile?.id) {
       connectWebSocket(user.token, profile.id);
     }
-  }, [user?.token, profile?.id]);
+  }, [user, profile?.id, connectWebSocket]);
 
   useEffect(() => {
     return () => { disconnectWebSocket(); };

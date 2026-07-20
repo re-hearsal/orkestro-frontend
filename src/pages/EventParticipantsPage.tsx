@@ -62,15 +62,15 @@ export default function EventParticipantsPage() {
 
   // Sync current organization
   useEffect(() => {
-    if (!isValid) return;
-    if (currentOrganization?.id === organizationId) return;
+    if (!isValid) {return;}
+    if (currentOrganization?.id === organizationId) {return;}
     const matched = organizations.find((o) => o.id === organizationId);
-    if (matched) setCurrentOrganization(matched);
+    if (matched) {setCurrentOrganization(matched);}
   }, [currentOrganization?.id, isValid, organizationId, organizations, setCurrentOrganization]);
 
   // Load event title
   useEffect(() => {
-    if (!user || !isValid) return;
+    if (!user || !isValid) {return;}
     void (async () => {
       try {
         const { data, error } = await client.GET(
@@ -80,7 +80,7 @@ export default function EventParticipantsPage() {
             headers: { Authorization: `Bearer ${user.token}` },
           }
         );
-        if (error) return;
+        if (error) {return;}
         setEvent(data as unknown as EventDTO);
       } catch {
         // ignore
@@ -90,7 +90,7 @@ export default function EventParticipantsPage() {
 
   const loadParticipants = useCallback(
     async (pageNum: number, query: string) => {
-      if (!user || !isValid) return;
+      if (!user || !isValid) {return;}
       setLoading(true);
       try {
         const { data, error } = await client.GET(
@@ -104,7 +104,7 @@ export default function EventParticipantsPage() {
             headers: { Authorization: `Bearer ${user.token}` },
           }
         );
-        if (error) throw error;
+        if (error) {throw error;}
         const payload = (data as unknown as PagedParticipantsResponse) ?? {};
         setParticipants(payload.content ?? []);
         setPage(pageNum);
@@ -124,7 +124,7 @@ export default function EventParticipantsPage() {
 
   const handleSearchChange = (value: string) => {
     setSearchInput(value);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (debounceRef.current) {clearTimeout(debounceRef.current);}
     debounceRef.current = setTimeout(() => {
       setSearchQuery(value.trim());
     }, 400);
@@ -141,7 +141,7 @@ export default function EventParticipantsPage() {
   };
 
   const handleExportCsv = async () => {
-    if (!user) return;
+    if (!user) {return;}
     setCsvLoading(true);
     try {
       const { data, error } = await client.GET(
@@ -152,7 +152,7 @@ export default function EventParticipantsPage() {
           parseAs: "blob",
         }
       );
-      if (error || !data) throw error ?? new Error("Empty response");
+      if (error || !data) {throw error ?? new Error("Empty response");}
       const blob = data as unknown as Blob;
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");

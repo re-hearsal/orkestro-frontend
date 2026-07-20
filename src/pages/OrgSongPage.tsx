@@ -47,11 +47,11 @@ function getErrorMessage(error: unknown): string {
 }
 
 function normalizeExternalUrl(value?: string | null): string | null {
-  if (!value) return null;
+  if (!value) {return null;}
   const trimmed = value.trim();
-  if (!trimmed) return null;
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
-  if (trimmed.startsWith("//")) return `https:${trimmed}`;
+  if (!trimmed) {return null;}
+  if (/^https?:\/\//i.test(trimmed)) {return trimmed;}
+  if (trimmed.startsWith("//")) {return `https:${trimmed}`;}
   return `https://${trimmed}`;
 }
 
@@ -105,14 +105,14 @@ export default function OrgSongPage() {
 
   // Sync current organization
   useEffect(() => {
-    if (!isValid) return;
-    if (currentOrganization?.id === organizationId) return;
+    if (!isValid) {return;}
+    if (currentOrganization?.id === organizationId) {return;}
     const matched = organizations.find((o) => o.id === organizationId);
-    if (matched) setCurrentOrganization(matched);
+    if (matched) {setCurrentOrganization(matched);}
   }, [currentOrganization?.id, isValid, organizationId, organizations, setCurrentOrganization]);
 
   const loadSong = useCallback(async (options?: { silent?: boolean }) => {
-    if (!user || !isValid) return;
+    if (!user || !isValid) {return;}
     const isSilent = options?.silent === true;
     if (!isSilent) {
       setLoading(true);
@@ -167,13 +167,13 @@ export default function OrgSongPage() {
   // ── Tag handlers ──────────────────────────────────────────────────────────
 
   const handleTagClick = (event: React.MouseEvent<HTMLElement>, tag: string) => {
-    if (!canManageTags) return;
+    if (!canManageTags) {return;}
     setTagMenuAnchor(event.currentTarget);
     setTagMenuTarget(tag);
   };
 
   const handleDeleteTag = async () => {
-    if (!song || !tagMenuTarget || !user) return;
+    if (!song || !tagMenuTarget || !user) {return;}
     setTagMenuAnchor(null);
     const updatedTags = (song.tags ?? []).filter((t) => t !== tagMenuTarget);
     setTagSaving(true);
@@ -186,7 +186,7 @@ export default function OrgSongPage() {
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       setSong(data as unknown as SongDTO);
       showAlert(String(t("repertoire.tagDeleted")), "success");
     } catch (err) {
@@ -201,7 +201,7 @@ export default function OrgSongPage() {
 
   const handleAddTag = async () => {
     const trimmed = newTagValue.trim().slice(0, 20);
-    if (!trimmed || !song || !user) return;
+    if (!trimmed || !song || !user) {return;}
     const currentTags = song.tags ?? [];
     if (currentTags.includes(trimmed) || currentTags.length >= MAX_TAGS) {
       setAddTagOpen(false);
@@ -218,7 +218,7 @@ export default function OrgSongPage() {
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       setSong(data as unknown as SongDTO);
       showAlert(String(t("repertoire.tagAdded")), "success");
     } catch (err) {
@@ -233,7 +233,7 @@ export default function OrgSongPage() {
   // ── Edit song dialog ──────────────────────────────────────────────────────
 
   const openEditDialog = () => {
-    if (!song) return;
+    if (!song) {return;}
     setEditTitle(song.title ?? "");
     setEditComposer(song.composer ?? "");
     setEditDuration(song.durationSeconds != null ? String(song.durationSeconds) : "");
@@ -248,7 +248,7 @@ export default function OrgSongPage() {
       setEditTitleError(String(t("repertoire.titleRequired")));
       return;
     }
-    if (!user) return;
+    if (!user) {return;}
     setEditSaving(true);
     try {
       const body: components["schemas"]["SongUpdateRequestDTO"] = {
@@ -275,7 +275,7 @@ export default function OrgSongPage() {
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       setSong(data as unknown as SongDTO);
       showAlert(String(t("repertoire.saveChanges")), "success");
       setEditOpen(false);
@@ -287,7 +287,7 @@ export default function OrgSongPage() {
   };
 
   const handleDeleteSong = async () => {
-    if (!user) return;
+    if (!user) {return;}
 
     setDeletingSong(true);
     try {
@@ -298,7 +298,7 @@ export default function OrgSongPage() {
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
 
       showAlert(String(t("repertoire.songDeleted")), "success");
       emitSongDeleted({ organizationId, songId });
@@ -321,7 +321,7 @@ export default function OrgSongPage() {
     );
   }
 
-  if (!song) return null;
+  if (!song) {return null;}
 
   const songVideoUrl = normalizeExternalUrl(song.videoUrl);
 
@@ -456,7 +456,7 @@ export default function OrgSongPage() {
                 value={newTagValue}
                 onChange={(e) => setNewTagValue(e.target.value.slice(0, 20))}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") void handleAddTag();
+                  if (e.key === "Enter") {void handleAddTag();}
                   if (e.key === "Escape") {
                     setAddTagOpen(false);
                     setNewTagValue("");
@@ -611,7 +611,7 @@ export default function OrgSongPage() {
               value={editTitle}
               onChange={(e) => {
                 setEditTitle(e.target.value.slice(0, 255));
-                if (e.target.value.trim()) setEditTitleError("");
+                if (e.target.value.trim()) {setEditTitleError("");}
               }}
               error={Boolean(editTitleError)}
               helperText={editTitleError || `${editTitle.length}/255`}

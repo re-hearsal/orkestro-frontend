@@ -148,32 +148,57 @@ function normalizeInstrumentName(name: string): string {
 export function resolveInstrumentTranslationKey(name: string): string | null {
   const normalized = normalizeInstrumentName(name);
   const direct = INSTRUMENT_NAME_ALIASES[normalized];
-  if (direct) return direct;
+  if (direct) {return direct;}
 
-  if (normalized.includes("саксофон") || normalized.includes("saxophone")) return "saxophone";
+  if (normalized.includes("саксофон") || normalized.includes("saxophone")) {return "saxophone";}
   if (normalized.includes("гитар") || normalized.includes("guitar")) {
-    if (normalized.includes("бас") || normalized.includes("bass")) return "bassGuitar";
-    if (normalized.includes("электр") || normalized.includes("electric")) return "electricGuitar";
+    if (normalized.includes("бас") || normalized.includes("bass")) {return "bassGuitar";}
+    if (normalized.includes("электр") || normalized.includes("electric")) {return "electricGuitar";}
     return "guitar";
   }
   if (normalized.includes("клавиш") || normalized.includes("keyboard") || normalized.includes("synth")) {
     return normalized.includes("synth") ? "synthesizer" : "keyboard";
   }
-  if (normalized.includes("фортеп") || normalized.includes("пиано") || normalized.includes("piano")) return "piano";
-  if (normalized.includes("барабан") || normalized.includes("drum") || normalized.includes("ударн")) return "drums";
-  if (normalized.includes("перкус") || normalized.includes("percussion")) return "percussion";
-  if (normalized.includes("бэк") || normalized.includes("backing")) return "backingVocal";
-  if (normalized.includes("вокал") || normalized.includes("vocal") || normalized.includes("voice")) return "vocal";
-  if (normalized.includes("хор") || normalized.includes("choir") || normalized.includes("chorus")) return "choir";
-  if (normalized.includes("валтор") || normalized.includes("french horn") || normalized.includes("horn")) return "frenchHorn";
-  if (normalized.includes("контрабас") || normalized.includes("double bass") || normalized.includes("contrabass")) return "doubleBass";
-  if (normalized.includes("виолонч") || normalized.includes("cello") || normalized.includes("violoncello")) return "cello";
+  if (normalized.includes("фортеп") || normalized.includes("пиано") || normalized.includes("piano")) {return "piano";}
+  if (normalized.includes("барабан") || normalized.includes("drum") || normalized.includes("ударн")) {return "drums";}
+  if (normalized.includes("перкус") || normalized.includes("percussion")) {return "percussion";}
+  if (normalized.includes("бэк") || normalized.includes("backing")) {return "backingVocal";}
+  if (normalized.includes("вокал") || normalized.includes("vocal") || normalized.includes("voice")) {return "vocal";}
+  if (normalized.includes("хор") || normalized.includes("choir") || normalized.includes("chorus")) {return "choir";}
+  if (normalized.includes("валтор") || normalized.includes("french horn") || normalized.includes("horn")) {return "frenchHorn";}
+  if (normalized.includes("контрабас") || normalized.includes("double bass") || normalized.includes("contrabass")) {return "doubleBass";}
+  if (normalized.includes("виолонч") || normalized.includes("cello") || normalized.includes("violoncello")) {return "cello";}
 
   return null;
 }
 
+/**
+ * Converts an English instrument name (from the API) to the camelCase i18n key
+ * used in `organizations.instrumentNames.*`.
+ * E.g. "Double bass" → "doubleBass", "French horn" → "frenchHorn"
+ */
+export function instrumentI18nKey(name: string): string {
+  const words = name.trim().split(/[\s-]+/);
+  return words
+    .map((w, i) => (i === 0 ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()))
+    .join("");
+}
+
 export function getInstrumentLabel(name: string, t: TFunction): string {
   const key = resolveInstrumentTranslationKey(name);
-  if (!key) return name;
+  if (!key) {return name;}
   return String(t(`organizations.instrumentNames.${key}`, { defaultValue: name }));
+}
+
+/**
+ * Sorts items alphabetically by their localized label, using collation rules
+ * for the given language (e.g. "ru" sorts Cyrillic labels correctly).
+ */
+export function sortByLocalizedLabel<T>(
+  items: T[],
+  getLabel: (item: T) => string,
+  lang: string
+): T[] {
+  const collator = new Intl.Collator(lang);
+  return [...items].sort((a, b) => collator.compare(getLabel(a), getLabel(b)));
 }

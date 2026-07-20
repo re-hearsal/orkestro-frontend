@@ -1,18 +1,10 @@
-import { createContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+import { useState, useEffect, useCallback, type ReactNode } from 'react';
 import client from '../api/client';
 import { useAuth } from '../hooks/useAuth';
 import type { components } from '../api/schema';
+import { OrganizationContext } from './OrganizationContext.context';
 
 export type OrganizationDTO = components['schemas']['OrganizationDTO'];
-
-interface OrganizationContextValue {
-  organizations: OrganizationDTO[];
-  currentOrganization: OrganizationDTO | null;
-  setCurrentOrganization: (org: OrganizationDTO | null) => void;
-  refreshOrganizations: () => void;
-}
-
-export const OrganizationContext = createContext<OrganizationContextValue | null>(null);
 
 const STORAGE_KEY = 'currentOrganizationId';
 
@@ -40,12 +32,12 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (user) {
-      fetchOrganizations(user.token);
-    } else {
+    if (!user) {return;}
+    void Promise.resolve().then(() => fetchOrganizations(user.token));
+    return () => {
       setOrganizations([]);
       setCurrentOrganizationState(null);
-    }
+    };
   }, [user, fetchOrganizations]);
 
   const setCurrentOrganization = useCallback((org: OrganizationDTO | null) => {

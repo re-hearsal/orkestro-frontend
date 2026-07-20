@@ -24,11 +24,11 @@ import {
   type DropResult,
 } from "@hello-pangea/dnd";
 import { useTranslation } from "react-i18next";
+import { instrumentI18nKey, sortByLocalizedLabel } from "../../utils/instrumentI18n";
 import client from "../../api/client";
 import type { components } from "../../api/schema";
 import { useAppAlert } from "../../hooks/useAppAlert";
 import { useAuth } from "../../hooks/useAuth";
-import { instrumentI18nKey } from "../profile/InstrumentPicker";
 
 type InstrumentDTO = { id?: number; name?: string };
 type SongDTO = components["schemas"]["SongDTO"];
@@ -56,16 +56,16 @@ function getErrorMessage(error: unknown): string {
 }
 
 function normalizeExternalUrl(value?: string | null): string | null {
-  if (!value) return null;
+  if (!value) {return null;}
   const trimmed = value.trim();
-  if (!trimmed) return null;
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
-  if (trimmed.startsWith("//")) return `https:${trimmed}`;
+  if (!trimmed) {return null;}
+  if (/^https?:\/\//i.test(trimmed)) {return trimmed;}
+  if (trimmed.startsWith("//")) {return `https:${trimmed}`;}
   return `https://${trimmed}`;
 }
 
 export default function CreateSongDialog({ open, onClose, organizationId, onCreated }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { showAlert } = useAppAlert();
   const theme = useTheme();
@@ -106,7 +106,7 @@ export default function CreateSongDialog({ open, onClose, organizationId, onCrea
 
   // Load instruments on step 2
   useEffect(() => {
-    if (step !== 2 || !user) return;
+    if (step !== 2 || !user) {return;}
     void (async () => {
       const { data } = await client.GET("/api/v1/instruments", {
         headers: { Authorization: `Bearer ${user.token}` },
@@ -196,12 +196,12 @@ export default function CreateSongDialog({ open, onClose, organizationId, onCrea
   };
 
   const handleNextStep = () => {
-    if (!validateStep1()) return;
+    if (!validateStep1()) {return;}
     setStep(2);
   };
 
   const handleAddInstrument = (instrument: InstrumentDTO | null) => {
-    if (!instrument?.id) return;
+    if (!instrument?.id) {return;}
     if (instrumentation.some((i) => i.instrumentId === instrument.id)) {
       setAutocompleteKey((k) => k + 1);
       return;
@@ -226,7 +226,7 @@ export default function CreateSongDialog({ open, onClose, organizationId, onCrea
   };
 
   const handleDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
+    if (!result.destination) {return;}
     const items = Array.from(instrumentation);
     const [removed] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, removed);
@@ -242,17 +242,17 @@ export default function CreateSongDialog({ open, onClose, organizationId, onCrea
       setInstrError(String(t("repertoire.instrumentCountMin")));
       return;
     }
-    if (!user) return;
+    if (!user) {return;}
 
     setSubmitting(true);
     try {
       const formData = new FormData();
       formData.append("title", title.trim());
-      if (composer.trim()) formData.append("composer", composer.trim());
-      if (durationSeconds) formData.append("durationSeconds", durationSeconds);
-      if (description.trim()) formData.append("description", description.trim());
+      if (composer.trim()) {formData.append("composer", composer.trim());}
+      if (durationSeconds) {formData.append("durationSeconds", durationSeconds);}
+      if (description.trim()) {formData.append("description", description.trim());}
       const normalizedVideoUrl = normalizeExternalUrl(videoUrl);
-      if (normalizedVideoUrl) formData.append("videoUrl", normalizedVideoUrl);
+      if (normalizedVideoUrl) {formData.append("videoUrl", normalizedVideoUrl);}
       tags.forEach((tag) => formData.append("tags", tag));
       instrumentation.forEach((item, index) => {
         formData.append(`instrumentation[${index}].instrumentId`, String(item.instrumentId));
@@ -271,7 +271,7 @@ export default function CreateSongDialog({ open, onClose, organizationId, onCrea
         }
       );
 
-      if (error) throw error;
+      if (error) {throw error;}
 
       const song = data as unknown as SongDTO;
       onCreated(song.id!);
@@ -289,8 +289,10 @@ export default function CreateSongDialog({ open, onClose, organizationId, onCrea
     return translated === `organizations.instrumentNames.${key}` ? apiName : translated;
   };
 
-  const availableInstruments = instruments.filter(
-    (inst) => !instrumentation.some((i) => i.instrumentId === inst.id)
+  const availableInstruments = sortByLocalizedLabel(
+    instruments.filter((inst) => !instrumentation.some((i) => i.instrumentId === inst.id)),
+    (inst) => localizedInstrumentName(inst.name ?? ""),
+    i18n.language
   );
 
   return (
@@ -309,7 +311,7 @@ export default function CreateSongDialog({ open, onClose, organizationId, onCrea
               value={title}
               onChange={(e) => {
                 setTitle(e.target.value.slice(0, 255));
-                if (e.target.value.trim()) setTitleError("");
+                if (e.target.value.trim()) {setTitleError("");}
               }}
               error={Boolean(titleError)}
               helperText={titleError || `${title.length}/255`}
@@ -322,7 +324,7 @@ export default function CreateSongDialog({ open, onClose, organizationId, onCrea
               value={composer}
               onChange={(e) => {
                 setComposer(e.target.value.slice(0, 255));
-                if (composerError && e.target.value.trim()) setComposerError("");
+                if (composerError && e.target.value.trim()) {setComposerError("");}
               }}
               error={Boolean(composerError)}
               helperText={composerError || `${composer.length}/255`}
@@ -336,7 +338,7 @@ export default function CreateSongDialog({ open, onClose, organizationId, onCrea
               value={durationSeconds}
               onChange={(e) => {
                 setDurationSeconds(e.target.value);
-                if (durationError) setDurationError("");
+                if (durationError) {setDurationError("");}
               }}
               error={Boolean(durationError)}
               helperText={durationError || undefined}
@@ -353,7 +355,7 @@ export default function CreateSongDialog({ open, onClose, organizationId, onCrea
               value={description}
               onChange={(e) => {
                 setDescription(e.target.value.slice(0, 3000));
-                if (descriptionError && e.target.value.trim()) setDescriptionError("");
+                if (descriptionError && e.target.value.trim()) {setDescriptionError("");}
               }}
               error={Boolean(descriptionError)}
               helperText={descriptionError || `${description.length}/3000`}
@@ -366,7 +368,7 @@ export default function CreateSongDialog({ open, onClose, organizationId, onCrea
               value={videoUrl}
               onChange={(e) => {
                 setVideoUrl(e.target.value.slice(0, 2048));
-                if (videoUrlError && e.target.value.trim()) setVideoUrlError("");
+                if (videoUrlError && e.target.value.trim()) {setVideoUrlError("");}
               }}
               error={Boolean(videoUrlError)}
               helperText={videoUrlError || undefined}

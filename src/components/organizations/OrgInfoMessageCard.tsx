@@ -9,18 +9,18 @@ import { navigateToUser } from "../../utils/navigateToUser";
 type OrgInfoMessageDTO = components["schemas"]["OrgInfoMessageDTO"];
 
 function formatDate(value?: string): string {
-  if (!value) return "-";
+  if (!value) {return "-";}
   const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return "-";
+  if (Number.isNaN(parsed.getTime())) {return "-";}
   const datePart = parsed.toLocaleDateString("ru-RU");
   const timePart = parsed.toLocaleString("ru-RU", { hour: "2-digit", minute: "2-digit" });
   return `${datePart} ${timePart}`;
 }
 
 function getInitials(name?: string): string {
-  if (!name) return "?";
+  if (!name) {return "?";}
   const parts = name.trim().split(/\s+/);
-  if (parts.length === 1) return parts[0][0]?.toUpperCase() ?? "?";
+  if (parts.length === 1) {return parts[0][0]?.toUpperCase() ?? "?";}
   return (parts[0][0] + parts[1][0]).toUpperCase();
 }
 
@@ -45,7 +45,6 @@ export default function OrgInfoMessageCard({ message }: Props) {
 
     if (!user || message.authorProfileImageFileId == null) {
       revoke();
-      setAvatarUrl(null);
       return;
     }
 
@@ -58,11 +57,11 @@ export default function OrgInfoMessageCard({ message }: Props) {
           headers: { Authorization: `Bearer ${user.token}` },
           parseAs: "blob",
         });
-        if (cancelled || !data) return;
+        if (cancelled || !data) {return;}
         revoke();
         const url = URL.createObjectURL(data as unknown as Blob);
         objectUrlRef.current = url;
-        if (!cancelled) setAvatarUrl(url);
+        if (!cancelled) {setAvatarUrl(url);}
       } catch {
         if (!cancelled) {
           revoke();
@@ -76,6 +75,7 @@ export default function OrgInfoMessageCard({ message }: Props) {
     return () => {
       cancelled = true;
       revoke();
+      setAvatarUrl(null);
     };
   }, [message.authorProfileImageFileId, user]);
 

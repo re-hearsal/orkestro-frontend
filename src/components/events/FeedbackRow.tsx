@@ -22,9 +22,9 @@ export interface EventFeedbackRowDTO {
 }
 
 function formatDate(value?: string): string {
-  if (!value) return "-";
+  if (!value) {return "-";}
   const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return "-";
+  if (Number.isNaN(parsed.getTime())) {return "-";}
   const datePart = parsed.toLocaleDateString("ru-RU");
   const timePart = parsed.toLocaleString("ru-RU", { hour: "2-digit", minute: "2-digit" });
   return `${datePart} ${timePart}`;
@@ -42,7 +42,7 @@ export default function FeedbackRow({ row, organizationId }: Props) {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!row.authorProfileImageFileId || !user) return;
+    if (!row.authorProfileImageFileId || !user) {return;}
     let cancelled = false;
     void (async () => {
       try {
@@ -51,7 +51,7 @@ export default function FeedbackRow({ row, organizationId }: Props) {
           headers: { Authorization: `Bearer ${user.token}` },
           parseAs: "blob",
         });
-        if (cancelled || !data) return;
+        if (cancelled || !data) {return;}
         const url = URL.createObjectURL(data as unknown as Blob);
         setAvatarUrl(url);
       } catch {
@@ -62,13 +62,13 @@ export default function FeedbackRow({ row, organizationId }: Props) {
   }, [row.authorProfileImageFileId, user]);
 
   const handleRowClick = () => {
-    if (!row.eventId) return;
+    if (!row.eventId) {return;}
     navigate(`/organizations/${organizationId}/events/${row.eventId}`);
   };
 
   const handleAuthorClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!row.authorUserId) return;
+    if (!row.authorUserId) {return;}
     navigate(`/users/${row.authorUserId}`);
   };
 

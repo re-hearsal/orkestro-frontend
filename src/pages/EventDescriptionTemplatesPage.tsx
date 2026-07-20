@@ -16,7 +16,7 @@ import { useAppAlert } from "../hooks/useAppAlert";
 import { useAuth } from "../hooks/useAuth";
 import { useOrgMemberContext } from "../hooks/useOrgMemberContext";
 import EventDescriptionTemplateDialog from "../components/events/EventDescriptionTemplateDialog";
-import { useMobileAction } from "../context/MobileActionContext";
+import { useMobileAction } from "../hooks/useMobileAction";
 
 type EventDescriptionTemplateDTO = components["schemas"]["EventDescriptionTemplateDTO"];
 type EventType = "REHEARSAL" | "CONCERT" | "OTHER";
@@ -24,9 +24,9 @@ type EventType = "REHEARSAL" | "CONCERT" | "OTHER";
 const EVENT_TYPES: EventType[] = ["REHEARSAL", "CONCERT", "OTHER"];
 
 function formatDate(value?: string): string {
-  if (!value) return "-";
+  if (!value) {return "-";}
   const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return "-";
+  if (Number.isNaN(parsed.getTime())) {return "-";}
   const datePart = parsed.toLocaleDateString("ru-RU");
   const timePart = parsed.toLocaleString("ru-RU", { hour: "2-digit", minute: "2-digit" });
   return `${datePart} ${timePart}`;
@@ -59,7 +59,7 @@ export default function EventDescriptionTemplatesPage() {
   const activeEventType = EVENT_TYPES[activeTab];
 
   const loadTemplates = useCallback(async () => {
-    if (!user || !isValid) return;
+    if (!user || !isValid) {return;}
     setLoading(true);
     try {
       const { data, error } = await client.GET(
@@ -69,7 +69,7 @@ export default function EventDescriptionTemplatesPage() {
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       const list = (data as unknown as EventDescriptionTemplateDTO[]) ?? [];
       const byType: Record<EventType, EventDescriptionTemplateDTO | undefined> = {
         REHEARSAL: undefined,
@@ -77,7 +77,7 @@ export default function EventDescriptionTemplatesPage() {
         OTHER: undefined,
       };
       for (const tpl of list) {
-        if (tpl.eventType) byType[tpl.eventType] = tpl;
+        if (tpl.eventType) {byType[tpl.eventType] = tpl;}
       }
       setTemplates(byType);
     } catch {
@@ -92,12 +92,12 @@ export default function EventDescriptionTemplatesPage() {
   }, [loadTemplates]);
 
   const handleSaved = useCallback((saved: EventDescriptionTemplateDTO) => {
-    if (!saved.eventType) return;
+    if (!saved.eventType) {return;}
     setTemplates((prev) => ({ ...prev, [saved.eventType!]: saved }));
   }, []);
 
   const handleDelete = useCallback(async (tpl: EventDescriptionTemplateDTO) => {
-    if (!user || tpl.id == null || !tpl.eventType) return;
+    if (!user || tpl.id == null || !tpl.eventType) {return;}
     setDeletingType(tpl.eventType as EventType);
     try {
       const deleteFn = client.DELETE as unknown as (
@@ -115,7 +115,7 @@ export default function EventDescriptionTemplatesPage() {
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       setTemplates((prev) => ({ ...prev, [tpl.eventType!]: undefined }));
       showAlert(t("events.templates.deleteSuccess"), "success");
     } catch (err) {

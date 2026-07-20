@@ -117,7 +117,7 @@ export default function EditOrgDialog({
   };
 
   const handleSave = async () => {
-    if (!user || !validate()) return;
+    if (!user || !validate()) {return;}
     setSaving(true);
     try {
       const body: Record<string, unknown> = {};
@@ -150,7 +150,7 @@ export default function EditOrgDialog({
         }
       );
 
-      if (error) throw error;
+      if (error) {throw error;}
 
       showAlert(String(t("organizations.editForm.success")), "success");
       onSaved((data as unknown as OrganizationDTO) ?? { ...organization, ...body });

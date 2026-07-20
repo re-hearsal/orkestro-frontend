@@ -15,23 +15,12 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from "react-i18next";
 import client from "../../api/client";
 import { useAuth } from "../../hooks/useAuth";
+import { instrumentI18nKey, sortByLocalizedLabel } from "../../utils/instrumentI18n";
 
 export type InstrumentDTO = {
   id: number;
   name: string;
 };
-
-/**
- * Converts an English instrument name (from the API) to the camelCase i18n key
- * used in `organizations.instrumentNames.*`.
- * E.g. "Double bass" → "doubleBass", "French horn" → "frenchHorn"
- */
-export function instrumentI18nKey(name: string): string {
-  const words = name.trim().split(/[\s-]+/);
-  return words
-    .map((w, i) => (i === 0 ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()))
-    .join("");
-}
 
 function instrumentSlug(name: string): string {
   return name.toLowerCase().replace(/ /g, "-");
@@ -45,7 +34,7 @@ interface Props {
 }
 
 export default function InstrumentPicker({ open, onClose, myInstrumentIds, onAdd }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -56,7 +45,7 @@ export default function InstrumentPicker({ open, onClose, myInstrumentIds, onAdd
   const [adding, setAdding] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {return;}
     setLoading(true);
     client
       .GET("/api/v1/instruments", {
@@ -64,7 +53,7 @@ export default function InstrumentPicker({ open, onClose, myInstrumentIds, onAdd
         parseAs: "json",
       })
       .then(({ data }) => {
-        if (data) setAllInstruments(data as unknown as InstrumentDTO[]);
+        if (data) {setAllInstruments(data as unknown as InstrumentDTO[]);}
       })
       .finally(() => setLoading(false));
   }, [open, user]);
@@ -76,14 +65,18 @@ export default function InstrumentPicker({ open, onClose, myInstrumentIds, onAdd
     return translated === `organizations.instrumentNames.${key}` ? name : translated;
   };
 
-  const available = allInstruments.filter(
-    (i) =>
-      !myInstrumentIds.includes(i.id) &&
-      localizedName(i.name).toLowerCase().includes(search.toLowerCase())
+  const available = sortByLocalizedLabel(
+    allInstruments.filter(
+      (i) =>
+        !myInstrumentIds.includes(i.id) &&
+        localizedName(i.name).toLowerCase().includes(search.toLowerCase())
+    ),
+    (i) => localizedName(i.name),
+    i18n.language
   );
 
   const handleAdd = async (instrument: InstrumentDTO) => {
-    if (!user) return;
+    if (!user) {return;}
     setAdding(instrument.id);
     try {
       await client.POST("/api/v1/users/me/musical-roles/{instrumentId}", {

@@ -14,7 +14,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { useAppAlert } from "../../hooks/useAppAlert";
 import { withFlatPagination } from "../../utils/pagination";
 import { getLocalizedRoleName } from "../../utils/roleNameI18n";
-import { getInstrumentLabel as getInstrumentLabelUtil } from "../../utils/instrumentI18n";
+import { getInstrumentLabel as getInstrumentLabelUtil, sortByLocalizedLabel } from "../../utils/instrumentI18n";
 import { MEMBER_ROLE_UPDATED_EVENT } from "../../utils/memberRoleEvents";
 import { ORG_ROLES_UPDATED_EVENT } from "../../utils/orgRolesEvents";
 import OrgMemberCard, { type OrgMemberCardData } from "./OrgMemberCard";
@@ -234,7 +234,7 @@ function normalizeInstrumentOptions(raw: unknown): InstrumentOption[] {
 }
 
 export default function OrgMembersList({ organizationId, permissions }: OrgMembersListProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, profile } = useAuth();
   const { showAlert } = useAppAlert();
 
@@ -495,7 +495,7 @@ export default function OrgMembersList({ organizationId, permissions }: OrgMembe
                 flex: 1,
               }}
             >
-              {instruments.map((instrument) => (
+              {sortByLocalizedLabel(instruments, (i) => getInstrumentLabelUtil(i.name, t), i18n.language).map((instrument) => (
                 <Chip
                   key={instrument.id}
                   label={getInstrumentLabelUtil(instrument.name, t)}

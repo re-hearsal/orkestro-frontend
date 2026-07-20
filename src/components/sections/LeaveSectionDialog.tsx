@@ -16,7 +16,7 @@ export default function LeaveSectionDialog({ open, onClose, onConfirm, loading =
   return (
     <Dialog
       open={open}
-      onClose={() => { if (!loading) onClose(); }}
+      onClose={() => { if (!loading) {onClose();} }}
       maxWidth="xs"
       fullWidth
       fullScreen={fullScreen}

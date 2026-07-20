@@ -44,7 +44,7 @@ export default function ChangePasswordDialog({ open, onClose, username }: Change
   const isValid = newPassword.length >= 8 && newPassword === confirmPassword;
 
   const handleClose = () => {
-    if (saving) return;
+    if (saving) {return;}
     setNewPassword("");
     setConfirmPassword("");
     setShowNew(false);
@@ -53,14 +53,14 @@ export default function ChangePasswordDialog({ open, onClose, username }: Change
   };
 
   const handleSave = async () => {
-    if (!user || !isValid) return;
+    if (!user || !isValid) {return;}
     setSaving(true);
     try {
       const { error } = await client.POST("/api/v1/auth/password/reset", {
         headers: { Authorization: `Bearer ${user.token}` },
         body: { username, newPassword },
       });
-      if (error) throw error;
+      if (error) {throw error;}
       showAlert(t("profile.security.passwordChanged"), "success");
       handleClose();
     } catch {

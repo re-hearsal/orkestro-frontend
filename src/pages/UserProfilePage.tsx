@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Box, Button, CircularProgress, IconButton, Popover, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import TelegramIcon from "@mui/icons-material/Telegram";
@@ -9,7 +9,8 @@ import UserAvatar from "../components/profile/UserAvatar";
 import EditProfileDialog from "../components/profile/EditProfileDialog";
 import ChangePasswordDialog from "../components/profile/ChangePasswordDialog";
 import DeleteAccountDialog from "../components/profile/DeleteAccountDialog";
-import InstrumentPicker, { type InstrumentDTO, InstrumentIcon, instrumentI18nKey } from "../components/profile/InstrumentPicker";
+import InstrumentPicker, { type InstrumentDTO, InstrumentIcon } from "../components/profile/InstrumentPicker";
+import { instrumentI18nKey, sortByLocalizedLabel } from "../utils/instrumentI18n";
 import { useAuth } from "../hooks/useAuth";
 import { useAppAlert } from "../hooks/useAppAlert";
 
@@ -23,7 +24,7 @@ function instrumentSlug(name: string): string {
 function formatBirthDate(dateStr: string, lang: string): string {
   // dateStr is YYYY-MM-DD
   const [year, month, day] = dateStr.split("-");
-  if (!year || !month || !day) return dateStr;
+  if (!year || !month || !day) {return dateStr;}
   return lang === "ru" ? `${day}.${month}.${year}` : `${month}/${day}/${year}`;
 }
 
@@ -50,26 +51,32 @@ export default function UserProfilePage() {
   const [unlinkingTelegram, setUnlinkingTelegram] = useState(false);
   const prevTelegramUserIdRef = useRef<number | undefined>(undefined);
 
-  const fetchFullProfile = async () => {
-    if (!user) return;
+  const fetchFullProfile = useCallback(async () => {
+    if (!user) {return;}
     const { data } = await client.GET("/api/v1/users/me", {
       headers: { Authorization: `Bearer ${user.token}` },
     });
-    if (data) setFullProfile(data as CurrentUserResponseDTO);
+    if (data) {setFullProfile(data as CurrentUserResponseDTO);}
+  }, [user]);
+
+  const localizedInstrumentName = (apiName: string): string => {
+    const i18nKey = instrumentI18nKey(apiName);
+    const translated = t(`organizations.instrumentNames.${i18nKey}`);
+    return translated === `organizations.instrumentNames.${i18nKey}` ? apiName : translated;
   };
 
-  const fetchMyInstruments = async () => {
-    if (!user) return;
+  const fetchMyInstruments = useCallback(async () => {
+    if (!user) {return;}
     const { data } = await client.GET("/api/v1/users/me/musical-roles", {
       headers: { Authorization: `Bearer ${user.token}` },
     });
-    if (data) setMyInstruments(Array.isArray(data) ? data : [data as MusicalRoleDTO]);
-  };
+    if (data) {setMyInstruments(Array.isArray(data) ? data : [data as MusicalRoleDTO]);}
+  }, [user]);
 
   useEffect(() => {
     setLoading(true);
     Promise.all([fetchFullProfile(), fetchMyInstruments()]).finally(() => setLoading(false));
-  }, [user]);
+  }, [fetchFullProfile, fetchMyInstruments]);
 
   // Detect Telegram linking via WS update in AuthContext.profile
   useEffect(() => {
@@ -85,7 +92,7 @@ export default function UserProfilePage() {
       void fetchFullProfile();
     }
     prevTelegramUserIdRef.current = current;
-  }, [profile?.telegramUserId]);
+  }, [profile?.telegramUserId, fetchFullProfile, showAlert, t]);
 
   const handleAvatarUpdated = async (fileId: number | null) => {
     setFullProfile((prev) => prev ? { ...prev, profileImageFileId: fileId ?? undefined } : prev);
@@ -104,7 +111,7 @@ export default function UserProfilePage() {
   };
 
   const handleRemoveInstrument = async (instrumentId: number) => {
-    if (!user) return;
+    if (!user) {return;}
     setRemoving(instrumentId);
     setRemoveAnchor(null);
     try {
@@ -114,14 +121,14 @@ export default function UserProfilePage() {
       });
       setMyInstruments((prev) => prev.filter((i) => i.instrumentId !== instrumentId));
     } catch {
-      showAlert(t("profile.removeInstrument") + " error", "error");
+      showAlert(`${t("profile.removeInstrument")  } error`, "error");
     } finally {
       setRemoving(null);
     }
   };
 
   const handleLinkTelegram = async () => {
-    if (!user) return;
+    if (!user) {return;}
     setLinkingTelegram(true);
     try {
       const { data } = await client.POST("/api/v1/users/me/telegram/link-token", {
@@ -131,14 +138,14 @@ export default function UserProfilePage() {
         setTelegramToken(data.token);
       }
     } catch {
-      showAlert(t("profile.telegram.link") + " error", "error");
+      showAlert(`${t("profile.telegram.link")  } error`, "error");
     } finally {
       setLinkingTelegram(false);
     }
   };
 
   const handleUnlinkTelegram = async () => {
-    if (!user) return;
+    if (!user) {return;}
     setUnlinkingTelegram(true);
     try {
       await client.DELETE("/api/v1/users/me/telegram/link", {
@@ -148,14 +155,14 @@ export default function UserProfilePage() {
       await refreshProfile();
       showAlert(t("profile.telegram.unlinked"), "success");
     } catch {
-      showAlert(t("profile.telegram.unlink") + " error", "error");
+      showAlert(`${t("profile.telegram.unlink")  } error`, "error");
     } finally {
       setUnlinkingTelegram(false);
     }
   };
 
   const handleCopyTelegramLink = async () => {
-    if (!telegramToken) return;
+    if (!telegramToken) {return;}
     const link = `https://t.me/orkestro_helper_bot?start=${telegramToken}`;
     try {
       await navigator.clipboard.writeText(link);
@@ -302,12 +309,10 @@ export default function UserProfilePage() {
         </Typography>
 
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, alignItems: "flex-start" }}>
-          {myInstruments.map((role) => {
+          {sortByLocalizedLabel(myInstruments, (role) => localizedInstrumentName(role.instrumentName ?? ""), i18n.language).map((role) => {
             const id = role.instrumentId!;
             const apiName = role.instrumentName ?? "";
-            const i18nKey = instrumentI18nKey(apiName);
-            const translated = t(`organizations.instrumentNames.${i18nKey}`);
-            const name = translated === `organizations.instrumentNames.${i18nKey}` ? apiName : translated;
+            const name = localizedInstrumentName(apiName);
             const slug = instrumentSlug(apiName);
             const isRemoving = removing === id;
             return (

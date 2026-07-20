@@ -38,15 +38,15 @@ export default function OrgClosedTasksPage() {
 
   // Sync current organization
   useEffect(() => {
-    if (!isValidOrganizationId) return;
-    if (currentOrganization?.id === organizationId) return;
+    if (!isValidOrganizationId) {return;}
+    if (currentOrganization?.id === organizationId) {return;}
     const matched = organizations.find((o) => o.id === organizationId);
-    if (matched) setCurrentOrganization(matched);
+    if (matched) {setCurrentOrganization(matched);}
   }, [currentOrganization?.id, isValidOrganizationId, organizationId, organizations, setCurrentOrganization]);
 
   const loadPage = useCallback(
     async (pageNum: number, replace: boolean) => {
-      if (!user || !isValidOrganizationId) return;
+      if (!user || !isValidOrganizationId) {return;}
       setLoading(true);
       try {
         const { data, error } = await client.GET(
@@ -60,7 +60,7 @@ export default function OrgClosedTasksPage() {
             headers: { Authorization: `Bearer ${user.token}` },
           }
         );
-        if (error) throw error;
+        if (error) {throw error;}
         const payload = (data as unknown as PagedTasksResponse) ?? {};
         const content = payload.content ?? [];
         setAllTasks((prev) => (replace ? content : [...prev, ...content]));
@@ -81,7 +81,7 @@ export default function OrgClosedTasksPage() {
 
   // Silent reload for WS events — fetches in background without showing spinner
   const silentReload = useCallback(async () => {
-    if (!user || !isValidOrganizationId) return;
+    if (!user || !isValidOrganizationId) {return;}
     const seq = ++silentReloadSeqRef.current;
     try {
       const { data, error } = await client.GET(
@@ -95,8 +95,8 @@ export default function OrgClosedTasksPage() {
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (seq !== silentReloadSeqRef.current) return;
-      if (error) throw error;
+      if (seq !== silentReloadSeqRef.current) {return;}
+      if (error) {throw error;}
       const payload = (data as unknown as PagedTasksResponse) ?? {};
       setAllTasks(payload.content ?? []);
       setPage(0);
@@ -107,8 +107,8 @@ export default function OrgClosedTasksPage() {
   }, [isValidOrganizationId, organizationId, user]);
 
   useEffect(() => {
-    const off1 = onTaskUpdated((d) => { if (d.organizationId === organizationId) void silentReload(); });
-    const off2 = onTaskDeleted((d) => { if (d.organizationId === organizationId) void silentReload(); });
+    const off1 = onTaskUpdated((d) => { if (d.organizationId === organizationId) {void silentReload();} });
+    const off2 = onTaskDeleted((d) => { if (d.organizationId === organizationId) {void silentReload();} });
     return () => { off1(); off2(); };
   }, [organizationId, silentReload]);
 

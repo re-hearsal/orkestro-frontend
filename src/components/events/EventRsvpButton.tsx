@@ -17,21 +17,21 @@ interface Props {
 }
 
 function getStatusColor(status?: RsvpStatus): string {
-  if (status === "ACCEPTED") return "#2e7d32";
-  if (status === "DECLINED") return "#d32f2f";
+  if (status === "ACCEPTED") {return "#2e7d32";}
+  if (status === "DECLINED") {return "#d32f2f";}
   return "#9e9e9e";
 }
 
 function StatusIcon({ status, compact }: { status?: RsvpStatus; compact: boolean }) {
   const sz = compact ? 20 : 28;
-  if (status === "ACCEPTED") return <CheckCircleOutlineIcon sx={{ fontSize: sz }} />;
-  if (status === "DECLINED") return <CancelOutlinedIcon sx={{ fontSize: sz }} />;
+  if (status === "ACCEPTED") {return <CheckCircleOutlineIcon sx={{ fontSize: sz }} />;}
+  if (status === "DECLINED") {return <CancelOutlinedIcon sx={{ fontSize: sz }} />;}
   return <HelpOutlineIcon sx={{ fontSize: sz }} />;
 }
 
 function getStatusLabel(status: RsvpStatus | undefined, t: (k: string) => string): string {
-  if (status === "ACCEPTED") return t("events.rsvpAccepted");
-  if (status === "DECLINED") return t("events.rsvpDeclined");
+  if (status === "ACCEPTED") {return t("events.rsvpAccepted");}
+  if (status === "DECLINED") {return t("events.rsvpDeclined");}
   return t("events.rsvpPending");
 }
 
@@ -47,7 +47,7 @@ export default function EventRsvpButton({ organizationId, eventId, initialStatus
 
   const handleSelect = async (newStatus: RsvpStatus) => {
     setAnchor(null);
-    if (!user) return;
+    if (!user) {return;}
     setSaving(true);
     try {
       const { error } = await client.PUT(
@@ -58,7 +58,7 @@ export default function EventRsvpButton({ organizationId, eventId, initialStatus
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       setStatus(newStatus);
       showAlert(String(t("events.rsvpUpdated")), "success");
     } catch {

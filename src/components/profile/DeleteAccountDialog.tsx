@@ -33,18 +33,18 @@ export default function DeleteAccountDialog({ open, onClose }: DeleteAccountDial
   const [deleting, setDeleting] = useState(false);
 
   const handleClose = () => {
-    if (deleting) return;
+    if (deleting) {return;}
     onClose();
   };
 
   const handleDelete = async () => {
-    if (!user) return;
+    if (!user) {return;}
     setDeleting(true);
     try {
       const { error } = await client.DELETE("/api/v1/auth/account", {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      if (error) throw error;
+      if (error) {throw error;}
       logout();
     } catch {
       showAlert(t("profile.security.deleteAccountError"), "error");

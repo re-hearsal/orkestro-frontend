@@ -43,31 +43,31 @@ interface Props {
 }
 
 function getErrorMessage(error: unknown): string {
-  if (error && typeof error === "object" && "message" in error) return String((error as { message: unknown }).message);
+  if (error && typeof error === "object" && "message" in error) {return String((error as { message: unknown }).message);}
   return String(error);
 }
 
 function getUploadErrorMessage(error: unknown, t: (k: string) => string): string {
   const msg = getErrorMessage(error).toLowerCase();
-  if (msg.includes("too large") || msg.includes("413")) return t("repertoire.fileTooLarge");
-  if (msg.includes("unsupported media type")) return t("repertoire.fileTypeNotSupportedByServer");
+  if (msg.includes("too large") || msg.includes("413")) {return t("repertoire.fileTooLarge");}
+  if (msg.includes("unsupported media type")) {return t("repertoire.fileTypeNotSupportedByServer");}
   return t("repertoire.fileUploadFailed");
 }
 
 function formatFileSize(size: number | undefined): string {
-  if (typeof size !== "number" || Number.isNaN(size) || size < 0) return "-";
-  if (size >= 1024 * 1024) return `${(size / (1024 * 1024)).toFixed(2)} MB`;
+  if (typeof size !== "number" || Number.isNaN(size) || size < 0) {return "-";}
+  if (size >= 1024 * 1024) {return `${(size / (1024 * 1024)).toFixed(2)} MB`;}
   return `${Math.max(size / 1024, 0.1).toFixed(1)} KB`;
 }
 
 function truncateFileName(name: string, max = 26): string {
-  if (name.length <= max) return name;
+  if (name.length <= max) {return name;}
   const dot = name.lastIndexOf(".");
-  if (dot <= 0 || dot >= name.length - 1) return `${name.slice(0, max - 1)}…`;
+  if (dot <= 0 || dot >= name.length - 1) {return `${name.slice(0, max - 1)}…`;}
   const ext = name.slice(dot);
   const base = name.slice(0, dot);
   const avail = max - ext.length - 1;
-  if (avail < 4) return `${name.slice(0, max - 1)}…`;
+  if (avail < 4) {return `${name.slice(0, max - 1)}…`;}
   return `${base.slice(0, avail)}…${ext}`;
 }
 
@@ -104,23 +104,23 @@ export default function EventFileSection({ organizationId, eventId, fileIds, can
   const files = useMemo<FileItem[]>(() => fileIds.map((id) => ({ id })), [fileIds]);
 
   const resolveFileType = (meta?: FileMetadataDTO): FileType => {
-    if (!meta?.fileType) return "UNKNOWN";
+    if (!meta?.fileType) {return "UNKNOWN";}
     return meta.fileType as FileType;
   };
 
   const getFileTypeLabel = (ft: FileType): string => {
-    if (ft === "PDF") return t("repertoire.fileTypePdf");
-    if (ft === "PHOTO") return t("repertoire.fileTypePhoto");
-    if (ft === "AUDIO") return t("repertoire.fileTypeAudio");
-    if (ft === "VIDEO") return t("repertoire.fileTypeVideo");
-    if (ft === "OTHER") return t("repertoire.fileTypeOther");
+    if (ft === "PDF") {return t("repertoire.fileTypePdf");}
+    if (ft === "PHOTO") {return t("repertoire.fileTypePhoto");}
+    if (ft === "AUDIO") {return t("repertoire.fileTypeAudio");}
+    if (ft === "VIDEO") {return t("repertoire.fileTypeVideo");}
+    if (ft === "OTHER") {return t("repertoire.fileTypeOther");}
     return t("repertoire.fileTypeUnknown");
   };
 
   useEffect(() => {
-    if (!user || files.length === 0) return;
+    if (!user || files.length === 0) {return;}
     const toLoad = files.map((f) => f.id).filter((id) => metadataById[id] == null);
-    if (toLoad.length === 0) return;
+    if (toLoad.length === 0) {return;}
     let cancelled = false;
     void (async () => {
       const entries = await Promise.all(
@@ -130,15 +130,15 @@ export default function EventFileSection({ organizationId, eventId, fileIds, can
               params: { path: { fileId } },
               headers: { Authorization: `Bearer ${user.token}` },
             });
-            if (error || !data) return null;
+            if (error || !data) {return null;}
             return [fileId, data as FileMetadataDTO] as const;
           } catch { return null; }
         })
       );
-      if (cancelled) return;
+      if (cancelled) {return;}
       const next: Record<number, FileMetadataDTO> = {};
-      entries.forEach((e) => { if (e) next[e[0]] = e[1]; });
-      if (Object.keys(next).length > 0) setMetadataById((prev) => ({ ...prev, ...next }));
+      entries.forEach((e) => { if (e) {next[e[0]] = e[1];} });
+      if (Object.keys(next).length > 0) {setMetadataById((prev) => ({ ...prev, ...next }));}
     })();
     return () => { cancelled = true; };
   }, [files, metadataById, user]);
@@ -147,7 +147,7 @@ export default function EventFileSection({ organizationId, eventId, fileIds, can
   const closeMenu = () => { setMenuAnchor(null); setMenuTarget(null); };
 
   const handleShowInfo = async () => {
-    if (!menuTarget || !user) return;
+    if (!menuTarget || !user) {return;}
     const target = menuTarget;
     closeMenu();
     setInfoOpen(true);
@@ -157,10 +157,10 @@ export default function EventFileSection({ organizationId, eventId, fileIds, can
         params: { path: { fileId: target.id } },
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      if (error) throw error;
+      if (error) {throw error;}
       const meta = (data as FileMetadataDTO) ?? null;
       setInfoMetadata(meta);
-      if (meta?.id != null) setMetadataById((prev) => ({ ...prev, [meta.id!]: meta }));
+      if (meta?.id != null) {setMetadataById((prev) => ({ ...prev, [meta.id!]: meta }));}
     } catch (err) {
       setInfoMetadata(null);
       showAlert(getErrorMessage(err), "error");
@@ -170,7 +170,7 @@ export default function EventFileSection({ organizationId, eventId, fileIds, can
   };
 
   const handleDownload = async () => {
-    if (!menuTarget || !user) return;
+    if (!menuTarget || !user) {return;}
     const target = menuTarget;
     closeMenu();
     try {
@@ -179,7 +179,7 @@ export default function EventFileSection({ organizationId, eventId, fileIds, can
         headers: { Authorization: `Bearer ${user.token}` },
         parseAs: "blob",
       });
-      if (error || !data) throw error ?? new Error("Empty response");
+      if (error || !data) {throw error ?? new Error("Empty response");}
       const blob = data as unknown as Blob;
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -195,14 +195,14 @@ export default function EventFileSection({ organizationId, eventId, fileIds, can
   };
 
   const handleRequestDelete = () => {
-    if (!menuTarget) return;
+    if (!menuTarget) {return;}
     setDeleteTarget(menuTarget);
     setDeleteOpen(true);
     closeMenu();
   };
 
   const handleDelete = async () => {
-    if (!deleteTarget || !user) return;
+    if (!deleteTarget || !user) {return;}
     setDeleting(true);
     try {
       const { error } = await client.DELETE(
@@ -212,7 +212,7 @@ export default function EventFileSection({ organizationId, eventId, fileIds, can
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       showAlert(String(t("repertoire.fileDeleted")), "success");
       setDeleteOpen(false);
       setDeleteTarget(null);
@@ -225,7 +225,7 @@ export default function EventFileSection({ organizationId, eventId, fileIds, can
   };
 
   const uploadFile = async (file: File) => {
-    if (!user) return;
+    if (!user) {return;}
     if (fileIds.length >= 100) { showAlert(String(t("events.filesMaxReached")), "error"); return; }
     setUploading(true);
     try {
@@ -240,7 +240,7 @@ export default function EventFileSection({ organizationId, eventId, fileIds, can
           bodySerializer: (body: FormData) => body,
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       showAlert(String(t("repertoire.fileUploaded")), "success");
       onUpdated();
     } catch (err) {
@@ -253,18 +253,18 @@ export default function EventFileSection({ organizationId, eventId, fileIds, can
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     e.target.value = "";
-    if (!f) return;
+    if (!f) {return;}
     void uploadFile(f);
   };
 
-  const handleDragOver = (e: DragEvent<HTMLElement>) => { if (!canManage) return; e.preventDefault(); setDragActive(true); };
-  const handleDragLeave = () => { if (!canManage) return; setDragActive(false); };
+  const handleDragOver = (e: DragEvent<HTMLElement>) => { if (!canManage) {return;} e.preventDefault(); setDragActive(true); };
+  const handleDragLeave = () => { if (!canManage) {return;} setDragActive(false); };
   const handleDrop = (e: DragEvent<HTMLElement>) => {
-    if (!canManage) return;
+    if (!canManage) {return;}
     e.preventDefault();
     setDragActive(false);
     const f = e.dataTransfer.files?.[0];
-    if (!f) return;
+    if (!f) {return;}
     void uploadFile(f);
   };
 

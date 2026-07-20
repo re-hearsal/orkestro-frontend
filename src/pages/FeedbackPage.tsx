@@ -55,10 +55,10 @@ export default function FeedbackPage() {
 
   // Sync current organization
   useEffect(() => {
-    if (!isValid) return;
-    if (currentOrganization?.id === organizationId) return;
+    if (!isValid) {return;}
+    if (currentOrganization?.id === organizationId) {return;}
     const matched = organizations.find((o) => o.id === organizationId);
-    if (matched) setCurrentOrganization(matched);
+    if (matched) {setCurrentOrganization(matched);}
   }, [currentOrganization?.id, isValid, organizationId, organizations, setCurrentOrganization]);
 
   // Filter state
@@ -92,7 +92,7 @@ export default function FeedbackPage() {
 
   // Load available tags
   useEffect(() => {
-    if (!user || !isValid) return;
+    if (!user || !isValid) {return;}
     void (async () => {
       try {
         const { data } = await client.GET(
@@ -102,7 +102,7 @@ export default function FeedbackPage() {
             headers: { Authorization: `Bearer ${user.token}` },
           }
         );
-        if (data) setAvailableTags(data as string[]);
+        if (data) {setAvailableTags(data as string[]);}
       } catch {
         // ignore
       }
@@ -110,16 +110,16 @@ export default function FeedbackPage() {
   }, [isValid, organizationId, user]);
 
   const loadFeedback = useCallback(async () => {
-    if (!user || !isValid) return;
+    if (!user || !isValid) {return;}
     setLoading(true);
     try {
       const query: Record<string, unknown> = {};
-      if (title.trim()) query.title = title.trim();
-      if (eventType !== "all") query.eventType = eventType;
-      if (dateFrom?.isValid()) query.from = dateFrom.startOf("day").toISOString();
-      if (dateTo?.isValid()) query.to = dateTo.endOf("day").toISOString();
-      if (tags.length > 0) query.tags = tags;
-      if (sortField) query.sortField = sortField;
+      if (title.trim()) {query.title = title.trim();}
+      if (eventType !== "all") {query.eventType = eventType;}
+      if (dateFrom?.isValid()) {query.from = dateFrom.startOf("day").toISOString();}
+      if (dateTo?.isValid()) {query.to = dateTo.endOf("day").toISOString();}
+      if (tags.length > 0) {query.tags = tags;}
+      if (sortField) {query.sortField = sortField;}
 
       const params = withFlatPagination(query, { page, size: PAGE_SIZE });
 

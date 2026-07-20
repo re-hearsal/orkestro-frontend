@@ -54,14 +54,14 @@ export default function LoginForm({ onBack }: Props) {
       }
     }
 
-    if (!password) errors.password = t('auth.errors.passwordRequired');
-    else if (password.length < 8) errors.password = t('auth.errors.passwordMinLength');
+    if (!password) {errors.password = t('auth.errors.passwordRequired');}
+    else if (password.length < 8) {errors.password = t('auth.errors.passwordMinLength');}
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async () => {
-    if (!validate()) return;
+    if (!validate()) {return;}
     setLoading(true);
     try {
       const { data, error: apiError } = await client.POST('/api/v1/auth/login', {

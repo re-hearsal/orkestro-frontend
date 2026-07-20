@@ -73,11 +73,11 @@ export default function TaskAssigneesSection({
 
   // Load avatars for assignees that have a profileImageFileId
   useEffect(() => {
-    if (!user) return;
+    if (!user) {return;}
     const toLoad = assignees.filter(
       (a) => a.userId != null && a.profileImageFileId != null && !avatarUrls[a.userId!]
     );
-    if (toLoad.length === 0) return;
+    if (toLoad.length === 0) {return;}
 
     void (async () => {
       const entries = await Promise.all(
@@ -86,7 +86,7 @@ export default function TaskAssigneesSection({
             const res = await fetch(`${BASE_URL}/api/v1/files/${a.profileImageFileId}`, {
               headers: { Authorization: `Bearer ${user.token}` },
             });
-            if (!res.ok) return null;
+            if (!res.ok) {return null;}
             const blob = await res.blob();
             return [a.userId!, URL.createObjectURL(blob)] as const;
           } catch {
@@ -96,7 +96,7 @@ export default function TaskAssigneesSection({
       );
       const next: Record<number, string> = {};
       for (const entry of entries) {
-        if (entry) next[entry[0]] = entry[1];
+        if (entry) {next[entry[0]] = entry[1];}
       }
       if (Object.keys(next).length > 0) {
         setAvatarUrls((prev) => ({ ...prev, ...next }));
@@ -120,7 +120,7 @@ export default function TaskAssigneesSection({
   };
 
   const handleRemoveAssignee = async () => {
-    if (!menuTarget?.userId || !user) return;
+    if (!menuTarget?.userId || !user) {return;}
     const targetUserId = menuTarget.userId;
     closeMenu();
 
@@ -132,7 +132,7 @@ export default function TaskAssigneesSection({
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       onUpdated();
     } catch (err) {
       showAlert(getErrorMessage(err), "error");
@@ -140,7 +140,7 @@ export default function TaskAssigneesSection({
   };
 
   const loadMembers = async () => {
-    if (!user || membersLoaded) return;
+    if (!user || membersLoaded) {return;}
     try {
       const { data } = await client.GET(
         "/api/v1/organizations/{organizationId}/members/page",
@@ -163,7 +163,7 @@ export default function TaskAssigneesSection({
   };
 
   const handleAddAssignee = async (member: OrgMember | null) => {
-    if (!member?.id || !user) return;
+    if (!member?.id || !user) {return;}
     setAutocompleteKey((k) => k + 1);
     setAddOpen(false);
 
@@ -185,7 +185,7 @@ export default function TaskAssigneesSection({
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       onUpdated();
     } catch (err) {
       showAlert(getErrorMessage(err), "error");

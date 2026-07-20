@@ -3,7 +3,7 @@ import { Box, Button, CircularProgress, Stack, Typography } from "@mui/material"
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../hooks/useAuth";
 import { useAppAlert } from "../../hooks/useAppAlert";
-import client from "../../api/client";
+import client, { type UnsafeApiMethod } from "../../api/client";
 
 const labelSx = {
   fontFamily: "Century Gothic, sans-serif",
@@ -43,17 +43,17 @@ export default function ScheduleExport() {
   };
 
   const handleExportCsv = async () => {
-    if (!user) return;
+    if (!user) {return;}
     setLoadingCsv(true);
     try {
-      const { data, error } = await (client.GET as Function)(
+      const { data, error } = await (client.GET as UnsafeApiMethod)(
         "/api/v1/events/exports/schedule.csv",
         {
           headers: { Authorization: `Bearer ${user.token}` },
           parseAs: "blob",
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       downloadBlob(data as Blob, "schedule.csv");
     } catch {
       showAlert(t("schedule.exportError"), "error");
@@ -63,17 +63,17 @@ export default function ScheduleExport() {
   };
 
   const handleExportIcal = async () => {
-    if (!user) return;
+    if (!user) {return;}
     setLoadingIcal(true);
     try {
-      const { data, error } = await (client.GET as Function)(
+      const { data, error } = await (client.GET as UnsafeApiMethod)(
         "/api/v1/events/exports/schedule.ics",
         {
           headers: { Authorization: `Bearer ${user.token}` },
           parseAs: "blob",
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       downloadBlob(data as Blob, "schedule.ics");
     } catch {
       showAlert(t("schedule.exportError"), "error");

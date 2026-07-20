@@ -44,9 +44,9 @@ type SectionDTO = components["schemas"]["SectionDTO"];
 type SongDTO = components["schemas"]["SongDTO"];
 
 function formatDate(value?: string): string {
-  if (!value) return "-";
+  if (!value) {return "-";}
   const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return "-";
+  if (Number.isNaN(parsed.getTime())) {return "-";}
   const datePart = parsed.toLocaleDateString("ru-RU");
   const timePart = parsed.toLocaleString("ru-RU", { hour: "2-digit", minute: "2-digit" });
   return `${datePart} ${timePart}`;
@@ -55,13 +55,13 @@ function formatDate(value?: string): string {
 function formatSetDuration(totalSeconds: number): string {
   const h = Math.floor(totalSeconds / 3600);
   const m = Math.floor((totalSeconds % 3600) / 60);
-  if (h > 0 && m > 0) return `${h}ч ${m}мин`;
-  if (h > 0) return `${h}ч`;
+  if (h > 0 && m > 0) {return `${h}ч ${m}мин`;}
+  if (h > 0) {return `${h}ч`;}
   return `${m}мин`;
 }
 
 function getErrorMessage(error: unknown): string {
-  if (error && typeof error === "object" && "message" in error) return String((error as { message: unknown }).message);
+  if (error && typeof error === "object" && "message" in error) {return String((error as { message: unknown }).message);}
   return String(error);
 }
 
@@ -110,15 +110,15 @@ export default function EventPage() {
 
   // Sync current organization
   useEffect(() => {
-    if (!isValid) return;
-    if (currentOrganization?.id === organizationId) return;
+    if (!isValid) {return;}
+    if (currentOrganization?.id === organizationId) {return;}
     const matched = organizations.find((o) => o.id === organizationId);
-    if (matched) setCurrentOrganization(matched);
+    if (matched) {setCurrentOrganization(matched);}
   }, [currentOrganization?.id, isValid, organizationId, organizations, setCurrentOrganization]);
 
   const loadEvent = useCallback(async (silent = false) => {
-    if (!user || !isValid) return;
-    if (!silent) setLoading(true);
+    if (!user || !isValid) {return;}
+    if (!silent) {setLoading(true);}
     try {
       const { data, error } = await client.GET(
         "/api/v1/organizations/{organizationId}/events/{eventId}",
@@ -172,7 +172,7 @@ export default function EventPage() {
     } catch (err) {
       showAlert(getErrorMessage(err), "error");
     } finally {
-      if (!silent) setLoading(false);
+      if (!silent) {setLoading(false);}
     }
   }, [eventId, isValid, navigate, organizationId, sections.length, showAlert, t, user]);
 
@@ -182,7 +182,7 @@ export default function EventPage() {
   }, [eventId, organizationId]);
 
   const loadComments = useCallback(async (page: number) => {
-    if (!user || !isValid) return;
+    if (!user || !isValid) {return;}
     setCommentsLoading(true);
     try {
       const { data, error } = await client.GET(
@@ -195,7 +195,7 @@ export default function EventPage() {
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       const paged = data as unknown as { content?: EventCommentDTO[]; page?: { totalPages?: number } };
       setComments(paged.content ?? []);
       setCommentsTotalPages(paged.page?.totalPages ?? 1);
@@ -214,7 +214,7 @@ export default function EventPage() {
   // Realtime comment subscription
   useEffect(() => {
     return onEventCommentCreated((detail) => {
-      if (detail.organizationId !== organizationId || detail.eventId !== eventId) return;
+      if (detail.organizationId !== organizationId || detail.eventId !== eventId) {return;}
       setCommentsPage(0);
       void loadComments(0);
     });
@@ -223,15 +223,15 @@ export default function EventPage() {
   // Event deleted subscription
   useEffect(() => {
     return onEventDeleted((detail) => {
-      if (detail.organizationId !== organizationId || detail.eventId !== eventId) return;
-      if (deleting) return;
+      if (detail.organizationId !== organizationId || detail.eventId !== eventId) {return;}
+      if (deleting) {return;}
       showAlert(String(t("events.eventDeleted")), "warning");
       navigate(`/organizations/${organizationId}/schedule`);
     });
   }, [deleting, eventId, navigate, organizationId, showAlert, t]);
 
   const updateEventTags = async (tags: string[]): Promise<EventDTO | null> => {
-    if (!user) return null;
+    if (!user) {return null;}
     const formData = new FormData();
     tags.forEach((tag) => formData.append("tags", tag));
     const { data, error } = await (client.PUT as unknown as (
@@ -246,18 +246,18 @@ export default function EventPage() {
         bodySerializer: (b: FormData) => b,
       }
     );
-    if (error) throw error;
+    if (error) {throw error;}
     return data as unknown as EventDTO;
   };
 
   // Tag handlers
   const handleDeleteTag = async (tag: string) => {
-    if (!event || !user) return;
+    if (!event || !user) {return;}
     const updated = (event.tags ?? []).filter((tg) => tg !== tag);
     setTagSaving(true);
     try {
       const ev = await updateEventTags(updated);
-      if (ev) setEvent(ev);
+      if (ev) {setEvent(ev);}
     } catch (err) {
       showAlert(getErrorMessage(err), "error");
     } finally {
@@ -267,7 +267,7 @@ export default function EventPage() {
 
   const handleAddTag = async () => {
     const trimmed = newTagValue.trim().slice(0, 20);
-    if (!trimmed || !event || !user) return;
+    if (!trimmed || !event || !user) {return;}
     const current = event.tags ?? [];
     if (current.includes(trimmed) || current.length >= MAX_TAGS) {
       setAddTagOpen(false);
@@ -277,7 +277,7 @@ export default function EventPage() {
     setTagSaving(true);
     try {
       const ev = await updateEventTags([...current, trimmed]);
-      if (ev) setEvent(ev);
+      if (ev) {setEvent(ev);}
     } catch (err) {
       showAlert(getErrorMessage(err), "error");
     } finally {
@@ -288,7 +288,7 @@ export default function EventPage() {
   };
 
   const handleDeleteEvent = async () => {
-    if (!user) return;
+    if (!user) {return;}
     setDeleting(true);
     try {
       const { error } = await client.DELETE(
@@ -298,7 +298,7 @@ export default function EventPage() {
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       emitEventDeleted({ organizationId, eventId });
       showAlert(String(t("events.eventDeleted")), "success");
       navigate(`/organizations/${organizationId}/schedule`);
@@ -318,7 +318,7 @@ export default function EventPage() {
     );
   }
 
-  if (!event) return null;
+  if (!event) {return null;}
 
   const isCreator = profile?.id != null && event.createdByUserId === profile.id;
   const canEdit = isCreator || canManageEvent;
@@ -334,10 +334,10 @@ export default function EventPage() {
   const totalSetSeconds = songs.reduce((acc, s) => acc + (s.durationSeconds ?? 0), 0);
 
   const normalizeUrl = (url?: string | null): string | null => {
-    if (!url) return null;
+    if (!url) {return null;}
     const trimmed = url.trim();
-    if (!trimmed) return null;
-    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    if (!trimmed) {return null;}
+    if (/^https?:\/\//i.test(trimmed)) {return trimmed;}
     return `https://${trimmed}`;
   };
   const externalUrl = normalizeUrl(event.externalLink);
@@ -559,7 +559,7 @@ export default function EventPage() {
                 value={newTagValue}
                 onChange={(e) => setNewTagValue(e.target.value.slice(0, 20))}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") void handleAddTag();
+                  if (e.key === "Enter") {void handleAddTag();}
                   if (e.key === "Escape") { setAddTagOpen(false); setNewTagValue(""); }
                 }}
                 sx={{ width: 160 }}
@@ -769,7 +769,7 @@ export default function EventPage() {
       {/* Delete confirm dialog */}
       <Dialog
         open={deleteOpen}
-        onClose={() => { if (!deleting) setDeleteOpen(false); }}
+        onClose={() => { if (!deleting) {setDeleteOpen(false);} }}
         maxWidth="xs"
         fullWidth
         slotProps={{ paper: { sx: { borderRadius: "16px" } } }}

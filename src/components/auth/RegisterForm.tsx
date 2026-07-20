@@ -23,7 +23,7 @@ import dayjs, { type Dayjs } from 'dayjs';
 import 'dayjs/locale/ru';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import client from '../../api/client';
+import client, { type UnsafeApiMethod } from '../../api/client';
 import { useAuth } from '../../hooks/useAuth';
 import { useAppAlert } from '../../hooks/useAppAlert';
 
@@ -72,18 +72,18 @@ export default function RegisterForm({ onBack }: Props) {
 
   const validateStep1 = (): boolean => {
     const errors: Step1Errors = {};
-    if (!username.trim()) errors.username = t('auth.errors.usernameRequired');
-    else if (username.trim().length < 3) errors.username = t('auth.errors.usernameMinLength');
-    else if (/\s/.test(username)) errors.username = t('auth.errors.usernameNoSpaces');
-    else if (!/^[a-zA-Z0-9_]+$/.test(username)) errors.username = t('auth.errors.usernameLatinOnly');
+    if (!username.trim()) {errors.username = t('auth.errors.usernameRequired');}
+    else if (username.trim().length < 3) {errors.username = t('auth.errors.usernameMinLength');}
+    else if (/\s/.test(username)) {errors.username = t('auth.errors.usernameNoSpaces');}
+    else if (!/^[a-zA-Z0-9_]+$/.test(username)) {errors.username = t('auth.errors.usernameLatinOnly');}
 
-    if (!name.trim()) errors.name = t('auth.errors.nameRequired');
+    if (!name.trim()) {errors.name = t('auth.errors.nameRequired');}
 
-    if (!email.trim()) errors.email = t('auth.errors.emailRequired');
-    else if (!EMAIL_RE.test(email)) errors.email = t('auth.errors.emailInvalid');
+    if (!email.trim()) {errors.email = t('auth.errors.emailRequired');}
+    else if (!EMAIL_RE.test(email)) {errors.email = t('auth.errors.emailInvalid');}
 
-    if (!password) errors.password = t('auth.errors.passwordRequired');
-    else if (password.length < 8) errors.password = t('auth.errors.passwordMinLength');
+    if (!password) {errors.password = t('auth.errors.passwordRequired');}
+    else if (password.length < 8) {errors.password = t('auth.errors.passwordMinLength');}
 
     setStep1Errors(errors);
     return Object.keys(errors).length === 0;
@@ -91,14 +91,14 @@ export default function RegisterForm({ onBack }: Props) {
 
   const validateStep2 = (): boolean => {
     const errors: Step2Errors = {};
-    if (!birthDate) errors.birthDate = t('auth.errors.birthDateRequired');
-    else if (birthDate.isAfter(dayjs())) errors.birthDate = t('auth.errors.birthDateFuture');
+    if (!birthDate) {errors.birthDate = t('auth.errors.birthDateRequired');}
+    else if (birthDate.isAfter(dayjs())) {errors.birthDate = t('auth.errors.birthDateFuture');}
     setStep2Errors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleNext = () => {
-    if (!validateStep1()) return;
+    if (!validateStep1()) {return;}
     setStep(1);
   };
 
@@ -114,11 +114,11 @@ export default function RegisterForm({ onBack }: Props) {
     setAvatar(null);
     setAvatarPreview(null);
     const input = document.getElementById('avatar-upload') as HTMLInputElement;
-    if (input) input.value = '';
+    if (input) {input.value = '';}
   };
 
   const handleSubmit = async () => {
-    if (!validateStep2()) return;
+    if (!validateStep2()) {return;}
     setLoading(true);
 
     try {
@@ -129,14 +129,17 @@ export default function RegisterForm({ onBack }: Props) {
       formData.append('email', email);
       formData.append('birthDate', birthDate!.format('YYYY-MM-DD'));
       formData.append('preferredLanguage', preferredLanguage);
-      if (location.trim()) formData.append('location', location.trim());
-      if (avatar) formData.append('avatar', avatar);
+      if (location.trim()) {formData.append('location', location.trim());}
+      if (avatar) {formData.append('avatar', avatar);}
 
 
-      const { data, error: apiErr } = await (client.POST as any)('/api/v1/auth/register', {
+      const { data, error: apiErr } = (await (client.POST as UnsafeApiMethod)('/api/v1/auth/register', {
         body: formData,
         bodySerializer: (body: FormData) => body,
-      });
+      })) as {
+        data?: { token: string; username: string };
+        error?: { details?: string[]; message?: string };
+      };
 
       if (apiErr || !data?.token || !data?.username) {
         const details: string[] = apiErr?.details ?? [];
