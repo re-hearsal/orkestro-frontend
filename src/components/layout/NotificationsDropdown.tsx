@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Box, Button, CircularProgress, Divider, Popover, Typography, useMediaQuery } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import client from '../../api/client';
 import type { components } from '../../api/schema';
 import { withFlatPagination } from '../../utils/pagination';
 import { emitNotificationsUpdated } from '../../utils/notificationsEvents';
+import { resolveNotificationRoute } from '../../utils/notificationRoute';
 import { useAuth } from '../../hooks/useAuth';
 
 type InAppNotificationDTO = components['schemas']['InAppNotificationDTO'];
@@ -28,6 +30,7 @@ function formatDate(iso?: string): string {
 export default function NotificationsDropdown({ anchorEl, onClose }: NotificationsDropdownProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const isTouch = useMediaQuery('(hover: none)');
   const [notifications, setNotifications] = useState<InAppNotificationDTO[]>([]);
   const [loading, setLoading] = useState(false);
@@ -142,6 +145,21 @@ export default function NotificationsDropdown({ anchorEl, onClose }: Notificatio
       .catch(() => {});
   };
 
+  const handleNotificationClick = (notification: InAppNotificationDTO) => {
+    markRead(notification);
+    const route = resolveNotificationRoute(
+      notification.type,
+      notification.entityType,
+      notification.entityId,
+      notification.organizationId,
+      notification.sectionId
+    );
+    if (route) {
+      onClose();
+      navigate(route);
+    }
+  };
+
   const hasMore = page < totalPages - 1;
 
   return (
@@ -207,12 +225,12 @@ export default function NotificationsDropdown({ anchorEl, onClose }: Notificatio
               <Box
                 onMouseEnter={isTouch ? undefined : () => handleMouseEnter(notification)}
                 onMouseLeave={isTouch ? undefined : () => handleMouseLeave(notification.id)}
-                onClick={isTouch ? () => markRead(notification) : undefined}
+                onClick={() => handleNotificationClick(notification)}
                 sx={{
                   px: 2,
                   py: 1.5,
                   bgcolor: notification.isRead ? '#fff' : 'rgba(15,62,181,0.07)',
-                  cursor: isTouch && !notification.isRead ? 'pointer' : 'default',
+                  cursor: 'pointer',
                   transition: 'background-color 0.2s',
                 }}
               >

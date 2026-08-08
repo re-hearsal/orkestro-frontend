@@ -98,14 +98,18 @@ export default function SectionProfilePage() {
         if (error) {throw error;}
         if (!cancelled) {setSection((data as SectionDTO) ?? null);}
       } catch {
-        if (!cancelled) { setSection(null); showAlert(String(t("organizations.profile.loadError")), "error"); }
+        if (!cancelled) {
+          setSection(null);
+          showAlert(String(t("organizations.profile.loadError")), "error");
+          navigate(`/organizations/${organizationId}/sections`);
+        }
       } finally {
         if (!cancelled) {setLoading(false);}
       }
     };
     void load();
     return () => { cancelled = true; };
-  }, [isValid, sectionId, user, showAlert, t]);
+  }, [isValid, sectionId, user, showAlert, t, navigate, organizationId]);
 
   // Load parent section name for breadcrumb
   useEffect(() => {

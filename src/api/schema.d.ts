@@ -2578,6 +2578,10 @@ export interface components {
             /** Format: int64 */
             entityId?: number;
             entityType?: string;
+            /** Format: int64 */
+            organizationId?: number;
+            /** Format: int64 */
+            sectionId?: number;
             isRead?: boolean;
             /** Format: date-time */
             createdAt?: string;
