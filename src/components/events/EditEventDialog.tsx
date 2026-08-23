@@ -32,7 +32,7 @@ import "dayjs/locale/ru";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from "react-i18next";
-import client from "../../api/client";
+import client, { type UnsafeApiMethod } from "../../api/client";
 import type { components } from "../../api/schema";
 import { useAuth } from "../../hooks/useAuth";
 import { useAppAlert } from "../../hooks/useAppAlert";
@@ -117,7 +117,7 @@ export default function EditEventDialog({ open, onClose, event, organizationId, 
 
   // Re-initialize from event when dialog opens
   useEffect(() => {
-    if (!open) return;
+    if (!open) {return;}
     setStep(0);
     setErrors({});
     setEventType((event.eventType as EventType) ?? "");
@@ -142,7 +142,7 @@ export default function EditEventDialog({ open, onClose, event, organizationId, 
 
   // Load sections, songs, and pre-fill user names when dialog opens
   useEffect(() => {
-    if (!open || !user || !organizationId) return;
+    if (!open || !user || !organizationId) {return;}
     let cancelled = false;
 
     const loadData = async () => {
@@ -160,9 +160,9 @@ export default function EditEventDialog({ open, onClose, event, organizationId, 
         }),
       ]);
 
-      if (cancelled) return;
+      if (cancelled) {return;}
 
-      if (Array.isArray(sectResult.data)) setAllSections(sectResult.data as SectionDTO[]);
+      if (Array.isArray(sectResult.data)) {setAllSections(sectResult.data as SectionDTO[]);}
 
       const allSongsContent = ((songsResult.data as unknown as { content?: SongDTO[] })?.content ?? []);
       setAllSongs(allSongsContent);
@@ -175,7 +175,7 @@ export default function EditEventDialog({ open, onClose, event, organizationId, 
       const eventUserIds = event.participantUserIds ?? [];
       if (eventUserIds.length > 0) {
         try {
-          const { data: membersData } = await (client.GET as Function)(
+          const { data: membersData } = await (client.GET as UnsafeApiMethod)(
             "/api/v1/organizations/{organizationId}/members/page",
             {
               params: {
@@ -185,7 +185,7 @@ export default function EditEventDialog({ open, onClose, event, organizationId, 
               headers: { Authorization: `Bearer ${user.token}` },
             }
           );
-          if (cancelled) return;
+          if (cancelled) {return;}
           const members = Array.isArray((membersData as { content?: unknown[] })?.content)
             ? (membersData as { content: Record<string, unknown>[] }).content
             : [];
@@ -213,12 +213,12 @@ export default function EditEventDialog({ open, onClose, event, organizationId, 
       setMemberSearchResults([]);
       return;
     }
-    if (memberSearchTimerRef.current) clearTimeout(memberSearchTimerRef.current);
+    if (memberSearchTimerRef.current) {clearTimeout(memberSearchTimerRef.current);}
     memberSearchTimerRef.current = setTimeout(async () => {
       setMemberSearchLoading(true);
       try {
         const query = withFlatPagination({ query: memberSearchQuery }, { page: 0, size: 10 });
-        const { data } = await (client.GET as Function)(
+        const { data } = await (client.GET as UnsafeApiMethod)(
           "/api/v1/organizations/{organizationId}/members/page",
           {
             params: { path: { organizationId }, query },
@@ -250,14 +250,14 @@ export default function EditEventDialog({ open, onClose, event, organizationId, 
   const validateStep = (s: number): boolean => {
     const newErrors: Record<string, string> = {};
     if (s === 0) {
-      if (!eventType) newErrors.eventType = t("organizations.events.create.eventTypeRequired");
+      if (!eventType) {newErrors.eventType = t("organizations.events.create.eventTypeRequired");}
     }
     if (s === 1) {
-      if (!title.trim()) newErrors.title = t("organizations.events.create.nameRequired");
-      if (title.trim().length > 30) newErrors.title = t("organizations.events.create.nameMaxLength");
+      if (!title.trim()) {newErrors.title = t("organizations.events.create.nameRequired");}
+      if (title.trim().length > 30) {newErrors.title = t("organizations.events.create.nameMaxLength");}
     }
     if (s === 2) {
-      if (!startTime) newErrors.startTime = t("organizations.events.create.startTimeRequired");
+      if (!startTime) {newErrors.startTime = t("organizations.events.create.startTimeRequired");}
       if (!endTime) {
         newErrors.endTime = t("organizations.events.create.endTimeRequired");
       } else if (startTime && endTime.isBefore(startTime)) {
@@ -269,7 +269,7 @@ export default function EditEventDialog({ open, onClose, event, organizationId, 
   };
 
   const handleNext = () => {
-    if (!validateStep(step)) return;
+    if (!validateStep(step)) {return;}
     setStep((s) => s + 1);
   };
 
@@ -279,8 +279,8 @@ export default function EditEventDialog({ open, onClose, event, organizationId, 
   };
 
   const handleSave = async () => {
-    if (!validateStep(step)) return;
-    if (!user || !startTime || !endTime) return;
+    if (!validateStep(step)) {return;}
+    if (!user || !startTime || !endTime) {return;}
 
     setSaving(true);
     try {
@@ -391,7 +391,7 @@ export default function EditEventDialog({ open, onClose, event, organizationId, 
         }
       );
 
-      if (error) throw error;
+      if (error) {throw error;}
       showAlert(t("events.editSaveSuccess"), "success");
       onSaved();
       onClose();
@@ -419,7 +419,7 @@ export default function EditEventDialog({ open, onClose, event, organizationId, 
   };
 
   const addParticipantUser = (member: MemberSearchResult) => {
-    if (!member.userId || participantUserIds.includes(member.userId)) return;
+    if (!member.userId || participantUserIds.includes(member.userId)) {return;}
     setParticipantUserIds([...participantUserIds, member.userId]);
     setParticipantUsers([...participantUsers, member]);
     setMemberSearchQuery("");
@@ -432,7 +432,7 @@ export default function EditEventDialog({ open, onClose, event, organizationId, 
   };
 
   const addSong = (song: SongDTO) => {
-    if (!song.id || songIds.includes(song.id)) return;
+    if (!song.id || songIds.includes(song.id)) {return;}
     setSongIds([...songIds, song.id]);
     setSongs([...songs, song]);
   };
@@ -515,7 +515,7 @@ export default function EditEventDialog({ open, onClose, event, organizationId, 
                   value={participantMode}
                   exclusive
                   size="small"
-                  onChange={(_, val) => { if (val) setParticipantMode(val); }}
+                  onChange={(_, val) => { if (val) {setParticipantMode(val);} }}
                   sx={{ mb: 1.5 }}
                 >
                   <ToggleButton value="all" sx={{ fontFamily: "Century Gothic, sans-serif", fontSize: "0.78rem", textTransform: "none" }}>
@@ -661,7 +661,7 @@ export default function EditEventDialog({ open, onClose, event, organizationId, 
                   value={null}
                   inputValue={songSearchInput}
                   onInputChange={(_, newValue, reason) => {
-                    if (reason !== "reset") setSongSearchInput(newValue);
+                    if (reason !== "reset") {setSongSearchInput(newValue);}
                   }}
                   onChange={(_, value) => {
                     if (value) {

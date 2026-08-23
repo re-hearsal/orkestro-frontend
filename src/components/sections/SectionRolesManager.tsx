@@ -23,6 +23,7 @@ import client from "../../api/client";
 import { useAuth } from "../../hooks/useAuth";
 import type { components } from "../../api/schema";
 import { getLocalizedRoleName } from "../../utils/roleNameI18n";
+import ConfirmDialog from "../common/ConfirmDialog";
 
 type TechnicalRoleDTO = components["schemas"]["TechnicalRoleDTO"];
 
@@ -80,13 +81,13 @@ function CreateSectionRoleDialog({ sectionId, open, onClose, onSaved, existingRo
   const handleTogglePermission = (code: string) => {
     setSelectedPermissions((prev) => {
       const next = new Set(prev);
-      if (next.has(code)) next.delete(code); else next.add(code);
+      if (next.has(code)) {next.delete(code);} else {next.add(code);}
       return next;
     });
   };
 
   const handleSubmit = async () => {
-    if (!validate() || !user) return;
+    if (!validate() || !user) {return;}
     setLoading(true);
     setApiError(null);
     try {
@@ -115,7 +116,7 @@ function CreateSectionRoleDialog({ sectionId, open, onClose, onSaved, existingRo
   const isEdit = existingRole != null;
 
   return (
-    <Dialog open={open} onClose={() => { if (!loading) onClose(); }} fullWidth maxWidth="sm" fullScreen={fullScreen} slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}>
+    <Dialog open={open} onClose={() => { if (!loading) {onClose();} }} fullWidth maxWidth="sm" fullScreen={fullScreen} slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}>
       <DialogTitle sx={{ fontFamily: "Century Gothic, sans-serif", fontWeight: 700, color: "#0f3eb5" }}>
         {isEdit ? t("roles.editTitle") : t("roles.createTitle")}
       </DialogTitle>
@@ -123,7 +124,7 @@ function CreateSectionRoleDialog({ sectionId, open, onClose, onSaved, existingRo
         <TextField
           label={t("roles.form.name")}
           value={name}
-          onChange={(e) => { setName(e.target.value); if (nameError) setNameError(null); }}
+          onChange={(e) => { setName(e.target.value); if (nameError) {setNameError(null);} }}
           error={nameError != null}
           helperText={nameError}
           fullWidth
@@ -182,16 +183,17 @@ export default function SectionRolesManager({ sectionId, canManage = false }: Se
   const [deleting, setDeleting] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<TechnicalRoleDTO | undefined>(undefined);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   const loadRoles = useCallback(async () => {
-    if (!user) return;
+    if (!user) {return;}
     setLoading(true);
     try {
       const { data, error } = await client.GET("/api/v1/sections/{sectionId}/roles", {
         params: { path: { sectionId } },
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      if (!error && data != null) setRoles(data as unknown as TechnicalRoleDTO[]);
+      if (!error && data != null) {setRoles(data as unknown as TechnicalRoleDTO[]);}
     } finally {
       setLoading(false);
     }
@@ -206,13 +208,13 @@ export default function SectionRolesManager({ sectionId, canManage = false }: Se
   };
 
   const handlePopoverClose = () => {
-    if (deleting) return;
+    if (deleting) {return;}
     setAnchorEl(null);
     setPopoverRole(null);
   };
 
   const handleDelete = async () => {
-    if (!user || !popoverRole?.id) return;
+    if (!user || !popoverRole?.id) {return;}
     setDeleting(true);
     try {
       const { error } = await client.DELETE("/api/v1/sections/{sectionId}/roles/{roleId}", {
@@ -226,6 +228,7 @@ export default function SectionRolesManager({ sectionId, canManage = false }: Se
       setRoles((prev) => prev.filter((r) => r.id !== popoverRole.id));
       setAnchorEl(null);
       setPopoverRole(null);
+      setDeleteConfirmOpen(false);
     } catch (err: unknown) {
       showAlert(err instanceof Error ? err.message : String(t("roles.deleteError")), "warning");
     } finally {
@@ -315,7 +318,7 @@ export default function SectionRolesManager({ sectionId, canManage = false }: Se
                 </Button>
                 <Button
                   size="small" variant="outlined" color="error" disabled={deleting}
-                  onClick={() => { if (window.confirm(String(t("roles.deleteConfirm")))) void handleDelete(); }}
+                  onClick={() => setDeleteConfirmOpen(true)}
                   sx={{ textTransform: "none", fontFamily: "Century Gothic, sans-serif", borderRadius: "8px", fontSize: "0.8rem" }}
                 >
                   {deleting ? <CircularProgress size={14} /> : t("roles.deleteButton")}
@@ -332,6 +335,15 @@ export default function SectionRolesManager({ sectionId, canManage = false }: Se
         onClose={() => { setDialogOpen(false); setEditingRole(undefined); }}
         onSaved={handleSaved}
         existingRole={editingRole}
+      />
+
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        message={String(t("roles.deleteConfirm"))}
+        confirmLabel={String(t("roles.deleteButton"))}
+        loading={deleting}
+        onClose={() => setDeleteConfirmOpen(false)}
+        onConfirm={handleDelete}
       />
     </Box>
   );

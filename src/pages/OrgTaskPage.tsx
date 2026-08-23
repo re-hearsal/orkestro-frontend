@@ -40,13 +40,13 @@ const ALL_STATUSES: Array<"OPEN" | "IN_PROGRESS" | "DONE" | "CANCELLED"> = [
 ];
 
 function formatDate(value?: string | null): string {
-  if (!value) return "-";
+  if (!value) {return "-";}
   const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return "-";
+  if (Number.isNaN(parsed.getTime())) {return "-";}
   return (
-    parsed.toLocaleDateString("ru-RU") +
-    " " +
-    parsed.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })
+    `${parsed.toLocaleDateString("ru-RU") 
+    } ${ 
+    parsed.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })}`
   );
 }
 
@@ -107,10 +107,10 @@ export default function OrgTaskPage() {
 
   // Sync current organization
   useEffect(() => {
-    if (!isValid) return;
-    if (currentOrganization?.id === organizationId) return;
+    if (!isValid) {return;}
+    if (currentOrganization?.id === organizationId) {return;}
     const matched = organizations.find((o) => o.id === organizationId);
-    if (matched) setCurrentOrganization(matched);
+    if (matched) {setCurrentOrganization(matched);}
   }, [
     currentOrganization?.id,
     isValid,
@@ -121,10 +121,10 @@ export default function OrgTaskPage() {
 
   const loadTask = useCallback(
     async (options?: { silent?: boolean }) => {
-      if (!user || !isValid) return;
+      if (!user || !isValid) {return;}
       const seq = ++loadTaskSeqRef.current;
       const isSilent = options?.silent === true;
-      if (!isSilent) setLoading(true);
+      if (!isSilent) {setLoading(true);}
       try {
         const { data, error } = await client.GET(
           "/api/v1/organizations/{organizationId}/tasks/{taskId}",
@@ -140,7 +140,7 @@ export default function OrgTaskPage() {
           }
         );
         // Discard response if a newer request was already started
-        if (seq !== loadTaskSeqRef.current) return;
+        if (seq !== loadTaskSeqRef.current) {return;}
         if (error) {
           const status = (error as { status?: number }).status;
           if (status === 404) {
@@ -154,7 +154,7 @@ export default function OrgTaskPage() {
       } catch (err) {
         showAlert(getErrorMessage(err), "error");
       } finally {
-        if (!isSilent) setLoading(false);
+        if (!isSilent) {setLoading(false);}
       }
     },
     [isValid, navigate, organizationId, showAlert, taskId, user]
@@ -166,7 +166,7 @@ export default function OrgTaskPage() {
 
   // Load author avatar
   useEffect(() => {
-    if (!task?.author?.profileImageFileId || !user) return;
+    if (!task?.author?.profileImageFileId || !user) {return;}
     const fileId = task.author.profileImageFileId;
     setAuthorAvatarUrl(null);
     void (async () => {
@@ -189,7 +189,7 @@ export default function OrgTaskPage() {
     const off1 = onTaskUpdated((d) => {
       if (d.organizationId === organizationId && d.taskId === taskId) {
         // Skip WS echo within 2s of our own mutation — PATCH already returned up-to-date state
-        if (Date.now() - lastMutationRef.current < 2000) return;
+        if (Date.now() - lastMutationRef.current < 2000) {return;}
         void loadTask({ silent: true });
       }
     });
@@ -213,7 +213,7 @@ export default function OrgTaskPage() {
   const canChangeStatus = isAuthor || isAssignee;
 
   const handleStatusChange = async (newStatus: "OPEN" | "IN_PROGRESS" | "DONE" | "CANCELLED") => {
-    if (!user || !task) return;
+    if (!user || !task) {return;}
     setStatusAnchor(null);
 
     // Optimistic update — apply immediately so UI responds without waiting for server
@@ -231,7 +231,7 @@ export default function OrgTaskPage() {
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
     } catch (err) {
       // Revert on failure
       setTask(previousTask);
@@ -245,7 +245,7 @@ export default function OrgTaskPage() {
   // ── Delete task ────────────────────────────────────────────────────────────
 
   const handleDelete = async () => {
-    if (!user) return;
+    if (!user) {return;}
     setDeleting(true);
     try {
       const { error } = await client.DELETE(
@@ -255,7 +255,7 @@ export default function OrgTaskPage() {
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       showAlert(String(t("tasks.deleted")), "success");
       navigate(`/organizations/${organizationId}/tasks`);
     } catch (err) {
@@ -276,7 +276,7 @@ export default function OrgTaskPage() {
     );
   }
 
-  if (!task) return null;
+  if (!task) {return null;}
 
   const isClosed = CLOSED_STATUSES.has(task.status ?? "");
   const isDeadlinePast = task.deadline
@@ -610,7 +610,7 @@ export default function OrgTaskPage() {
       {/* Delete confirmation dialog */}
       <Dialog
         open={deleteOpen}
-        onClose={() => { if (!deleting) setDeleteOpen(false); }}
+        onClose={() => { if (!deleting) {setDeleteOpen(false);} }}
         maxWidth="xs"
         fullWidth
         slotProps={{ paper: { sx: { borderRadius: "16px" } } }}

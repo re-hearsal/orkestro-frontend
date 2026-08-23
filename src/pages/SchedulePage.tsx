@@ -6,9 +6,9 @@ import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import { format, getDay, parse, startOfWeek } from "date-fns";
 import { ru, enUS } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import client from "../api/client";
+import client, { type UnsafeApiMethod } from "../api/client";
 import type { components } from "../api/schema";
 import { useAuth } from "../hooks/useAuth";
 import { useAppAlert } from "../hooks/useAppAlert";
@@ -20,14 +20,12 @@ import EventHoverPopup from "../components/schedule/EventHoverPopup";
 import WeekEventCard from "../components/schedule/WeekEventCard";
 import MonthEventCell from "../components/schedule/MonthEventCell";
 import type { CalendarEvent, SectionDTO } from "../components/schedule/types";
-import { useMobileAction } from "../context/MobileActionContext";
+import { useMobileAction } from "../hooks/useMobileAction";
 
 type EventCalendarGroupedResponseDTO = components["schemas"]["EventCalendarGroupedResponseDTO"];
 type EventCalendarDTO = components["schemas"]["EventCalendarDTO"];
 
 type CalendarView = "month" | "week";
-
-const locales = { ru, en: enUS };
 
 function buildLocalizer(lang: string) {
   const locale = lang === "ru" ? ru : enUS;
@@ -72,9 +70,9 @@ function formatRangeLabel(view: CalendarView, date: Date, lang: string): string 
 function buildCalendarEvents(data: EventCalendarGroupedResponseDTO): CalendarEvent[] {
   const sectionMap = new Map<number, number[]>();
   for (const group of data.sectionGroups ?? []) {
-    if (group.sectionId == null) continue;
+    if (group.sectionId == null) {continue;}
     for (const ev of group.events ?? []) {
-      if (ev.id == null) continue;
+      if (ev.id == null) {continue;}
       const existing = sectionMap.get(ev.id) ?? [];
       existing.push(group.sectionId);
       sectionMap.set(ev.id, existing);
@@ -83,17 +81,17 @@ function buildCalendarEvents(data: EventCalendarGroupedResponseDTO): CalendarEve
 
   const allEventsMap = new Map<number, EventCalendarDTO>();
   for (const ev of data.organizationWideEvents ?? []) {
-    if (ev.id != null) allEventsMap.set(ev.id, ev);
+    if (ev.id != null) {allEventsMap.set(ev.id, ev);}
   }
   for (const group of data.sectionGroups ?? []) {
     for (const ev of group.events ?? []) {
-      if (ev.id != null) allEventsMap.set(ev.id, ev);
+      if (ev.id != null) {allEventsMap.set(ev.id, ev);}
     }
   }
 
   const result: CalendarEvent[] = [];
   for (const [id, ev] of allEventsMap) {
-    if (!ev.startTime || !ev.endTime) continue;
+    if (!ev.startTime || !ev.endTime) {continue;}
     result.push({
       id,
       title: ev.title ?? "",
@@ -308,7 +306,7 @@ function AgendaView({ events, lang, noEventsLabel, onEventClick }: AgendaViewPro
 export default function SchedulePage() {
   const { t, i18n } = useTranslation();
   const { organizationId: rawOrgId } = useParams<{ organizationId: string }>();
-  const navigate = useNavigate();
+
   const { user } = useAuth();
   const { showAlert } = useAppAlert();
   const { organizations, setCurrentOrganization } = useOrganization();
@@ -335,13 +333,13 @@ export default function SchedulePage() {
   const localizer = useMemo(() => buildLocalizer(i18n.language), [i18n.language]);
 
   useEffect(() => {
-    if (!user || !Number.isFinite(organizationId) || organizationId <= 0) return;
+    if (!user || !Number.isFinite(organizationId) || organizationId <= 0) {return;}
     const org = organizations.find((o) => o.id === organizationId);
-    if (org) setCurrentOrganization(org);
+    if (org) {setCurrentOrganization(org);}
   }, [organizationId, organizations, setCurrentOrganization, user]);
 
   useEffect(() => {
-    if (!user || !Number.isFinite(organizationId) || organizationId <= 0) return;
+    if (!user || !Number.isFinite(organizationId) || organizationId <= 0) {return;}
     let cancelled = false;
 
     const loadSections = async () => {
@@ -349,13 +347,13 @@ export default function SchedulePage() {
         params: { path: { organizationId } },
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      if (cancelled || !Array.isArray(data)) return;
+      if (cancelled || !Array.isArray(data)) {return;}
       const all = data as SectionDTO[];
       setSections(all);
 
       const membershipFlags = await Promise.all(
         all.map(async (section) => {
-          if (typeof section.id !== "number") return false;
+          if (typeof section.id !== "number") {return false;}
           const query = withFlatPagination({ query: user.username }, { page: 0, size: 1 });
           const { data: membersData, error } = await client.GET(
             "/api/v1/sections/{sectionId}/members/page",
@@ -364,7 +362,7 @@ export default function SchedulePage() {
               headers: { Authorization: `Bearer ${user.token}` },
             }
           );
-          if (error) return false;
+          if (error) {return false;}
           const paged = (membersData as unknown as { content?: unknown[] }) ?? {};
           return Array.isArray(paged.content) && paged.content.length > 0;
         })
@@ -389,7 +387,7 @@ export default function SchedulePage() {
   }, [organizationId, user]);
 
   const loadEvents = useCallback(async () => {
-    if (!user || !Number.isFinite(organizationId) || organizationId <= 0) return;
+    if (!user || !Number.isFinite(organizationId) || organizationId <= 0) {return;}
 
     const range = isMobile ? getWeekRange(currentDate) : view === "month" ? getMonthRange(currentDate) : getWeekRange(currentDate);
 
@@ -403,7 +401,7 @@ export default function SchedulePage() {
         { page: 0, size: 200 }
       );
 
-      const { data, error } = await (client.GET as Function)(
+      const { data, error } = await (client.GET as UnsafeApiMethod)(
         "/api/v1/organizations/{organizationId}/events/calendar/me",
         {
           params: { path: { organizationId }, query },
@@ -411,7 +409,7 @@ export default function SchedulePage() {
         }
       );
 
-      if (error) throw error;
+      if (error) {throw error;}
 
       const built = buildCalendarEvents(data as EventCalendarGroupedResponseDTO);
       setEvents(built);
@@ -425,7 +423,7 @@ export default function SchedulePage() {
   }, [loadEvents]);
 
   const filteredEvents = useMemo(() => {
-    if (sectionMode === "all" || selectedSectionIds.length === 0) return events;
+    if (sectionMode === "all" || selectedSectionIds.length === 0) {return events;}
     return events.filter((e) => {
       const sectionIds = e.resource.sectionIds ?? [];
       return sectionIds.some((id) => selectedSectionIds.includes(id));
@@ -443,7 +441,7 @@ export default function SchedulePage() {
   };
 
   const openPopup = (event: CalendarEvent, target: HTMLElement) => {
-    if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    if (hideTimerRef.current) {clearTimeout(hideTimerRef.current);}
     setPopupEvent(event);
     setPopupAnchor(target);
     setPopupOpen(true);
@@ -454,7 +452,7 @@ export default function SchedulePage() {
   };
 
   const cancelHide = () => {
-    if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    if (hideTimerRef.current) {clearTimeout(hideTimerRef.current);}
   };
 
   const rangeLabel = formatRangeLabel(isMobile ? "week" : view, currentDate, i18n.language);
@@ -462,7 +460,7 @@ export default function SchedulePage() {
   useMobileAction(null);
 
   const calendarFormats = useMemo(() => {
-    if (i18n.language !== "ru") return {};
+    if (i18n.language !== "ru") {return {};}
     const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
     return {
       weekdayFormat: (date: Date) => cap(format(date, "EEEE", { locale: ru })),

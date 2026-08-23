@@ -5,7 +5,7 @@ export function navigateToUser(
   currentUserId: number | undefined,
   navigate: NavigateFunction
 ): void {
-  if (userId === undefined || userId === null) return;
+  if (userId === undefined || userId === null) {return;}
   if (userId === currentUserId) {
     navigate('/profile');
   } else {

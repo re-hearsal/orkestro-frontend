@@ -151,7 +151,7 @@ export default function OrgMemberCard({
   };
 
   const handleRemoveMember = async () => {
-    if (!user || !organizationId || !member.id) return;
+    if (!user || !organizationId || !member.id) {return;}
     setRemoving(true);
     try {
       const { error } = await client.DELETE(
@@ -161,7 +161,7 @@ export default function OrgMemberCard({
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       setRemoveDialogOpen(false);
       setMenuAnchorUser(null);
       showAlert(String(t("organizations.members.removed")), "success");
@@ -174,7 +174,7 @@ export default function OrgMemberCard({
   };
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    if (!canAssignRole || !organizationId || !member.id) return;
+    if (!canAssignRole || !organizationId || !member.id) {return;}
     setMenuAnchor(event.currentTarget);
   };
 
@@ -192,7 +192,7 @@ export default function OrgMemberCard({
   };
 
   const handleAssignRole = async (role: TechnicalRoleDTO) => {
-    if (!user || !organizationId || !member.id || !role.id) return;
+    if (!user || !organizationId || !member.id || !role.id) {return;}
     handleMenuClose();
     setRoleLoading(true);
     try {
@@ -206,7 +206,7 @@ export default function OrgMemberCard({
             headers: { Authorization: `Bearer ${user.token}` },
           }
         );
-        if (deleteError) throw deleteError;
+        if (deleteError) {throw deleteError;}
       }
       const { error: postError } = await client.POST(
         "/api/v1/organizations/{organizationId}/members/{userId}/roles/{roleId}",
@@ -217,7 +217,7 @@ export default function OrgMemberCard({
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (postError) throw postError;
+      if (postError) {throw postError;}
       setCurrentRole({ id: role.id, name: role.name ?? "" });
       showAlert(String(t("organizations.members.roleAssigned")), "success");
     } catch (err) {
@@ -228,7 +228,7 @@ export default function OrgMemberCard({
   };
 
   const handleRemoveRole = async () => {
-    if (!user || !organizationId || !member.id || !currentRole) return;
+    if (!user || !organizationId || !member.id || !currentRole) {return;}
     handleMenuClose();
     setRoleLoading(true);
     try {
@@ -241,7 +241,7 @@ export default function OrgMemberCard({
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (deleteError) throw deleteError;
+      if (deleteError) {throw deleteError;}
       setCurrentRole(undefined);
       showAlert(String(t("organizations.members.roleRemoved")), "success");
     } catch (err) {
@@ -488,7 +488,7 @@ export default function OrgMemberCard({
         maxWidth="xs"
         fullWidth
         fullScreen={fullScreen}
-        PaperProps={{ sx: { borderRadius: fullScreen ? 0 : "16px" } }}
+        slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}
       >
         <DialogTitle sx={{ color: "error.main", fontFamily: "Century Gothic, sans-serif" }}>
           {t("organizations.members.removeConfirmTitle")}

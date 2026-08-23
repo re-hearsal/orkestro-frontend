@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { OrganizationContext } from '../context/OrganizationContext';
+import { OrganizationContext } from '../context/OrganizationContext.context';
 
 export function useOrganization() {
   const ctx = useContext(OrganizationContext);

@@ -67,15 +67,15 @@ export default function EditProfileDialog({
   }, [open, profile]);
 
   const handleSave = async () => {
-    if (!user) return;
+    if (!user) {return;}
     setSaving(true);
     try {
       const body: UserProfileUpdateRequestDTO = {};
       const birthDateStr = birthDate?.isValid() ? birthDate.format("YYYY-MM-DD") : "";
-      if (name.trim() !== (profile.name ?? "")) body.name = name.trim() || undefined;
-      if (email.trim() !== (profile.email ?? "")) body.email = email.trim() || undefined;
-      if (location.trim() !== (profile.location ?? "")) body.location = location.trim() || undefined;
-      if (birthDateStr !== (profile.birthDate ?? "")) body.birthDate = birthDateStr || undefined;
+      if (name.trim() !== (profile.name ?? "")) {body.name = name.trim() || undefined;}
+      if (email.trim() !== (profile.email ?? "")) {body.email = email.trim() || undefined;}
+      if (location.trim() !== (profile.location ?? "")) {body.location = location.trim() || undefined;}
+      if (birthDateStr !== (profile.birthDate ?? "")) {body.birthDate = birthDateStr || undefined;}
       if (preferredLanguage !== ((profile.preferredLanguage as "RU" | "EN") ?? "RU")) {
         body.preferredLanguage = preferredLanguage;
       }
@@ -90,7 +90,7 @@ export default function EditProfileDialog({
         body,
       });
 
-      if (error) throw error;
+      if (error) {throw error;}
 
       if (body.preferredLanguage) {
         await i18n.changeLanguage(body.preferredLanguage === "RU" ? "ru" : "en");

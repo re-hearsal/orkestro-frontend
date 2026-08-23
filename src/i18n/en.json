@@ -28,7 +28,7 @@
     },
     "login": {
       "title": "Log in",
-      "username": "Username",
+      "login": "Username or Email",
       "password": "Password",
       "submit": "Log in",
       "back": "Back"
@@ -39,6 +39,7 @@
       "usernameNoSpaces": "Must not contain spaces",
       "usernameLatinOnly": "Only Latin letters, digits and _",
       "nameRequired": "Enter your name",
+      "loginRequired": "Enter your username or email",
       "emailRequired": "Enter your email",
       "emailInvalid": "Invalid email address",
       "passwordRequired": "Enter a password",
@@ -318,6 +319,7 @@
       "drums": "Drums",
       "percussion": "Percussion",
       "vocal": "Vocal",
+      "backingVocal": "Backing vocal",
       "choir": "Choir",
       "choirSoprano": "Choir soprano",
       "choirAlto": "Choir alto",
@@ -325,7 +327,8 @@
       "choirBass": "Choir bass",
       "accordion": "Accordion",
       "harp": "Harp",
-      "ukulele": "Ukulele"
+      "ukulele": "Ukulele",
+      "other": "Other"
     },
     "roleNames": {
       "leader": "Leader",
@@ -715,6 +718,7 @@
   "common": {
     "back": "Back",
     "cancel": "Cancel",
+    "confirm": "Confirm",
     "edit": "Edit",
     "save": "Save",
     "send": "Send"

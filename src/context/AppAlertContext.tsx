@@ -1,18 +1,12 @@
-import { createContext, useCallback, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { Alert, Snackbar, type AlertColor } from "@mui/material";
+import { AppAlertContext } from "./AppAlertContext.context";
 
 interface AppAlertState {
   message: string;
   severity: AlertColor;
   autoHideDuration: number;
 }
-
-interface AppAlertContextValue {
-  showAlert: (message: string, severity?: AlertColor, autoHideDuration?: number) => void;
-  clearAlert: () => void;
-}
-
-export const AppAlertContext = createContext<AppAlertContextValue | null>(null);
 
 export function AppAlertProvider({ children }: { children: ReactNode }) {
   const [alert, setAlert] = useState<AppAlertState | null>(null);

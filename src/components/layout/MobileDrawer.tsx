@@ -96,9 +96,9 @@ export default function MobileDrawer({ open, onClose }: MobileDrawerProps) {
 
   const isVisible = (item: NavItemDef): boolean => {
     if (item.requiresOrg && (!hasOrganizations || activeOrganizationId === null))
-      return false;
-    if (item.requiresFund && !canViewFund) return false;
-    if (item.requiresJoinRequestView && !canViewJoinRequests) return false;
+      {return false;}
+    if (item.requiresFund && !canViewFund) {return false;}
+    if (item.requiresJoinRequestView && !canViewJoinRequests) {return false;}
     return true;
   };
 
@@ -219,7 +219,7 @@ export default function MobileDrawer({ open, onClose }: MobileDrawerProps) {
         {/* Nav links */}
         <List disablePadding sx={{ flex: 1 }}>
           {NAV_ITEMS.map((item) => {
-            if (!isVisible(item)) return null;
+            if (!isVisible(item)) {return null;}
             const path = item.getPath(activeOrganizationId);
             const active = activeForKey[item.key] ?? false;
 

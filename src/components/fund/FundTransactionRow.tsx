@@ -90,7 +90,6 @@ export default function FundTransactionRow({ transaction, currentUserId }: FundT
 
     if (!user || transaction.performedByProfileImageFileId == null) {
       revokeObjectUrl();
-      setAvatarUrl(null);
       return;
     }
 
@@ -129,6 +128,7 @@ export default function FundTransactionRow({ transaction, currentUserId }: FundT
     return () => {
       cancelled = true;
       revokeObjectUrl();
+      setAvatarUrl(null);
     };
   }, [transaction.performedByProfileImageFileId, user]);
 

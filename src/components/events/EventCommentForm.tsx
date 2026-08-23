@@ -21,7 +21,7 @@ export default function EventCommentForm({ organizationId, eventId, onCreated, o
   const [saving, setSaving] = useState(false);
 
   const handleSubmit = async () => {
-    if (!user || !text.trim()) return;
+    if (!user || !text.trim()) {return;}
     setSaving(true);
     try {
       const ratingNum = rating !== "" ? Number(rating) : undefined;
@@ -33,7 +33,7 @@ export default function EventCommentForm({ organizationId, eventId, onCreated, o
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       showAlert(String(t("events.commentCreated")), "success");
       onCreated();
     } catch {
@@ -75,7 +75,7 @@ export default function EventCommentForm({ organizationId, eventId, onCreated, o
             const val = e.target.value;
             if (val === "") { setRating(""); return; }
             const n = Number(val);
-            if (n >= 0 && n <= 10) setRating(val);
+            if (n >= 0 && n <= 10) {setRating(val);}
           }}
           slotProps={{ input: { inputProps: { min: 0, max: 10, step: 1 }, sx: { fontFamily: "Century Gothic, sans-serif" } } }}
           sx={{ maxWidth: 140 }}

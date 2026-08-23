@@ -4,9 +4,9 @@ import { useTranslation } from "react-i18next";
 import type { CalendarEvent, SectionDTO } from "./types";
 
 function formatDate(dateTime?: string | Date): string {
-  if (!dateTime) return "";
+  if (!dateTime) {return "";}
   const date = typeof dateTime === "string" ? new Date(dateTime) : dateTime;
-  if (Number.isNaN(date.getTime())) return "";
+  if (Number.isNaN(date.getTime())) {return "";}
   return date.toLocaleDateString("ru-RU", {
     day: "2-digit",
     month: "2-digit",
@@ -15,9 +15,9 @@ function formatDate(dateTime?: string | Date): string {
 }
 
 function formatTime(dateTime?: string | Date): string {
-  if (!dateTime) return "--:--";
+  if (!dateTime) {return "--:--";}
   const date = typeof dateTime === "string" ? new Date(dateTime) : dateTime;
-  if (Number.isNaN(date.getTime())) return "--:--";
+  if (Number.isNaN(date.getTime())) {return "--:--";}
   return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
 }
 
@@ -42,14 +42,14 @@ export default function EventHoverPopup({
   const navigate = useNavigate();
   const { organizationId } = useParams<{ organizationId: string }>();
 
-  if (!event) return null;
+  if (!event) {return null;}
 
   const eventData = event.resource;
   const sectionIds = eventData.sectionIds ?? [];
 
   const getTypeLabel = () => {
-    if (eventData.eventType === "REHEARSAL") return t("organizations.events.rehearsal");
-    if (eventData.eventType === "CONCERT") return t("organizations.events.concert");
+    if (eventData.eventType === "REHEARSAL") {return t("organizations.events.rehearsal");}
+    if (eventData.eventType === "CONCERT") {return t("organizations.events.concert");}
     return t("organizations.events.other");
   };
 

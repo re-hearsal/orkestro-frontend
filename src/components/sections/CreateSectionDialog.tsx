@@ -36,7 +36,7 @@ export default function CreateSectionDialog({
   const [nameError, setNameError] = useState("");
 
   const handleClose = () => {
-    if (loading) return;
+    if (loading) {return;}
     setName("");
     setDescription("");
     setNameError("");
@@ -91,7 +91,7 @@ export default function CreateSectionDialog({
             value={name}
             onChange={(e) => {
               setName(e.target.value);
-              if (nameError) setNameError("");
+              if (nameError) {setNameError("");}
             }}
             error={Boolean(nameError)}
             helperText={nameError}

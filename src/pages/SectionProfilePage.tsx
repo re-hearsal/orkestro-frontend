@@ -27,6 +27,7 @@ import CreateSectionDialog from "../components/sections/CreateSectionDialog";
 import SectionMembersList from "../components/sections/SectionMembersList";
 import SectionRolesManager from "../components/sections/SectionRolesManager";
 import LeaveSectionDialog from "../components/sections/LeaveSectionDialog";
+import ConfirmDialog from "../components/common/ConfirmDialog";
 import OrgInfoMessageSection from "../components/organizations/OrgInfoMessageSection";
 import { getLocalizedRoleName } from "../utils/roleNameI18n";
 
@@ -52,7 +53,7 @@ export default function SectionProfilePage() {
     const to = new Date(now);
     to.setDate(now.getDate() + 30);
     return { from: now.toISOString(), to: to.toISOString() };
-  }, [sectionId]);
+  }, []);
 
   const [section, setSection] = useState<SectionDTO | null>(null);
   const [loading, setLoading] = useState(true);
@@ -79,6 +80,7 @@ export default function SectionProfilePage() {
 
   // Leave / delete
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [leaveLoading, setLeaveLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
@@ -93,17 +95,21 @@ export default function SectionProfilePage() {
           params: { path: { sectionId } },
           headers: { Authorization: `Bearer ${user.token}` },
         });
-        if (error) throw error;
-        if (!cancelled) setSection((data as SectionDTO) ?? null);
+        if (error) {throw error;}
+        if (!cancelled) {setSection((data as SectionDTO) ?? null);}
       } catch {
-        if (!cancelled) { setSection(null); showAlert(String(t("organizations.profile.loadError")), "error"); }
+        if (!cancelled) {
+          setSection(null);
+          showAlert(String(t("organizations.profile.loadError")), "error");
+          navigate(`/organizations/${organizationId}/sections`);
+        }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {setLoading(false);}
       }
     };
     void load();
     return () => { cancelled = true; };
-  }, [isValid, sectionId, user, showAlert, t]);
+  }, [isValid, sectionId, user, showAlert, t, navigate, organizationId]);
 
   // Load parent section name for breadcrumb
   useEffect(() => {
@@ -115,9 +121,9 @@ export default function SectionProfilePage() {
           params: { path: { sectionId: section.parentSectionId as number } },
           headers: { Authorization: `Bearer ${user.token}` },
         });
-        if (!cancelled) setParentSection((data as SectionDTO) ?? null);
+        if (!cancelled) {setParentSection((data as SectionDTO) ?? null);}
       } catch {
-        if (!cancelled) setParentSection(null);
+        if (!cancelled) {setParentSection(null);}
       }
     };
     void load();
@@ -139,7 +145,7 @@ export default function SectionProfilePage() {
           headers: { Authorization: `Bearer ${user.token}` },
         });
 
-        if (cancelled) return;
+        if (cancelled) {return;}
 
         if (error) {
           setSectionPermissions(new Set());
@@ -182,7 +188,7 @@ export default function SectionProfilePage() {
           setChildSectionsLoaded(true);
         }
       } catch {
-        if (!cancelled) setChildSectionsLoaded(true);
+        if (!cancelled) {setChildSectionsLoaded(true);}
       }
     };
     void load();
@@ -199,21 +205,21 @@ export default function SectionProfilePage() {
           body: data,
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       return newSection as SectionDTO;
     },
     [sectionId, user]
   );
 
   const handleJoinSection = async () => {
-    if (!user || !profile) return;
+    if (!user || !profile) {return;}
     const headers = { Authorization: `Bearer ${user.token}` };
     try {
       const { error } = await client.POST("/api/v1/sections/{sectionId}/members/me", {
         params: { path: { sectionId } },
         headers,
       });
-      if (error) throw error;
+      if (error) {throw error;}
       showAlert(String(t("sections.joinSuccess")), "success");
       setIsNotMember(false);
       setPermissionsTrigger((prev) => prev + 1);
@@ -232,7 +238,7 @@ export default function SectionProfilePage() {
   };
 
   const handleSaveEdit = async () => {
-    if (!user || !section?.id) return;
+    if (!user || !section?.id) {return;}
     setEditLoading(true);
     try {
       const body: Record<string, unknown> = {};
@@ -248,7 +254,7 @@ export default function SectionProfilePage() {
         headers: { Authorization: `Bearer ${user.token}` },
         body: body as components["schemas"]["SectionUpdateRequestDTO"],
       });
-      if (error) throw error;
+      if (error) {throw error;}
       setSection(data as SectionDTO);
       setEditDialogOpen(false);
     } catch (err) {
@@ -262,14 +268,14 @@ export default function SectionProfilePage() {
   };
 
   const handleLeave = async () => {
-    if (!user) return;
+    if (!user) {return;}
     setLeaveLoading(true);
     try {
       const { error } = await client.DELETE("/api/v1/sections/{sectionId}/members/me", {
         params: { path: { sectionId } },
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      if (error) throw error;
+      if (error) {throw error;}
       setLeaveDialogOpen(false);
       showAlert(String(t("sections.leaveSection")), "success");
       navigateToParent();
@@ -284,14 +290,14 @@ export default function SectionProfilePage() {
   };
 
   const handleDelete = async () => {
-    if (!user || !window.confirm(String(t("sections.confirmDeleteSection")))) return;
+    if (!user) {return;}
     setDeleteLoading(true);
     try {
       const { error } = await client.DELETE("/api/v1/sections/{sectionId}", {
         params: { path: { sectionId } },
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      if (error) throw error;
+      if (error) {throw error;}
       showAlert(String(t("sections.deleteSection")), "success");
       navigateToParent();
     } catch (err) {
@@ -312,7 +318,7 @@ export default function SectionProfilePage() {
     }
   };
 
-  if (!isValid) return <Navigate to="/organizations" replace />;
+  if (!isValid) {return <Navigate to="/organizations" replace />;}
 
   if (loading) {
     return (
@@ -322,7 +328,7 @@ export default function SectionProfilePage() {
     );
   }
 
-  if (!section) return null;
+  if (!section) {return null;}
 
   const canEdit = sectionPermissions.has("SECTION_EDIT");
   const canDelete = sectionPermissions.has("SECTION_DELETE");
@@ -531,7 +537,7 @@ export default function SectionProfilePage() {
             variant="outlined"
             color="error"
             disabled={deleteLoading}
-            onClick={() => void handleDelete()}
+            onClick={() => setDeleteConfirmOpen(true)}
             sx={{ borderRadius: "8px", fontFamily: "Century Gothic, sans-serif", fontWeight: 700, textTransform: "none" }}
           >
             {deleteLoading ? <CircularProgress size={16} /> : t("sections.deleteSection")}
@@ -542,7 +548,7 @@ export default function SectionProfilePage() {
       {/* Edit dialog */}
       <Dialog
         open={editDialogOpen}
-        onClose={() => { if (!editLoading) setEditDialogOpen(false); }}
+        onClose={() => { if (!editLoading) {setEditDialogOpen(false);} }}
         maxWidth="sm"
         fullWidth
         fullScreen={fullScreen}
@@ -603,6 +609,16 @@ export default function SectionProfilePage() {
         onClose={() => setLeaveDialogOpen(false)}
         onConfirm={handleLeave}
         loading={leaveLoading}
+      />
+
+      {/* Delete section confirm dialog */}
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        message={String(t("sections.confirmDeleteSection"))}
+        confirmLabel={String(t("sections.deleteSection"))}
+        loading={deleteLoading}
+        onClose={() => setDeleteConfirmOpen(false)}
+        onConfirm={handleDelete}
       />
 
       {/* Create child section dialog */}

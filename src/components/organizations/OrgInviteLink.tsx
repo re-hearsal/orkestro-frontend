@@ -39,7 +39,7 @@ export default function OrgInviteLink({ organizationId, permissions }: OrgInvite
   const canEdit = permissions.has("ORG_EDIT");
 
   useEffect(() => {
-    if (!canEdit || !user) return;
+    if (!canEdit || !user) {return;}
 
     let cancelled = false;
 
@@ -64,13 +64,13 @@ export default function OrgInviteLink({ organizationId, permissions }: OrgInvite
     };
   }, [canEdit, organizationId, user]);
 
-  if (!canEdit) return null;
+  if (!canEdit) {return null;}
 
   const baseUrl = import.meta.env.VITE_APP_BASE_URL ?? window.location.origin;
   const inviteUrl = `${baseUrl}/join?code=${code ?? ""}`;
 
   const handleCopy = () => {
-    if (!code) return;
+    if (!code) {return;}
     void navigator.clipboard.writeText(inviteUrl).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -78,7 +78,7 @@ export default function OrgInviteLink({ organizationId, permissions }: OrgInvite
   };
 
   const handleRegenerate = async () => {
-    if (!user) return;
+    if (!user) {return;}
 
     setRegenerating(true);
     try {

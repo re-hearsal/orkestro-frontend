@@ -145,27 +145,27 @@ export default function SongFileSection({
   const files = useMemo<SongFileItem[]>(() => fileIds.map((id) => ({ id })), [fileIds]);
 
   const resolveFileType = (metadata?: FileMetadataDTO): SongFileType => {
-    if (!metadata?.fileType) return "UNKNOWN";
+    if (!metadata?.fileType) {return "UNKNOWN";}
     return metadata.fileType;
   };
 
   const getFileTypeLabel = (fileType: SongFileType): string => {
-    if (fileType === "PDF") return t("repertoire.fileTypePdf");
-    if (fileType === "PHOTO") return t("repertoire.fileTypePhoto");
-    if (fileType === "AUDIO") return t("repertoire.fileTypeAudio");
-    if (fileType === "VIDEO") return t("repertoire.fileTypeVideo");
-    if (fileType === "OTHER") return t("repertoire.fileTypeOther");
+    if (fileType === "PDF") {return t("repertoire.fileTypePdf");}
+    if (fileType === "PHOTO") {return t("repertoire.fileTypePhoto");}
+    if (fileType === "AUDIO") {return t("repertoire.fileTypeAudio");}
+    if (fileType === "VIDEO") {return t("repertoire.fileTypeVideo");}
+    if (fileType === "OTHER") {return t("repertoire.fileTypeOther");}
     return t("repertoire.fileTypeUnknown");
   };
 
   useEffect(() => {
-    if (!user || files.length === 0) return;
+    if (!user || files.length === 0) {return;}
 
     const fileIdsToLoad = files
       .map((file) => file.id)
       .filter((id) => metadataById[id] == null);
 
-    if (fileIdsToLoad.length === 0) return;
+    if (fileIdsToLoad.length === 0) {return;}
 
     let cancelled = false;
 
@@ -187,11 +187,11 @@ export default function SongFileSection({
         })
       );
 
-      if (cancelled) return;
+      if (cancelled) {return;}
 
       const next: Record<number, FileMetadataDTO> = {};
       loadedEntries.forEach((entry) => {
-        if (!entry) return;
+        if (!entry) {return;}
         const [fileId, metadata] = entry;
         next[fileId] = metadata;
       });
@@ -217,7 +217,7 @@ export default function SongFileSection({
   };
 
   const handleShowInfo = async () => {
-    if (!menuTarget || !user) return;
+    if (!menuTarget || !user) {return;}
     const target = menuTarget;
     closeMenu();
 
@@ -229,7 +229,7 @@ export default function SongFileSection({
         params: { path: { fileId: target.id } },
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      if (error) throw error;
+      if (error) {throw error;}
 
       const metadata = (data as FileMetadataDTO) ?? null;
       setInfoMetadata(metadata);
@@ -245,7 +245,7 @@ export default function SongFileSection({
   };
 
   const handleDownload = async () => {
-    if (!menuTarget || !user) return;
+    if (!menuTarget || !user) {return;}
     const target = menuTarget;
     closeMenu();
 
@@ -275,25 +275,25 @@ export default function SongFileSection({
   };
 
   const handleRequestDelete = () => {
-    if (!menuTarget) return;
+    if (!menuTarget) {return;}
     setDeleteTarget(menuTarget);
     setDeleteOpen(true);
     closeMenu();
   };
 
   const handleDelete = async () => {
-    if (!deleteTarget || !user) return;
+    if (!deleteTarget || !user) {return;}
 
     setDeleting(true);
     try {
       const { error } = await client.DELETE(
-        "/api/v1/organizations/{organizationId}/repertoire/songs/{songId}/files/{fileId}",
+        "/api/v1/files/{fileId}",
         {
-          params: { path: { organizationId, songId, fileId: deleteTarget.id } },
+          params: { path: { fileId: deleteTarget.id } },
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
 
       showAlert(String(t("repertoire.fileDeleted")), "success");
       setDeleteOpen(false);
@@ -307,7 +307,7 @@ export default function SongFileSection({
   };
 
   const uploadFile = async (file: File) => {
-    if (!user) return;
+    if (!user) {return;}
 
     setUploading(true);
 
@@ -325,7 +325,7 @@ export default function SongFileSection({
         }
       );
 
-      if (error) throw error;
+      if (error) {throw error;}
 
       showAlert(String(t("repertoire.fileUploaded")), "success");
       onUpdate();
@@ -339,28 +339,28 @@ export default function SongFileSection({
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const nextFile = event.target.files?.[0];
     event.target.value = "";
-    if (!nextFile) return;
+    if (!nextFile) {return;}
     void uploadFile(nextFile);
   };
 
   const handleDragOver = (event: DragEvent<HTMLElement>) => {
-    if (!canManage) return;
+    if (!canManage) {return;}
     event.preventDefault();
     setDragActive(true);
   };
 
   const handleDragLeave = () => {
-    if (!canManage) return;
+    if (!canManage) {return;}
     setDragActive(false);
   };
 
   const handleDrop = (event: DragEvent<HTMLElement>) => {
-    if (!canManage) return;
+    if (!canManage) {return;}
     event.preventDefault();
     setDragActive(false);
 
     const nextFile = event.dataTransfer.files?.[0];
-    if (!nextFile) return;
+    if (!nextFile) {return;}
     void uploadFile(nextFile);
   };
 

@@ -4,7 +4,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { ruRU, enUS } from "@mui/x-date-pickers/locales";
-import dayjs, { type Dayjs } from "dayjs";
+import { type Dayjs } from "dayjs";
 import "dayjs/locale/ru";
 import { Navigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -18,7 +18,7 @@ import { useOrgMemberContext } from "../hooks/useOrgMemberContext";
 import { useOrganization } from "../hooks/useOrganization";
 import { withFlatPagination } from "../utils/pagination";
 import { onFundRealtimeSnapshot } from "../utils/fundEvents";
-import { useMobileAction } from "../context/MobileActionContext";
+import { useMobileAction } from "../hooks/useMobileAction";
 import FundTransactionRow from "../components/fund/FundTransactionRow";
 import CreateFundTransactionDialog from "../components/fund/CreateFundTransactionDialog";
 

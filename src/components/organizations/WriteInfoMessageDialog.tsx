@@ -63,7 +63,7 @@ export default function WriteInfoMessageDialog({ open, onClose, organizationId }
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
-    if (!open || !user) return;
+    if (!open || !user) {return;}
 
     setText("");
     setSelectedSectionIds([]);
@@ -80,13 +80,13 @@ export default function WriteInfoMessageDialog({ open, onClose, organizationId }
             headers: { Authorization: `Bearer ${user.token}` },
           }
         );
-        if (error || !data) return;
+        if (error || !data) {return;}
 
         const sections = (data as SectionDTO[]) ?? [];
 
         const results = await Promise.allSettled(
           sections.map(async (s) => {
-            if (s.id == null) return null;
+            if (s.id == null) {return null;}
             const { data: ctx, error: ctxErr } = await client.GET(
               "/api/v1/sections/{sectionId}/members/me",
               {
@@ -94,7 +94,7 @@ export default function WriteInfoMessageDialog({ open, onClose, organizationId }
                 headers: { Authorization: `Bearer ${user.token}` },
               }
             );
-            if (ctxErr || !ctx) return null;
+            if (ctxErr || !ctx) {return null;}
             const permissions = (ctx as { permissions?: string[] }).permissions ?? [];
             if (permissions.includes("SECTION_WRITE_INFO")) {
               return { id: s.id, name: s.name ?? "" } as WritableSection;
@@ -140,7 +140,7 @@ export default function WriteInfoMessageDialog({ open, onClose, organizationId }
   const canSend = hasTarget && text.trim().length > 0 && !sending;
 
   const handleSend = async () => {
-    if (!user || !canSend) return;
+    if (!user || !canSend) {return;}
     setSending(true);
 
     const requests: Promise<unknown>[] = [];
@@ -348,7 +348,7 @@ export default function WriteInfoMessageDialog({ open, onClose, organizationId }
               fullWidth
               size="small"
               disabled={sending}
-              inputProps={{ maxLength: 5000 }}
+              slotProps={{ htmlInput: { maxLength: 5000 } }}
             />
             <Box
               sx={{

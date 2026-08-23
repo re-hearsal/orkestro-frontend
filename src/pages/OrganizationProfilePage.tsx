@@ -81,7 +81,7 @@ export default function OrganizationProfilePage() {
     const to = new Date(now);
     to.setDate(now.getDate() + 30);
     return { from: now.toISOString(), to: to.toISOString() };
-  }, [organization?.id]);
+  }, []);
 
   useEffect(() => {
     if (!user || !isValidOrganizationId) {
@@ -139,7 +139,7 @@ export default function OrganizationProfilePage() {
     return () => {
       cancelled = true;
     };
-  }, [isValidOrganizationId, organizationId, setCurrentOrganization, user]);
+  }, [isValidOrganizationId, organizationId, setCurrentOrganization, user, showAlert, t]);
 
   useEffect(() => {
     if (!user || !isValidOrganizationId) {
@@ -273,7 +273,7 @@ export default function OrganizationProfilePage() {
           body: data,
         }
       );
-      if (responseError) throw responseError;
+      if (responseError) {throw responseError;}
       return newSection as SectionDTO;
     },
     [organizationId, user]

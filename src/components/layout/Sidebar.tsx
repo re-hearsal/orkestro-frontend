@@ -103,12 +103,11 @@ export default function Sidebar() {
   }, [activeOrganizationId, canViewJoinRequests, userToken]);
 
   useEffect(() => {
-    setSectionsExpanded(false);
+    void Promise.resolve().then(() => setSectionsExpanded(false));
   }, [activeOrganizationId]);
 
   useEffect(() => {
     if (!userToken || activeOrganizationId === null || !user?.username) {
-      setMySections([]);
       return;
     }
 
@@ -175,6 +174,7 @@ export default function Sidebar() {
 
     return () => {
       cancelled = true;
+      setMySections([]);
     };
   }, [activeOrganizationId, user?.username, userToken]);
 
@@ -277,9 +277,9 @@ export default function Sidebar() {
 
   const isVisible = (item: NavItemDef): boolean => {
     if (item.requiresOrg && (!hasOrganizations || activeOrganizationId === null))
-      return false;
-    if (item.requiresFund && !canViewFund) return false;
-    if (item.requiresJoinRequestView && !canViewJoinRequests) return false;
+      {return false;}
+    if (item.requiresFund && !canViewFund) {return false;}
+    if (item.requiresJoinRequestView && !canViewJoinRequests) {return false;}
     return true;
   };
 
@@ -341,6 +341,7 @@ export default function Sidebar() {
             color: "#fff",
             fontSize: "1.6rem",
             letterSpacing: 2,
+            whiteSpace: "nowrap",
           }}
         >
           ORKESTRO
@@ -350,7 +351,7 @@ export default function Sidebar() {
       <List disablePadding sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
         <Box sx={{ height: "50%", display: "flex", flexDirection: "column", justifyContent: "space-evenly" }}>
           {NAV_ITEMS.filter((item) => !item.isBottom).map((item) => {
-            if (!isVisible(item)) return null;
+            if (!isVisible(item)) {return null;}
             const path = item.getPath(activeOrganizationId);
             const active = activeForKey[item.key] ?? false;
 
@@ -370,7 +371,7 @@ export default function Sidebar() {
                 {item.key === "sections" && (
                   <>
                     {visibleSections.map((section) => {
-                      if (section.id == null) return null;
+                      if (section.id == null) {return null;}
                       const sectionPath = `/organizations/${activeOrganizationId}/sections/${section.id}`;
                       const sectionActive = location.pathname.startsWith(sectionPath);
                       return (

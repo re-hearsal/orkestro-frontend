@@ -102,11 +102,11 @@ export default function SectionMemberCard({
           headers: { Authorization: `Bearer ${user.token}` },
           parseAs: "blob",
         });
-        if (cancelled || !data) return;
+        if (cancelled || !data) {return;}
         revoke();
         const nextUrl = await toRenderableImageSource(data as unknown as Blob);
         objectUrlRef.current = nextUrl;
-        if (!cancelled) setAvatarUrl(nextUrl);
+        if (!cancelled) {setAvatarUrl(nextUrl);}
       } catch {
         if (!cancelled) { revoke(); setAvatarUrl(null); }
       }
@@ -135,7 +135,7 @@ export default function SectionMemberCard({
   };
 
   const handleAssignRole = async (role: TechnicalRoleDTO) => {
-    if (!user || !member.id || !role.id) return;
+    if (!user || !member.id || !role.id) {return;}
     setMenuAnchor(null);
     setRoleLoading(true);
     try {
@@ -144,13 +144,13 @@ export default function SectionMemberCard({
           "/api/v1/sections/{sectionId}/members/{userId}/roles/{roleId}",
           { params: { path: { sectionId, userId: member.id, roleId: currentRole.id } }, headers: { Authorization: `Bearer ${user.token}` } }
         );
-        if (deleteError) throw deleteError;
+        if (deleteError) {throw deleteError;}
       }
       const { error: postError } = await client.POST(
         "/api/v1/sections/{sectionId}/members/{userId}/roles/{roleId}",
         { params: { path: { sectionId, userId: member.id, roleId: role.id } }, headers: { Authorization: `Bearer ${user.token}` } }
       );
-      if (postError) throw postError;
+      if (postError) {throw postError;}
       setCurrentRole({ id: role.id, name: role.name ?? "" });
       showAlert(String(t("organizations.members.roleAssigned")), "success");
     } catch (err) {
@@ -161,7 +161,7 @@ export default function SectionMemberCard({
   };
 
   const handleRemoveRole = async () => {
-    if (!user || !member.id || !currentRole) return;
+    if (!user || !member.id || !currentRole) {return;}
     setMenuAnchor(null);
     setRoleLoading(true);
     try {
@@ -169,7 +169,7 @@ export default function SectionMemberCard({
         "/api/v1/sections/{sectionId}/members/{userId}/roles/{roleId}",
         { params: { path: { sectionId, userId: member.id, roleId: currentRole.id } }, headers: { Authorization: `Bearer ${user.token}` } }
       );
-      if (deleteError) throw deleteError;
+      if (deleteError) {throw deleteError;}
       setCurrentRole(undefined);
       showAlert(String(t("organizations.members.roleRemoved")), "success");
     } catch (err) {
@@ -180,14 +180,14 @@ export default function SectionMemberCard({
   };
 
   const handleRemoveMember = async () => {
-    if (!user || !member.id) return;
+    if (!user || !member.id) {return;}
     setRemoving(true);
     try {
       const { error } = await client.DELETE(
         "/api/v1/sections/{sectionId}/members/{userId}",
         { params: { path: { sectionId, userId: member.id } }, headers: { Authorization: `Bearer ${user.token}` } }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       setRemoveDialogOpen(false);
       setMenuAnchorUser(null);
       showAlert(String(t("organizations.members.removed")), "success");
@@ -363,7 +363,7 @@ export default function SectionMemberCard({
         maxWidth="xs"
         fullWidth
         fullScreen={fullScreen}
-        PaperProps={{ sx: { borderRadius: fullScreen ? 0 : "16px" } }}
+        slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}
       >
         <DialogTitle sx={{ color: "error.main", fontFamily: "Century Gothic, sans-serif" }}>
           {t("sections.removeMember")}

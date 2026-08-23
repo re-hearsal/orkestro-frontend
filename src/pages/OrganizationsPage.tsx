@@ -33,7 +33,7 @@ async function fetchLeaders(orgId: number, token: string): Promise<string[]> {
     const leaderRole = roles.find(
       (r) => r.system && r.name?.toLowerCase() === "leader"
     );
-    if (!leaderRole?.id) return [];
+    if (!leaderRole?.id) {return [];}
 
     const { data: membersData } = await client.GET(
       "/api/v1/organizations/{organizationId}/members/page",
@@ -70,7 +70,7 @@ async function fetchImageUrl(
       headers: { Authorization: `Bearer ${token}` },
       parseAs: "blob",
     });
-    if (!data) return undefined;
+    if (!data) {return undefined;}
     return await toRenderableImageSource(data as unknown as Blob);
   } catch {
     return undefined;
@@ -96,7 +96,7 @@ export default function OrganizationsPage() {
 
       await Promise.all(
         orgs.map(async (org) => {
-          if (org.id == null) return;
+          if (org.id == null) {return;}
           const [orgLeaders, imageUrl] = await Promise.all([
             fetchLeaders(org.id, token),
             org.profileImageFileId != null
@@ -104,7 +104,7 @@ export default function OrganizationsPage() {
               : Promise.resolve(undefined),
           ]);
           leadersMap[org.id] = orgLeaders;
-          if (imageUrl) imagesMap[org.id] = imageUrl;
+          if (imageUrl) {imagesMap[org.id] = imageUrl;}
         })
       );
 
@@ -116,9 +116,8 @@ export default function OrganizationsPage() {
   );
 
   useEffect(() => {
-    if (user && organizations.length > 0) {
-      loadOrgData(organizations, user.token);
-    }
+    if (!(user && organizations.length > 0)) {return;}
+    void Promise.resolve().then(() => loadOrgData(organizations, user.token));
   }, [organizations, user, loadOrgData]);
 
   const handleCardClick = (org: OrganizationDTO) => {

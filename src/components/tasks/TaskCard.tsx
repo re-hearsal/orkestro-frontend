@@ -15,10 +15,10 @@ interface TaskCardProps {
 }
 
 function formatDate(value?: string | null): string {
-  if (!value) return "-";
+  if (!value) {return "-";}
   const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return "-";
-  return parsed.toLocaleDateString("ru-RU") + " " + parsed.toLocaleString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+  if (Number.isNaN(parsed.getTime())) {return "-";}
+  return `${parsed.toLocaleDateString("ru-RU")  } ${  parsed.toLocaleString("ru-RU", { hour: "2-digit", minute: "2-digit" })}`;
 }
 
 const CLOSED_STATUSES = new Set(["DONE", "CANCELLED"]);

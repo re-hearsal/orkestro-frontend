@@ -20,9 +20,9 @@ import client from "../../api/client";
 import type { components } from "../../api/schema";
 import { useAppAlert } from "../../hooks/useAppAlert";
 import { useAuth } from "../../hooks/useAuth";
-import { instrumentI18nKey } from "../profile/InstrumentPicker";
+import { instrumentI18nKey, sortByLocalizedLabel } from "../../utils/instrumentI18n";
 
-type InstrumentDTO = components["schemas"]["InstrumentDTO"];
+type InstrumentDTO = { id?: number; name?: string };
 type SongInstrumentDTO = components["schemas"]["SongInstrumentDTO"];
 
 interface Props {
@@ -52,7 +52,7 @@ export default function InstrumentationSection({
   songId,
   onUpdate,
 }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { showAlert } = useAppAlert();
 
@@ -63,7 +63,7 @@ export default function InstrumentationSection({
   const [autocompleteKey, setAutocompleteKey] = useState(0);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {return;}
     void (async () => {
       const { data } = await client.GET("/api/v1/instruments", {
         headers: { Authorization: `Bearer ${user.token}` },
@@ -89,7 +89,7 @@ export default function InstrumentationSection({
   };
 
   const handleDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
+    if (!result.destination) {return;}
     const items = Array.from(editList);
     const [removed] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, removed);
@@ -108,7 +108,7 @@ export default function InstrumentationSection({
   };
 
   const handleAddInstrument = (instrument: InstrumentDTO | null) => {
-    if (!instrument?.id) return;
+    if (!instrument?.id) {return;}
     if (editList.some((i) => i.instrumentId === instrument.id)) {
       setAutocompleteKey((k) => k + 1);
       return;
@@ -118,7 +118,7 @@ export default function InstrumentationSection({
   };
 
   const handleSave = async () => {
-    if (!user) return;
+    if (!user) {return;}
     setSaving(true);
     try {
       const { data, error } = await client.PUT(
@@ -129,7 +129,7 @@ export default function InstrumentationSection({
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       const updated = (data as unknown as { instrumentation?: SongInstrumentDTO[] }).instrumentation ?? editList;
       showAlert(String(t("repertoire.instrumentationSaved")), "success");
       setEditMode(false);
@@ -141,8 +141,10 @@ export default function InstrumentationSection({
     }
   };
 
-  const availableInstruments = instruments.filter(
-    (inst) => !editList.some((i) => i.instrumentId === inst.id)
+  const availableInstruments = sortByLocalizedLabel(
+    instruments.filter((inst) => !editList.some((i) => i.instrumentId === inst.id)),
+    (inst) => localizedName(inst.name ?? ""),
+    i18n.language
   );
 
   const displayList = editMode ? editList : instrumentation;

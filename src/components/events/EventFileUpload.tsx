@@ -10,21 +10,21 @@ import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { useTranslation } from "react-i18next";
 
 function getFileTypeByMime(file: File): "PDF" | "PHOTO" | "AUDIO" | "VIDEO" | "OTHER" {
-  if (file.type === "application/pdf") return "PDF";
-  if (file.type.startsWith("image/")) return "PHOTO";
-  if (file.type.startsWith("audio/")) return "AUDIO";
-  if (file.type.startsWith("video/")) return "VIDEO";
+  if (file.type === "application/pdf") {return "PDF";}
+  if (file.type.startsWith("image/")) {return "PHOTO";}
+  if (file.type.startsWith("audio/")) {return "AUDIO";}
+  if (file.type.startsWith("video/")) {return "VIDEO";}
   return "OTHER";
 }
 
 function truncateName(name: string, max = 20): string {
-  if (name.length <= max) return name;
+  if (name.length <= max) {return name;}
   const dot = name.lastIndexOf(".");
   if (dot > 0 && dot < name.length - 1) {
     const ext = name.slice(dot);
     const base = name.slice(0, dot);
     const avail = max - ext.length - 1;
-    if (avail >= 4) return `${base.slice(0, avail)}…${ext}`;
+    if (avail >= 4) {return `${base.slice(0, avail)}…${ext}`;}
   }
   return `${name.slice(0, max - 1)}…`;
 }
@@ -41,7 +41,7 @@ export default function EventFileUpload({ files, onChange, maxFiles = 50 }: Prop
   const [dragActive, setDragActive] = useState(false);
 
   const addFiles = (incoming: FileList | null) => {
-    if (!incoming) return;
+    if (!incoming) {return;}
     const combined = [...files, ...Array.from(incoming)];
     onChange(combined.slice(0, maxFiles));
   };

@@ -24,7 +24,7 @@ import { useOrganization } from "../hooks/useOrganization";
 import { withFlatPagination } from "../utils/pagination";
 import { onSongDeleted } from "../utils/songEvents";
 import CreateSongDialog from "../components/repertoire/CreateSongDialog";
-import { useMobileAction } from "../context/MobileActionContext";
+import { useMobileAction } from "../hooks/useMobileAction";
 
 type SongDTO = components["schemas"]["SongDTO"];
 
@@ -99,15 +99,15 @@ export default function OrgRepertoirePage() {
 
   // Sync current organization
   useEffect(() => {
-    if (!isValidOrganizationId) return;
-    if (currentOrganization?.id === organizationId) return;
+    if (!isValidOrganizationId) {return;}
+    if (currentOrganization?.id === organizationId) {return;}
     const matched = organizations.find((o) => o.id === organizationId);
-    if (matched) setCurrentOrganization(matched);
+    if (matched) {setCurrentOrganization(matched);}
   }, [currentOrganization?.id, isValidOrganizationId, organizationId, organizations, setCurrentOrganization]);
 
   // Load available tags
   useEffect(() => {
-    if (!user || !isValidOrganizationId) return;
+    if (!user || !isValidOrganizationId) {return;}
 
     void (async () => {
       const { data } = await client.GET(
@@ -144,7 +144,7 @@ export default function OrgRepertoirePage() {
 
   const loadSongs = useCallback(
     async (searchQuery: string) => {
-      if (!user || !isValidOrganizationId) return;
+      if (!user || !isValidOrganizationId) {return;}
       setSongsLoading(true);
       try {
         const flatQuery = withFlatPagination(
@@ -164,7 +164,7 @@ export default function OrgRepertoirePage() {
           }
         );
 
-        if (error) throw error;
+        if (error) {throw error;}
 
         const payload = (data as unknown as SongsPage) ?? {};
         setAllSongs(payload.content ?? []);
@@ -184,7 +184,7 @@ export default function OrgRepertoirePage() {
 
   useEffect(() => {
     const unsubscribe = onSongDeleted((detail) => {
-      if (detail.organizationId !== organizationId) return;
+      if (detail.organizationId !== organizationId) {return;}
       void loadSongs(debouncedQuery);
     });
     return unsubscribe;

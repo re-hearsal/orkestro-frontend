@@ -14,6 +14,7 @@ import type { components } from "../../api/schema";
 import { getLocalizedRoleName } from "../../utils/roleNameI18n";
 import { emitOrgRolesUpdated } from "../../utils/orgRolesEvents";
 import CreateRoleDialog from "./CreateRoleDialog";
+import ConfirmDialog from "../common/ConfirmDialog";
 
 type TechnicalRoleDTO = components["schemas"]["TechnicalRoleDTO"];
 
@@ -35,9 +36,10 @@ export default function OrgRolesManager({ organizationId, canManage = false }: O
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<TechnicalRoleDTO | undefined>(undefined);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   const loadRoles = useCallback(async () => {
-    if (!user) return;
+    if (!user) {return;}
     setLoading(true);
     try {
       const { data, error } = await client.GET(
@@ -66,13 +68,13 @@ export default function OrgRolesManager({ organizationId, canManage = false }: O
   };
 
   const handlePopoverClose = () => {
-    if (deleting) return;
+    if (deleting) {return;}
     setAnchorEl(null);
     setPopoverRole(null);
   };
 
   const handleDelete = async () => {
-    if (!user || !popoverRole?.id) return;
+    if (!user || !popoverRole?.id) {return;}
     setDeleting(true);
     try {
       await client.DELETE("/api/v1/organizations/{organizationId}/roles/{roleId}", {
@@ -82,6 +84,7 @@ export default function OrgRolesManager({ organizationId, canManage = false }: O
       setRoles((prev) => prev.filter((r) => r.id !== popoverRole.id));
       setAnchorEl(null);
       setPopoverRole(null);
+      setDeleteConfirmOpen(false);
       emitOrgRolesUpdated();
     } finally {
       setDeleting(false);
@@ -260,11 +263,7 @@ export default function OrgRolesManager({ organizationId, canManage = false }: O
                   size="small"
                   variant="outlined"
                   color="error"
-                  onClick={() => {
-                    if (window.confirm(String(t("roles.deleteConfirm")))) {
-                      void handleDelete();
-                    }
-                  }}
+                  onClick={() => setDeleteConfirmOpen(true)}
                   disabled={deleting}
                   sx={{
                     textTransform: "none",
@@ -290,6 +289,15 @@ export default function OrgRolesManager({ organizationId, canManage = false }: O
         }}
         onSaved={handleSaved}
         existingRole={editingRole}
+      />
+
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        message={String(t("roles.deleteConfirm"))}
+        confirmLabel={String(t("roles.deleteButton"))}
+        loading={deleting}
+        onClose={() => setDeleteConfirmOpen(false)}
+        onConfirm={handleDelete}
       />
     </Box>
   );

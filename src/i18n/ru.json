@@ -28,7 +28,7 @@
     },
     "login": {
       "title": "Вход",
-      "username": "Имя пользователя",
+      "login": "Имя пользователя или Email",
       "password": "Пароль",
       "submit": "Войти",
       "back": "Назад"
@@ -39,6 +39,7 @@
       "usernameNoSpaces": "Не должно содержать пробелов",
       "usernameLatinOnly": "Только латинские буквы, цифры и _",
       "nameRequired": "Введите имя",
+      "loginRequired": "Введите имя пользователя или email",
       "emailRequired": "Введите email",
       "emailInvalid": "Некорректный email",
       "passwordRequired": "Введите пароль",
@@ -315,9 +316,10 @@
       "guitar": "Гитара",
       "electricGuitar": "Электрогитара",
       "bassGuitar": "Бас-гитара",
-      "drums": "Барабаны",
+      "drums": "Ударные",
       "percussion": "Перкуссия",
       "vocal": "Вокал",
+      "backingVocal": "Бэк-вокал",
       "choir": "Хор",
       "choirSoprano": "Хор сопрано",
       "choirAlto": "Хор альт",
@@ -325,7 +327,8 @@
       "choirBass": "Хор бас",
       "accordion": "Аккордеон",
       "harp": "Арфа",
-      "ukulele": "Укулеле"
+      "ukulele": "Укулеле",
+      "other": "Другие"
     },
     "roleNames": {
       "leader": "Руководитель",
@@ -715,6 +718,7 @@
   "common": {
     "back": "Назад",
     "cancel": "Отмена",
+    "confirm": "Подтвердить",
     "edit": "Редактировать",
     "save": "Сохранить",
     "send": "Отправить"

@@ -987,7 +987,7 @@ export interface paths {
         put?: never;
         /**
          * Вход в систему
-         * @description Аутентифицирует пользователя по имени и паролю. Возвращает JWT токен для доступа к защищенным ресурсам.
+         * @description Аутентифицирует пользователя по имени/почте и паролю. Возвращает JWT токен для доступа к защищенным ресурсам.
          */
         post: operations["login"];
         delete?: never;
@@ -2294,8 +2294,6 @@ export interface components {
             /** Format: int64 */
             authorUserId?: number;
             authorName?: string;
-            /** Format: int64 */
-            authorProfileImageFileId?: number;
             text?: string;
             /** Format: date-time */
             createdAt?: string;
@@ -2549,7 +2547,7 @@ export interface components {
         };
         /** @description Учетные данные пользователя */
         LoginRequestDTO: {
-            username: string;
+            login: string;
             password: string;
         };
         /** @description Данные для обновления секции */
@@ -2580,6 +2578,10 @@ export interface components {
             /** Format: int64 */
             entityId?: number;
             entityType?: string;
+            /** Format: int64 */
+            organizationId?: number;
+            /** Format: int64 */
+            sectionId?: number;
             isRead?: boolean;
             /** Format: date-time */
             createdAt?: string;

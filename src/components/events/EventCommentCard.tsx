@@ -11,9 +11,9 @@ import { navigateToUser } from "../../utils/navigateToUser";
 type EventCommentDTO = components["schemas"]["EventCommentDTO"];
 
 function formatDate(value?: string): string {
-  if (!value) return "-";
+  if (!value) {return "-";}
   const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return "-";
+  if (Number.isNaN(parsed.getTime())) {return "-";}
   const datePart = parsed.toLocaleDateString("ru-RU");
   const timePart = parsed.toLocaleString("ru-RU", { hour: "2-digit", minute: "2-digit" });
   return `${datePart} ${timePart}`;
@@ -36,7 +36,7 @@ export default function EventCommentCard({ comment, organizationId, eventId, can
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    if (!comment.authorProfileImageFileId || !user) return;
+    if (!comment.authorProfileImageFileId || !user) {return;}
     let cancelled = false;
     void (async () => {
       try {
@@ -45,7 +45,7 @@ export default function EventCommentCard({ comment, organizationId, eventId, can
           headers: { Authorization: `Bearer ${user.token}` },
           parseAs: "blob",
         });
-        if (cancelled || !data) return;
+        if (cancelled || !data) {return;}
         const url = URL.createObjectURL(data as unknown as Blob);
         setAvatarUrl(url);
       } catch {
@@ -56,7 +56,7 @@ export default function EventCommentCard({ comment, organizationId, eventId, can
   }, [comment.authorProfileImageFileId, user]);
 
   const handleDelete = async () => {
-    if (!user || !comment.id) return;
+    if (!user || !comment.id) {return;}
     setDeleting(true);
     try {
       const { error } = await client.DELETE(
@@ -66,7 +66,7 @@ export default function EventCommentCard({ comment, organizationId, eventId, can
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       showAlert(String(t("events.commentDeleted")), "success");
       onDeleted();
     } catch {

@@ -71,14 +71,14 @@ export default function EventDescriptionTemplateDialog({
   const handleSubmit = async () => {
     let valid = true;
     if (!title.trim()) {
-      setTitleError(t("events.templates.dialog.titleField") + " — " + t("auth.errors.nameRequired"));
+      setTitleError(`${t("events.templates.dialog.titleField")  } — ${  t("auth.errors.nameRequired")}`);
       valid = false;
     }
     if (!content.trim()) {
-      setContentError(t("events.templates.dialog.contentField") + " — " + t("auth.errors.nameRequired"));
+      setContentError(`${t("events.templates.dialog.contentField")  } — ${  t("auth.errors.nameRequired")}`);
       valid = false;
     }
-    if (!valid || !user) return;
+    if (!valid || !user) {return;}
 
     setSubmitting(true);
     try {
@@ -107,7 +107,7 @@ export default function EventDescriptionTemplateDialog({
           }
         );
 
-        if (error) throw error;
+        if (error) {throw error;}
         showAlert(t("events.templates.updateSuccess"), "success");
         onSaved(data as EventDescriptionTemplateDTO);
       } else {
@@ -120,7 +120,7 @@ export default function EventDescriptionTemplateDialog({
           }
         );
 
-        if (error) throw error;
+        if (error) {throw error;}
         showAlert(t("events.templates.createSuccess"), "success");
         onSaved(data as unknown as EventDescriptionTemplateDTO);
       }
@@ -148,7 +148,7 @@ export default function EventDescriptionTemplateDialog({
             value={title}
             onChange={(e) => {
               setTitle(e.target.value.slice(0, 255));
-              if (e.target.value.trim()) setTitleError("");
+              if (e.target.value.trim()) {setTitleError("");}
             }}
             error={Boolean(titleError)}
             helperText={titleError || `${title.length}/255`}
@@ -164,7 +164,7 @@ export default function EventDescriptionTemplateDialog({
             value={content}
             onChange={(e) => {
               setContent(e.target.value.slice(0, 5000));
-              if (e.target.value.trim()) setContentError("");
+              if (e.target.value.trim()) {setContentError("");}
             }}
             error={Boolean(contentError)}
             helperText={contentError || `${content.length}/5000`}

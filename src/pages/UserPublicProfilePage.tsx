@@ -8,7 +8,8 @@ import { useAuth } from "../hooks/useAuth";
 import { isBlobUrl, toRenderableImageSource } from "../utils/imageSource";
 import client from "../api/client";
 import type { components } from "../api/schema.d";
-import { InstrumentIcon, instrumentI18nKey } from "../components/profile/InstrumentPicker";
+import { InstrumentIcon } from "../components/profile/InstrumentPicker";
+import { instrumentI18nKey, sortByLocalizedLabel } from "../utils/instrumentI18n";
 
 type UserData = components["schemas"]["PublicUserProfileDTO"];
 type MusicalRoleDTO = components["schemas"]["MusicalRoleDTO"];
@@ -19,12 +20,12 @@ function instrumentSlug(name: string): string {
 
 function formatBirthDate(dateStr: string, lang: string): string {
   const [year, month, day] = dateStr.split("-");
-  if (!year || !month || !day) return dateStr;
+  if (!year || !month || !day) {return dateStr;}
   return lang === "ru" ? `${day}.${month}.${year}` : `${month}/${day}/${year}`;
 }
 
 function normalizeMusicalRoles(data: unknown): MusicalRoleDTO[] {
-  if (!data) return [];
+  if (!data) {return [];}
   if (Array.isArray(data)) {
     return data as MusicalRoleDTO[];
   }
@@ -47,6 +48,12 @@ export default function UserPublicProfilePage() {
   const objectUrlRef = useRef<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
+  const localizedInstrumentName = (apiName: string): string => {
+    const i18nKey = instrumentI18nKey(apiName);
+    const translated = t(`organizations.instrumentNames.${i18nKey}`);
+    return translated === `organizations.instrumentNames.${i18nKey}` ? apiName : translated;
+  };
+
   useEffect(() => {
     if (profile?.id && userId === profile.id) {
       navigate("/profile", { replace: true });
@@ -54,7 +61,7 @@ export default function UserPublicProfilePage() {
   }, [userId, profile?.id, navigate]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {return;}
     if (!Number.isFinite(userId) || userId <= 0) {
       setLoading(false);
       setNotFound(true);
@@ -129,7 +136,7 @@ export default function UserPublicProfilePage() {
           parseAs: "blob",
         });
 
-        if (cancelled || !data) return;
+        if (cancelled || !data) {return;}
 
         revoke();
         const nextUrl = await toRenderableImageSource(data as unknown as Blob);
@@ -339,11 +346,9 @@ export default function UserPublicProfilePage() {
           </Typography>
         ) : (
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, alignItems: "flex-start" }}>
-            {userInstruments.map((role) => {
+            {sortByLocalizedLabel(userInstruments, (role) => localizedInstrumentName(role.instrumentName ?? ""), i18n.language).map((role) => {
               const apiName = role.instrumentName ?? "";
-              const i18nKey = instrumentI18nKey(apiName);
-              const translated = t(`organizations.instrumentNames.${i18nKey}`);
-              const name = translated === `organizations.instrumentNames.${i18nKey}` ? apiName : translated;
+              const name = localizedInstrumentName(apiName);
               const slug = instrumentSlug(apiName);
               return (
                 <Box

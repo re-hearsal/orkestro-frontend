@@ -19,7 +19,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { useAppAlert } from "../../hooks/useAppAlert";
 import { withFlatPagination } from "../../utils/pagination";
 import { getLocalizedRoleName } from "../../utils/roleNameI18n";
-import { getInstrumentLabel } from "../../utils/instrumentI18n";
+import { getInstrumentLabel, sortByLocalizedLabel } from "../../utils/instrumentI18n";
 import SectionMemberCard, { type SectionMemberCardData } from "./SectionMemberCard";
 
 type TechnicalRoleDTO = components["schemas"]["TechnicalRoleDTO"];
@@ -52,16 +52,16 @@ function extractInstruments(member: Record<string, unknown>): string[] {
   const buckets = [member.musicalRoles, member.instruments, member.instrumentation];
   const names: string[] = [];
   for (const bucket of buckets) {
-    if (!Array.isArray(bucket)) continue;
+    if (!Array.isArray(bucket)) {continue;}
     for (const item of bucket) {
       if (typeof item === "string") { names.push(item); continue; }
       const itemRec = asRecord(item);
-      if (!itemRec) continue;
-      if (typeof itemRec.instrumentName === "string") names.push(itemRec.instrumentName);
-      else if (typeof itemRec.name === "string") names.push(itemRec.name);
+      if (!itemRec) {continue;}
+      if (typeof itemRec.instrumentName === "string") {names.push(itemRec.instrumentName);}
+      else if (typeof itemRec.name === "string") {names.push(itemRec.name);}
     }
   }
-  if (typeof member.instrumentName === "string") names.push(member.instrumentName);
+  if (typeof member.instrumentName === "string") {names.push(member.instrumentName);}
   return Array.from(new Set(names.map((n) => n.trim()).filter(Boolean)));
 }
 
@@ -149,14 +149,14 @@ function normalizeOrgMember(rawMember: unknown): { id?: number; name?: string } 
 }
 
 function normalizeInstrumentOptions(raw: unknown): InstrumentOption[] {
-  if (!Array.isArray(raw)) return [];
+  if (!Array.isArray(raw)) {return [];}
   return raw.map((item, index) => {
-    if (typeof item === "string") return { id: index + 1, name: item };
+    if (typeof item === "string") {return { id: index + 1, name: item };}
     const rec = asRecord(item);
-    if (!rec) return null;
+    if (!rec) {return null;}
     const id = typeof rec.id === "number" ? rec.id : typeof rec.instrumentId === "number" ? rec.instrumentId : null;
     const name = typeof rec.name === "string" ? rec.name : typeof rec.instrumentName === "string" ? rec.instrumentName : null;
-    if (id == null || !name) return null;
+    if (id == null || !name) {return null;}
     return { id, name };
   }).filter((o): o is InstrumentOption => o !== null);
 }
@@ -168,7 +168,7 @@ export default function SectionMembersList({
   currentUserId,
   parentSectionId,
 }: SectionMembersListProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { showAlert } = useAppAlert();
   const theme = useTheme();
@@ -199,7 +199,7 @@ export default function SectionMembersList({
 
   // Load roles and instruments for filters
   useEffect(() => {
-    if (!user) return;
+    if (!user) {return;}
     let cancelled = false;
     const load = async () => {
       try {
@@ -253,8 +253,8 @@ export default function SectionMembersList({
           }
         );
 
-        if (responseError) throw responseError;
-        if (cancelled) return;
+        if (responseError) {throw responseError;}
+        if (cancelled) {return;}
 
         const paged = (data as unknown as PagedModelLike) ?? {};
         const nextMembers = (paged.content ?? []).map(normalizeMember);
@@ -270,7 +270,7 @@ export default function SectionMembersList({
           if (page === 0) { setMembers([]); setTotalElements(0); }
         }
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {setLoading(false);}
       }
     };
     void loadMembers();
@@ -279,7 +279,7 @@ export default function SectionMembersList({
 
   // Load org members for add dialog
   useEffect(() => {
-    if (!addDialogOpen || !user) return;
+    if (!addDialogOpen || !user) {return;}
     let cancelled = false;
     const load = async () => {
       setOrgMembersLoading(true);
@@ -307,9 +307,9 @@ export default function SectionMembersList({
           );
         }
       } catch {
-        if (!cancelled) setOrgMembers([]);
+        if (!cancelled) {setOrgMembers([]);}
       } finally {
-        if (!cancelled) setOrgMembersLoading(false);
+        if (!cancelled) {setOrgMembersLoading(false);}
       }
     };
     void load();
@@ -317,14 +317,14 @@ export default function SectionMembersList({
   }, [addDialogOpen, currentUserId, orgMemberQuery, organizationId, parentSectionId, user]);
 
   const handleAddMember = async (userId: number) => {
-    if (!user || addingMemberId != null) return;
+    if (!user || addingMemberId != null) {return;}
     setAddingMemberId(userId);
     try {
       const { error } = await client.POST(
         "/api/v1/sections/{sectionId}/members/{userId}",
         { params: { path: { sectionId, userId } }, headers: { Authorization: `Bearer ${user.token}` } }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       showAlert(String(t("sections.addMember")), "success");
       setAddDialogOpen(false);
       setPage(0);
@@ -395,7 +395,7 @@ export default function SectionMembersList({
                 {t("organizations.members.filterByInstrument")}:
               </Typography>
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75, maxHeight: 96, overflowY: "auto", flex: 1 }}>
-                {instruments.map((instrument) => (
+                {sortByLocalizedLabel(instruments, (i) => getInstrumentLabel(i.name, t), i18n.language).map((instrument) => (
                   <Chip
                     key={instrument.id}
                     label={getInstrumentLabel(instrument.name, t)}
@@ -476,7 +476,7 @@ export default function SectionMembersList({
         maxWidth="sm"
         fullWidth
         fullScreen={fullScreen}
-        PaperProps={{ sx: { borderRadius: fullScreen ? 0 : "16px" } }}
+        slotProps={{ paper: { sx: { borderRadius: fullScreen ? 0 : "16px" } } }}
       >
         <DialogTitle sx={{ fontFamily: "Century Gothic, sans-serif", color: "#0f3eb5", fontWeight: 700 }}>
           {t("sections.addMember")}

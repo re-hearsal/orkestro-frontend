@@ -64,7 +64,7 @@ export default function CreateTaskDialog({ open, onClose, organizationId, onCrea
 
   // Load roles when ROLE_RESTRICTED is selected
   useEffect(() => {
-    if (visibility !== "ROLE_RESTRICTED" || !user || !open) return;
+    if (visibility !== "ROLE_RESTRICTED" || !user || !open) {return;}
     void (async () => {
       const { data } = await client.GET("/api/v1/organizations/{organizationId}/roles", {
         params: { path: { organizationId } },
@@ -89,7 +89,7 @@ export default function CreateTaskDialog({ open, onClose, organizationId, onCrea
   }, [open]);
 
   const handleAddRole = (role: TechnicalRoleDTO | null) => {
-    if (!role?.id) return;
+    if (!role?.id) {return;}
     if (selectedRoles.some((r) => r.id === role.id)) {
       setAutocompleteKey((k) => k + 1);
       return;
@@ -104,21 +104,21 @@ export default function CreateTaskDialog({ open, onClose, organizationId, onCrea
 
   const handleSubmit = async () => {
     if (!title.trim()) {
-      setTitleError(String(t("tasks.form.title")) + " — " + String(t("auth.errors.nameRequired")));
+      setTitleError(`${String(t("tasks.form.title"))  } — ${  String(t("auth.errors.nameRequired"))}`);
       return;
     }
-    if (!user) return;
+    if (!user) {return;}
 
     setSubmitting(true);
     try {
       const formData = new FormData();
       formData.append("title", title.trim());
-      if (description.trim()) formData.append("description", description.trim());
+      if (description.trim()) {formData.append("description", description.trim());}
       formData.append("visibility", visibility);
       if (visibility === "ROLE_RESTRICTED") {
         selectedRoles.forEach((r) => formData.append("visibilityRoleIds", String(r.id)));
       }
-      if (deadline) formData.append("deadline", deadline.toISOString());
+      if (deadline) {formData.append("deadline", deadline.toISOString());}
 
       const postFn = client.POST as unknown as (
         path: "/api/v1/organizations/{organizationId}/tasks",
@@ -140,7 +140,7 @@ export default function CreateTaskDialog({ open, onClose, organizationId, onCrea
         }
       );
 
-      if (error) throw error;
+      if (error) {throw error;}
       onCreated();
       onClose();
     } catch (err) {
@@ -173,7 +173,7 @@ export default function CreateTaskDialog({ open, onClose, organizationId, onCrea
             value={title}
             onChange={(e) => {
               setTitle(e.target.value.slice(0, 255));
-              if (e.target.value.trim()) setTitleError("");
+              if (e.target.value.trim()) {setTitleError("");}
             }}
             error={Boolean(titleError)}
             helperText={titleError || `${title.length}/255`}

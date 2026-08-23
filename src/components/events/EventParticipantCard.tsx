@@ -31,15 +31,15 @@ interface StatusStyle {
 }
 
 function rsvpStyle(status?: string): StatusStyle {
-  if (status === "ACCEPTED") return { bg: "#e8f5e9", color: "#2e7d32", dot: "#4caf50" };
-  if (status === "DECLINED") return { bg: "#ffebee", color: "#c62828", dot: "#f44336" };
+  if (status === "ACCEPTED") {return { bg: "#e8f5e9", color: "#2e7d32", dot: "#4caf50" };}
+  if (status === "DECLINED") {return { bg: "#ffebee", color: "#c62828", dot: "#f44336" };}
   return { bg: "#f5f5f5", color: "#757575", dot: "#9e9e9e" };
 }
 
 function attendanceStyle(status?: string): StatusStyle {
-  if (status === "ATTENDED") return { bg: "#e8f5e9", color: "#2e7d32", dot: "#4caf50" };
-  if (status === "ABSENT")   return { bg: "#ffebee", color: "#c62828", dot: "#f44336" };
-  if (status === "EXCUSED")  return { bg: "#fff3e0", color: "#e65100", dot: "#ff9800" };
+  if (status === "ATTENDED") {return { bg: "#e8f5e9", color: "#2e7d32", dot: "#4caf50" };}
+  if (status === "ABSENT")   {return { bg: "#ffebee", color: "#c62828", dot: "#f44336" };}
+  if (status === "EXCUSED")  {return { bg: "#fff3e0", color: "#e65100", dot: "#ff9800" };}
   return { bg: "#f5f5f5", color: "#757575", dot: "#9e9e9e" };
 }
 
@@ -73,7 +73,7 @@ export default function EventParticipantCard({
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!participant.profileImageFileId || !user) return;
+    if (!participant.profileImageFileId || !user) {return;}
     let cancelled = false;
     void (async () => {
       try {
@@ -82,7 +82,7 @@ export default function EventParticipantCard({
           headers: { Authorization: `Bearer ${user.token}` },
           parseAs: "blob",
         });
-        if (cancelled || !data) return;
+        if (cancelled || !data) {return;}
         setAvatarUrl(URL.createObjectURL(data as unknown as Blob));
       } catch {
         // use system avatar
@@ -92,13 +92,13 @@ export default function EventParticipantCard({
   }, [participant.profileImageFileId, user]);
 
   const handleAttendanceClick = (e: React.MouseEvent<HTMLElement>) => {
-    if (!canMarkAttendance) return;
+    if (!canMarkAttendance) {return;}
     setAnchorEl(e.currentTarget);
   };
 
   const handleSelect = async (status: "UNKNOWN" | "ATTENDED" | "ABSENT" | "EXCUSED") => {
     setAnchorEl(null);
-    if (!user || !participant.userId) return;
+    if (!user || !participant.userId) {return;}
     try {
       const { error } = await client.POST(
         "/api/v1/organizations/{organizationId}/events/{eventId}/attendance",
@@ -108,7 +108,7 @@ export default function EventParticipantCard({
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       showAlert(String(t("events.attendanceUpdated")), "success");
       onAttendanceUpdated(participant.userId, status);
     } catch {
@@ -120,8 +120,8 @@ export default function EventParticipantCard({
   const attendSt = attendanceStyle(participant.attendanceStatus);
 
   const rsvpLabel = (() => {
-    if (participant.rsvpStatus === "ACCEPTED") return String(t("events.rsvpAccepted"));
-    if (participant.rsvpStatus === "DECLINED") return String(t("events.rsvpDeclined"));
+    if (participant.rsvpStatus === "ACCEPTED") {return String(t("events.rsvpAccepted"));}
+    if (participant.rsvpStatus === "DECLINED") {return String(t("events.rsvpDeclined"));}
     return String(t("events.rsvpPending"));
   })();
 

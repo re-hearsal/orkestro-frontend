@@ -19,16 +19,18 @@ interface Props {
 }
 
 interface FieldErrors {
-  username?: string;
+  login?: string;
   password?: string;
 }
+
+const isEmail = (value: string) => value.includes('@');
 
 export default function LoginForm({ onBack }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [username, setUsername] = useState('');
+  const [loginValue, setLoginValue] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const { showAlert } = useAppAlert();
@@ -37,20 +39,33 @@ export default function LoginForm({ onBack }: Props) {
 
   const validate = (): boolean => {
     const errors: FieldErrors = {};
-    if (!username.trim()) errors.username = t('auth.errors.usernameRequired');
-    else if (!/^[a-zA-Z0-9_]+$/.test(username)) errors.username = t('auth.errors.usernameLatinOnly');
-    if (!password) errors.password = t('auth.errors.passwordRequired');
-    else if (password.length < 8) errors.password = t('auth.errors.passwordMinLength');
+
+    if (!loginValue.trim()) {
+      errors.login = t('auth.errors.loginRequired');
+    } else if (isEmail(loginValue)) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginValue)) {
+        errors.login = t('auth.errors.emailInvalid');
+      }
+    } else {
+      if (!/^[a-zA-Z0-9_]+$/.test(loginValue)) {
+        errors.login = t('auth.errors.usernameLatinOnly');
+      } else if (loginValue.length < 3) {
+        errors.login = t('auth.errors.usernameMinLength');
+      }
+    }
+
+    if (!password) {errors.password = t('auth.errors.passwordRequired');}
+    else if (password.length < 8) {errors.password = t('auth.errors.passwordMinLength');}
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async () => {
-    if (!validate()) return;
+    if (!validate()) {return;}
     setLoading(true);
     try {
       const { data, error: apiError } = await client.POST('/api/v1/auth/login', {
-        body: { username, password },
+        body: { login: loginValue, password },
       });
       if (apiError || !data?.token || !data?.username) {
         showAlert((apiError as { message?: string })?.message ?? t('auth.errors.loginFailed'), 'error');
@@ -72,13 +87,14 @@ export default function LoginForm({ onBack }: Props) {
       </Typography>
 
       <TextField
-        label={t('auth.login.username')}
-        value={username}
-        onChange={(e) => { setUsername(e.target.value); setFieldErrors((p) => ({ ...p, username: undefined })); }}
+        label={t('auth.login.login')}
+        value={loginValue}
+        onChange={(e) => { setLoginValue(e.target.value); setFieldErrors((p) => ({ ...p, login: undefined })); }}
         fullWidth
         required
-        error={!!fieldErrors.username}
-        helperText={fieldErrors.username}
+        error={!!fieldErrors.login}
+        helperText={fieldErrors.login}
+        autoComplete="username"
       />
       <TextField
         label={t('auth.login.password')}
@@ -89,6 +105,7 @@ export default function LoginForm({ onBack }: Props) {
         required
         error={!!fieldErrors.password}
         helperText={fieldErrors.password}
+        autoComplete="current-password"
         slotProps={{
           input: {
             endAdornment: (

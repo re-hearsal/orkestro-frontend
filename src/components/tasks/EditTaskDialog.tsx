@@ -81,7 +81,7 @@ export default function EditTaskDialog({ open, onClose, task, organizationId, on
 
   // Load roles when ROLE_RESTRICTED is selected
   useEffect(() => {
-    if (visibility !== "ROLE_RESTRICTED" || !user || !open) return;
+    if (visibility !== "ROLE_RESTRICTED" || !user || !open) {return;}
     void (async () => {
       const { data } = await client.GET("/api/v1/organizations/{organizationId}/roles", {
         params: { path: { organizationId } },
@@ -100,7 +100,7 @@ export default function EditTaskDialog({ open, onClose, task, organizationId, on
   }, [visibility, open, user, organizationId, task.visibilityRoleIds]);
 
   const handleAddRole = (role: TechnicalRoleDTO | null) => {
-    if (!role?.id) return;
+    if (!role?.id) {return;}
     if (selectedRoles.some((r) => r.id === role.id)) {
       setAutocompleteKey((k) => k + 1);
       return;
@@ -115,10 +115,10 @@ export default function EditTaskDialog({ open, onClose, task, organizationId, on
 
   const handleSubmit = async () => {
     if (!title.trim()) {
-      setTitleError(String(t("tasks.form.title")) + " — " + String(t("auth.errors.nameRequired")));
+      setTitleError(`${String(t("tasks.form.title"))  } — ${  String(t("auth.errors.nameRequired"))}`);
       return;
     }
-    if (!user) return;
+    if (!user) {return;}
 
     setSubmitting(true);
     try {
@@ -184,7 +184,7 @@ export default function EditTaskDialog({ open, onClose, task, organizationId, on
         }
       );
 
-      if (error) throw error;
+      if (error) {throw error;}
       onUpdated();
       onClose();
     } catch (err) {
@@ -217,7 +217,7 @@ export default function EditTaskDialog({ open, onClose, task, organizationId, on
             value={title}
             onChange={(e) => {
               setTitle(e.target.value.slice(0, 255));
-              if (e.target.value.trim()) setTitleError("");
+              if (e.target.value.trim()) {setTitleError("");}
             }}
             error={Boolean(titleError)}
             helperText={titleError || `${title.length}/255`}

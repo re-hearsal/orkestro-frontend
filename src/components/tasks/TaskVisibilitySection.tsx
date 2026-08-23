@@ -55,7 +55,7 @@ export default function TaskVisibilitySection({
   }, [task.visibilityRoleIds]);
 
   const loadRoles = async () => {
-    if (!user || rolesLoaded) return;
+    if (!user || rolesLoaded) {return;}
     try {
       const { data } = await client.GET("/api/v1/organizations/{organizationId}/roles", {
         params: { path: { organizationId } },
@@ -80,7 +80,7 @@ export default function TaskVisibilitySection({
     newVisibility: "ALL_MEMBERS" | "ROLE_RESTRICTED",
     roleIds?: number[]
   ) => {
-    if (!user) return;
+    if (!user) {return;}
     try {
       const body: { visibility: "ALL_MEMBERS" | "ROLE_RESTRICTED"; visibilityRoleIds?: number[] } = {
         visibility: newVisibility,
@@ -106,7 +106,7 @@ export default function TaskVisibilitySection({
           headers: { Authorization: `Bearer ${user.token}` },
         }
       );
-      if (error) throw error;
+      if (error) {throw error;}
       onUpdated();
     } catch (err) {
       showAlert(getErrorMessage(err), "error");
@@ -121,9 +121,9 @@ export default function TaskVisibilitySection({
   };
 
   const handleAddRole = async (role: TechnicalRoleDTO | null) => {
-    if (!role?.id) return;
+    if (!role?.id) {return;}
     setAutocompleteKey((k) => k + 1);
-    if (selectedRoleIds.includes(role.id)) return;
+    if (selectedRoleIds.includes(role.id)) {return;}
     const next = [...selectedRoleIds, role.id];
     setSelectedRoleIds(next);
     await putVisibility("ROLE_RESTRICTED", next);

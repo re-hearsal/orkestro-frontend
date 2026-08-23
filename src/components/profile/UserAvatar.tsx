@@ -29,11 +29,11 @@ interface UserAvatarProps {
 }
 
 function getApiErrorMessage(error: unknown): string | null {
-  if (!error || typeof error !== "object") return null;
-  if ("message" in error && typeof error.message === "string") return error.message;
+  if (!error || typeof error !== "object") {return null;}
+  if ("message" in error && typeof error.message === "string") {return error.message;}
   if ("details" in error && Array.isArray(error.details)) {
     const details = (error.details as unknown[]).filter((d): d is string => typeof d === "string");
-    if (details.length > 0) return details.join("\n");
+    if (details.length > 0) {return details.join("\n");}
   }
   return null;
 }
@@ -86,7 +86,7 @@ export default function UserAvatar({ profileImageFileId, userName, onAvatarUpdat
           parseAs: "blob",
         });
 
-        if (cancelled) return;
+        if (cancelled) {return;}
 
         revokeObjectUrl();
 
@@ -103,7 +103,7 @@ export default function UserAvatar({ profileImageFileId, userName, onAvatarUpdat
           setImageUrl(null);
         }
       } finally {
-        if (!cancelled) setLoadingImage(false);
+        if (!cancelled) {setLoadingImage(false);}
       }
     };
 
@@ -116,7 +116,7 @@ export default function UserAvatar({ profileImageFileId, userName, onAvatarUpdat
   }, [revokeObjectUrl]);
 
   const fetchUpdatedFileId = async (): Promise<number | null> => {
-    if (!user) return null;
+    if (!user) {return null;}
     const { data } = await client.GET("/api/v1/users/me", {
       headers: { Authorization: `Bearer ${user.token}` },
     });
@@ -127,7 +127,7 @@ export default function UserAvatar({ profileImageFileId, userName, onAvatarUpdat
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = "";
-    if (!file || !user) return;
+    if (!file || !user) {return;}
 
     setUpdating(true);
     try {
@@ -154,7 +154,7 @@ export default function UserAvatar({ profileImageFileId, userName, onAvatarUpdat
   };
 
   const handleRemoveImage = async () => {
-    if (!user) return;
+    if (!user) {return;}
     setUpdating(true);
     try {
       const { error } = await client.DELETE("/api/v1/users/me/profile-image", {

@@ -130,7 +130,7 @@ export default function ScheduleFilters({
           orientation="vertical"
           size="small"
           onChange={(_, val: "all" | "bySection") => {
-            if (val) onSectionModeChange(val);
+            if (val) {onSectionModeChange(val);}
           }}
           sx={{ mb: 1, width: "100%" }}
         >
